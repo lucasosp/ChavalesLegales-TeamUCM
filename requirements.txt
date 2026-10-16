@@ -1,0 +1,14 @@
+# Extracción de datos legales
+requests>=2.31          # Cliente HTTP (CENDOJ, BOE, descargas)
+beautifulsoup4>=4.12    # Parseo de HTML de CENDOJ (parser estándar, sin lxml)
+pdfplumber>=0.11        # Extracción de texto de sentencias en PDF (opcional)
+
+# Utilidades
+python-dotenv>=1.0      # Carga de config desde .env (opcional)
+
+# Desarrollo / pruebas
+pytest>=8.0
+
+# Nota: el BOE se parsea con xml.etree (biblioteca estándar), no hace falta lxml.
+# Las dependencias del generador de juegos (jsonschema) se añadirán cuando se
+# retome ese módulo.
