@@ -2,223 +2,178 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>Chavales Legales — Dossier legal, plan y diseño</title>
+<title>Chavales Legales — Dossier legal, juegos, plan y diseño</title>
 <style>
   :root{
     --ink:#1B2240; --ink-soft:#4A5273; --line:#E2E7F0;
     --bg:#FFFFFF; --soft:#F5F7FB;
-    --blue:#2541B2; --blue-soft:#EAEEFB;
+    --blue:#2F8FE6; --blue-soft:#E7F2FD;
     --teal:#0FA896; --teal-soft:#E4F6F3;
-    --orange:#F2792B; --orange-soft:#FDECE0;
+    --orange:#E8872B; --orange-soft:#FDECE0;
     --red:#D7363D; --red-soft:#FBE7E8;
-    --violet:#6B3FB5; --violet-soft:#EEE7F8;
-    --green:#2E8B57; --green-soft:#E5F2EA;
+    --violet:#B13E86; --violet-soft:#F8E6F1;
+    --green:#6FB73A; --green-soft:#EBF6E0;
+    --yellow:#FBD24E;
+    /* marca */
+    --b-green:#86D04F; --b-blue:#4FA9F3; --b-yellow:#FBD24E; --b-pink:#F870B0; --b-cream:#F4ECD6;
   }
   *{box-sizing:border-box}
   @page{ size:A4; margin:16mm 14mm; }
   html,body{margin:0;padding:0}
-  body{
-    font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;
-    color:var(--ink); font-size:10.6pt; line-height:1.5;
-    -webkit-print-color-adjust:exact; print-color-adjust:exact;
-  }
-  h1,h2,h3,h4{line-height:1.2;margin:0}
-  p{margin:.4em 0}
-  a{color:var(--blue);text-decoration:none}
-  small{font-size:8.4pt}
-  .muted{color:var(--ink-soft)}
-  section{page-break-before:always}
-  .nobreak{page-break-inside:avoid}
+  body{font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;color:var(--ink);font-size:10.6pt;line-height:1.5;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  h1,h2,h3,h4{line-height:1.2;margin:0} p{margin:.4em 0} a{color:var(--blue);text-decoration:none}
+  small{font-size:8.4pt} .muted{color:var(--ink-soft)}
+  section{page-break-before:always} .nobreak{page-break-inside:avoid}
+  .brandstrip{height:9px;border-radius:6px;display:flex;overflow:hidden;margin:10px 0}
+  .brandstrip i{flex:1} .bs1{background:var(--b-yellow)}.bs2{background:var(--b-pink)}.bs3{background:var(--b-green)}.bs4{background:var(--b-blue)}.bs5{background:var(--b-cream)}
 
-  /* ---------- Portada ---------- */
-  .cover{
-    page-break-before:avoid;
-    background:linear-gradient(135deg,#2541B2 0%,#4064E0 55%,#0FA896 130%);
-    color:#fff; border-radius:18px; padding:34px 34px 28px;
-    min-height:252mm; display:flex; flex-direction:column;
-  }
-  .cover .kicker{letter-spacing:.14em;text-transform:uppercase;font-size:9pt;opacity:.85;font-weight:600}
-  .cover h1{font-size:34pt;margin:.15em 0 .1em;font-weight:800;letter-spacing:-.5px}
-  .cover .sub{font-size:13.5pt;opacity:.95;max-width:430px}
-  .cover .mascot{margin:14px 0 6px}
-  .cover .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-  .cover .tag{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);
-    padding:5px 12px;border-radius:999px;font-size:9.4pt;font-weight:600}
-  .cover .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;font-size:9.2pt;opacity:.92}
-  .cover .card{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
-    border-radius:12px;padding:12px 16px;margin-top:16px;font-size:9.6pt;max-width:460px}
+  /* portada */
+  .cover{page-break-before:avoid;background:linear-gradient(135deg,#EBF6E0 0%,#E7F2FD 50%,#F8E6F1 100%);
+    border-radius:18px;padding:30px 34px 24px;min-height:252mm;display:flex;flex-direction:column;border:1px solid #E2E7F0}
+  .cover .kicker{letter-spacing:.14em;text-transform:uppercase;font-size:9pt;color:var(--ink-soft);font-weight:700}
+  .logocard{background:#fff;border-radius:16px;padding:14px 18px;margin:12px 0 6px;box-shadow:0 6px 20px rgba(27,34,64,.08);align-self:flex-start}
+  .logocard img{height:120px;display:block}
+  .cover h1{font-size:25pt;margin:.3em 0 .1em;font-weight:800;color:var(--ink);letter-spacing:-.3px}
+  .cover .sub{font-size:12.5pt;color:var(--ink-soft);max-width:470px}
+  .cover .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .cover .tag{padding:6px 13px;border-radius:999px;font-size:9.6pt;font-weight:700;color:#fff}
+  .t-ph{background:var(--blue)} .t-st{background:var(--violet)} .t-df{background:var(--red)}
+  .cover .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin-top:16px;font-size:9.8pt;max-width:490px;color:var(--ink-soft)}
+  .cover .card b{color:var(--ink)}
+  .cover .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;font-size:9.2pt;color:var(--ink-soft)}
 
-  /* ---------- Cabeceras de sección ---------- */
+  /* secciones */
   .sec-head{display:flex;align-items:center;gap:12px;margin-bottom:10px;border-bottom:3px solid var(--line);padding-bottom:10px}
-  .sec-num{background:var(--blue);color:#fff;width:34px;height:34px;border-radius:9px;
-    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14pt;flex:0 0 auto}
+  .sec-num{background:var(--b-green);color:#fff;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14pt;flex:0 0 auto}
   .sec-head h2{font-size:19pt;font-weight:800}
-  .lead{font-size:11pt;color:var(--ink-soft);max-width:640px}
+  .lead{font-size:11pt;color:var(--ink-soft);max-width:660px}
 
-  /* ---------- Índice ---------- */
-  .toc{display:grid;grid-template-columns:1fr;gap:8px;margin-top:14px}
-  .toc .row{display:flex;gap:12px;align-items:center;background:var(--soft);
-    border:1px solid var(--line);border-radius:10px;padding:10px 14px}
-  .toc .n{font-weight:800;color:var(--blue);font-size:13pt;width:26px}
-  .toc .t{font-weight:700}
-  .toc .d{color:var(--ink-soft);font-size:9.3pt}
+  /* índice */
+  .toc{display:grid;gap:8px;margin-top:14px}
+  .toc .row{display:flex;gap:12px;align-items:center;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+  .toc .n{font-weight:800;color:var(--b-green);font-size:13pt;width:26px}
+  .toc .t{font-weight:700} .toc .d{color:var(--ink-soft);font-size:9.3pt}
 
-  /* ---------- Tarjetas de tema ---------- */
+  /* tarjetas tema */
   .topic{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:12px 0}
   .topic .bar{padding:12px 16px;display:flex;align-items:center;gap:12px;color:#fff}
-  .topic .bar h3{font-size:14pt;font-weight:800}
-  .topic .bar .ico{width:34px;height:34px;flex:0 0 auto}
+  .topic .bar h3{font-size:14pt;font-weight:800} .topic .bar .ico{width:32px;height:32px;flex:0 0 auto}
   .topic .body{padding:14px 16px}
-  .topic.ph .bar{background:var(--blue)} .topic.ph .pill{background:var(--blue-soft);color:var(--blue)}
-  .topic.st .bar{background:var(--violet)} .topic.st .pill{background:var(--violet-soft);color:var(--violet)}
-  .topic.df .bar{background:var(--red)} .topic.df .pill{background:var(--red-soft);color:var(--red)}
+  .topic.ph .bar{background:var(--blue)} .topic.st .bar{background:var(--violet)} .topic.df .bar{background:var(--red)}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   .block h4{font-size:9.2pt;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin-bottom:4px}
-  .pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:8.6pt;font-weight:700;margin:2px 4px 2px 0}
   ul.tight{margin:.2em 0;padding-left:1.1em} ul.tight li{margin:.18em 0}
-  .law{background:var(--soft);border-left:4px solid var(--blue);border-radius:0 8px 8px 0;padding:8px 12px;margin:6px 0;font-size:9.6pt}
-  .law b{color:var(--ink)}
-  .topic.st .law{border-left-color:var(--violet)} .topic.df .law{border-left-color:var(--red)}
+  .law{background:var(--soft);border-left:4px solid var(--blue);border-radius:0 8px 8px 0;padding:8px 12px;margin:6px 0;font-size:9.5pt}
+  .law b{color:var(--ink)} .topic.st .law{border-left-color:var(--violet)} .topic.df .law{border-left-color:var(--red)}
 
-  /* ---------- Ejemplo / escenario ---------- */
-  .ex{border:1px solid var(--line);border-radius:12px;padding:0;margin:10px 0;overflow:hidden}
-  .ex .h{padding:9px 14px;font-weight:700;display:flex;justify-content:space-between;align-items:center;color:#fff}
-  .ex.ph .h{background:var(--blue)} .ex.st .h{background:var(--violet)} .ex.df .h{background:var(--red)}
-  .ex .c{padding:12px 14px}
-  .ex .scene{background:var(--soft);border:1px dashed var(--line);border-radius:8px;padding:10px 12px;font-style:italic}
-  .ex .q{font-weight:700;margin-top:8px}
-  .opt{border:1px solid var(--line);border-radius:8px;padding:7px 10px;margin:5px 0;display:flex;gap:8px;align-items:flex-start}
-  .opt .k{font-weight:800;width:18px;flex:0 0 auto}
-  .opt.ok{background:var(--green-soft);border-color:#B7DEC6}
-  .opt.no{background:#FBF1F1;border-color:#EBC7C9}
-  .tag-ok{color:var(--green);font-weight:800}
-  .tag-no{color:var(--red);font-weight:800}
+  /* caja penas */
+  .pen{margin-top:10px;border:1.5px solid #E7B36a;background:linear-gradient(0deg,#FFF6E8,#FFFDF8);border-radius:12px;padding:11px 14px}
+  .pen h4{color:#9a5a12;font-size:10.5pt;display:flex;align-items:center;gap:7px;margin-bottom:6px;text-transform:none;letter-spacing:0}
+  .pen .rows{display:grid;gap:5px}
+  .pen .r{display:flex;gap:8px;font-size:9.5pt} .pen .r b{color:#8a4a0a}
+  .pen .fine{background:#fff;border:1px solid #F0D6Ae;border-radius:7px;padding:1px 8px;font-weight:800;color:#9a5a12;white-space:nowrap}
 
-  /* ---------- Caja denuncia ---------- */
+  /* caja menores + denuncia */
+  .note{border-radius:12px;padding:12px 16px;margin:12px 0;font-size:9.6pt}
+  .note.minor{background:var(--orange-soft);border:1px solid #F3C9A8}
+  .note.minor b{color:#9a4a12}
   .help{background:var(--teal-soft);border:1px solid #BBE6DF;border-radius:14px;padding:14px 16px;margin:14px 0}
   .help h3{color:var(--teal);font-size:13pt;display:flex;align-items:center;gap:8px}
   .help .items{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-  .help .it{background:#fff;border:1px solid #CDEAE4;border-radius:9px;padding:8px 11px;font-size:9.3pt}
-  .help .it b{color:var(--teal)}
+  .help .it{background:#fff;border:1px solid #CDEAE4;border-radius:9px;padding:8px 11px;font-size:9.3pt} .help .it b{color:var(--teal)}
 
-  /* ---------- Plan / pasos ---------- */
-  .steps{counter-reset:s;display:grid;gap:9px;margin-top:8px}
+  /* juegos */
+  .game{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:12px 0}
+  .game .h{padding:11px 16px;color:#fff;display:flex;justify-content:space-between;align-items:center}
+  .game .h h3{font-size:13.5pt;font-weight:800} .game .h .type{font-size:8.8pt;background:rgba(255,255,255,.22);padding:3px 10px;border-radius:999px;font-weight:700}
+  .game.g1 .h{background:var(--blue)} .game.g2 .h{background:var(--red)} .game.g3 .h{background:var(--violet)} .game.g4 .h{background:var(--green)}
+  .game .c{padding:13px 16px;display:grid;grid-template-columns:1.15fr 1fr;gap:14px}
+  .game .c h4{font-size:9.2pt;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin-bottom:3px}
+  .chip{display:inline-block;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:8.6pt;font-weight:700;margin:2px 4px 2px 0}
+
+  /* plan */
+  .steps{display:grid;gap:9px;margin-top:8px;counter-reset:s}
   .step{display:flex;gap:12px;background:var(--soft);border:1px solid var(--line);border-radius:11px;padding:11px 14px}
-  .step .b{counter-increment:s;background:var(--blue);color:#fff;width:28px;height:28px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;font-weight:800;flex:0 0 auto}
-  .step .b::before{content:counter(s)}
-  .step h4{font-size:11pt}
+  .step .b{counter-increment:s;background:var(--b-green);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;flex:0 0 auto}
+  .step .b::before{content:counter(s)} .step h4{font-size:11pt}
   table{width:100%;border-collapse:collapse;margin:10px 0;font-size:9.4pt}
   th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
-  th{background:var(--blue);color:#fff;font-weight:700}
-  tr:nth-child(even) td{background:var(--soft)}
-  .done{color:var(--green);font-weight:800}
-  code,pre{font-family:"Cascadia Code",Consolas,monospace}
-  pre{background:#11162B;color:#E7ECFF;border-radius:10px;padding:12px 14px;font-size:8.6pt;overflow:auto;line-height:1.45}
+  th{background:var(--b-green);color:#fff;font-weight:700} tr:nth-child(even) td{background:var(--soft)}
+  .done{color:var(--green);font-weight:800} code{font-family:Consolas,monospace}
+  pre{background:#11162B;color:#E7ECFF;border-radius:10px;padding:12px 14px;font-size:8.5pt;line-height:1.45;font-family:Consolas,monospace;overflow:auto}
   .k-str{color:#9DE2C6}.k-key{color:#8FB6FF}.k-num{color:#FFC98A}
 
-  /* ---------- Mockups ---------- */
-  .mock-wrap{margin:12px 0}
-  .mock-cap{font-weight:700;margin:10px 0 4px;color:var(--ink)}
-  .mock-cap span{color:var(--ink-soft);font-weight:400}
+  /* mockups */
+  .mock-cap{font-weight:700;margin:12px 0 4px} .mock-cap span{color:var(--ink-soft);font-weight:400}
   .legend{font-size:9pt;color:var(--ink-soft);margin-top:4px}
-  .foot-note{margin-top:14px;font-size:8.6pt;color:var(--ink-soft);background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
-  .src{font-size:8.4pt;color:var(--ink-soft);columns:2;column-gap:20px}
-  .src a{color:var(--blue)} .src p{margin:.2em 0;break-inside:avoid}
-  .badge-dis{background:var(--orange-soft);border:1px solid #F3C9A8;color:#9a4a12;border-radius:10px;padding:10px 12px;font-size:9pt;margin:10px 0}
+  .src{font-size:8.4pt;color:var(--ink-soft);columns:2;column-gap:20px;margin-top:6px} .src p{margin:.2em 0;break-inside:avoid}
+  .designnote{margin-top:12px;font-size:9pt;color:var(--ink-soft);background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
 </style>
 </head>
 <body>
 
-<!-- ============== PORTADA ============== -->
+<!-- PORTADA -->
 <div class="cover">
   <div class="kicker">Hackatón · Team UCM</div>
-  <h1>Chavales Legales</h1>
-  <div class="sub">Cómo la ley española protege a niños y jóvenes frente al phishing, el acecho y los deepfakes — y cómo lo enseñamos jugando.</div>
-
-  <div class="mascot">
-    <!-- Mascota: escudo "Lex" -->
-    <svg width="150" height="150" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg" aria-label="Mascota Lex">
-      <defs><linearGradient id="sh" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#FFE29A"/><stop offset="1" stop-color="#FFC24B"/></linearGradient></defs>
-      <path d="M75 12 L128 30 V74 C128 108 104 130 75 140 C46 130 22 108 22 74 V30 Z" fill="url(#sh)" stroke="#fff" stroke-width="4"/>
-      <path d="M75 12 L128 30 V74 C128 108 104 130 75 140 Z" fill="#000" opacity="0.06"/>
-      <circle cx="59" cy="66" r="9" fill="#1B2240"/><circle cx="91" cy="66" r="9" fill="#1B2240"/>
-      <circle cx="62" cy="63" r="3" fill="#fff"/><circle cx="94" cy="63" r="3" fill="#fff"/>
-      <path d="M58 92 Q75 106 92 92" stroke="#1B2240" stroke-width="5" fill="none" stroke-linecap="round"/>
-      <path d="M68 40 l7 10 l7 -10" stroke="#1B2240" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="46" cy="83" r="5" fill="#FF8A5B" opacity=".65"/><circle cx="104" cy="83" r="5" fill="#FF8A5B" opacity=".65"/>
-    </svg>
-  </div>
-
+  <div class="logocard"><img src="logo.png" alt="Chavales Legales"></div>
+  <h1>Defiéndete y respeta la ley digital</h1>
+  <div class="sub">Cómo la ley española protege a niños y jóvenes frente al phishing, el acecho y los deepfakes —
+  qué pasa si alguien lo hace— y cómo lo enseñamos con <b>juegos interactivos</b>.</div>
   <div class="tags">
-    <span class="tag">⚖️ Phishing / ciberestafa</span>
-    <span class="tag">🛰️ Acecho (stalking)</span>
-    <span class="tag">🎭 Deepfakes</span>
+    <span class="tag t-ph">⚖️ Phishing / ciberestafa</span>
+    <span class="tag t-st">🛰️ Acecho (stalking)</span>
+    <span class="tag t-df">🎭 Deepfakes</span>
   </div>
-
-  <div class="card">
-    <b>Qué contiene este dossier:</b> el marco legal español explicado para menores con ejemplos,
-    el plan de implementación y cómo funciona la máquina que genera los juegos, y una propuesta de
-    diseño de la web con mockups.
-  </div>
-
-  <div class="foot">
-    <div>Documento de trabajo · v1.0</div>
-    <div>17 de octubre de 2026</div>
-  </div>
+  <div class="card"><b>Qué contiene:</b> el marco legal por tema con las penas (cárcel y multa), los
+  juegos interactivos con los que se aprende, el plan de implementación y cómo la máquina genera los juegos,
+  y una propuesta de diseño de la web.</div>
+  <div class="brandstrip" style="max-width:490px"><i class="bs1"></i><i class="bs2"></i><i class="bs3"></i><i class="bs4"></i><i class="bs5"></i></div>
+  <div class="foot"><div>Documento de trabajo · v2.0</div><div>17 de octubre de 2026</div></div>
 </div>
 
-<!-- ============== ÍNDICE ============== -->
-<section style="page-break-before:always">
+<!-- ÍNDICE -->
+<section>
   <div class="sec-head"><div class="sec-num">§</div><h2>Índice</h2></div>
   <div class="toc">
-    <div class="row"><div class="n">1</div><div><div class="t">El lado legal: cómo estás protegido</div><div class="d">Phishing, acecho y deepfakes explicados + artículos de la ley española + cómo denunciar.</div></div></div>
-    <div class="row"><div class="n">2</div><div><div class="t">Ejemplos (contenido de los juegos)</div><div class="d">Escenarios reales por tema, ya listos para convertirse en retos jugables.</div></div></div>
-    <div class="row"><div class="n">3</div><div><div class="t">Plan de implementación</div><div class="d">Pasos del proyecto y cómo la máquina transforma parámetros en un juego.</div></div></div>
-    <div class="row"><div class="n">4</div><div><div class="t">Diseño de la web</div><div class="d">Mockups: panel del profesor, generador y los dos tipos de juego.</div></div></div>
+    <div class="row"><div class="n">1</div><div><div class="t">El lado legal: cómo estás protegido y qué pasa si lo haces</div><div class="d">Phishing, acecho y deepfakes + artículos de la ley española + penas (cárcel/multa) + cómo denunciar.</div></div></div>
+    <div class="row"><div class="n">2</div><div><div class="t">Los juegos interactivos</div><div class="d">Cuatro formatos jugables (arrastrar, inspeccionar, decidir) con los que se aprende cada tema.</div></div></div>
+    <div class="row"><div class="n">3</div><div><div class="t">Plan de implementación</div><div class="d">Pasos del proyecto y cómo la máquina transforma parámetros en un juego interactivo.</div></div></div>
+    <div class="row"><div class="n">4</div><div><div class="t">Diseño de la web</div><div class="d">Mockups: panel del profesor, generador y los juegos interactivos.</div></div></div>
   </div>
-
-  <div class="badge-dis">
-    <b>Aviso.</b> Este material es <b>educativo y divulgativo, no asesoramiento jurídico</b>. La normativa está
-    referida a 17/10/2026; parte de ella (Ley de IA y Ley de protección de menores en entornos digitales)
-    estaba <b>en tramitación</b> y conviene confirmar su texto vigente en el BOE antes de usarla en el aula.
-  </div>
+  <div class="brandstrip"><i class="bs1"></i><i class="bs2"></i><i class="bs3"></i><i class="bs4"></i><i class="bs5"></i></div>
+  <p class="muted" style="margin-top:14px">Doble objetivo del proyecto: que los chavales sepan <b>defenderse</b> cuando son víctimas y que
+  <b>no lo hagan ellos</b>, porque también hay consecuencias para quien lo comete (incluso siendo menor).</p>
 </section>
 
-<!-- ============== 1. LEGAL ============== -->
+<!-- 1. LEGAL -->
 <section>
-  <div class="sec-head"><div class="sec-num">1</div><h2>El lado legal: cómo estás protegido</h2></div>
-  <p class="lead">La idea central para los chavales: <b>no estás solo y la ley te respalda</b>. Aquí tienes, por tema,
-  qué es, un ejemplo cercano, los artículos que te protegen y qué puedes hacer.</p>
+  <div class="sec-head"><div class="sec-num">1</div><h2>El lado legal: protección y consecuencias</h2></div>
+  <p class="lead">Para cada tema: qué es, cómo te protege la ley, <b>qué le puede caer a quien lo hace</b> (cárcel y multa) y qué puedes hacer tú.</p>
 
   <!-- PHISHING -->
   <div class="topic ph nobreak">
-    <div class="bar">
-      <svg class="ico" viewBox="0 0 48 48"><path d="M8 14h32v20H8z" fill="none" stroke="#fff" stroke-width="3"/><path d="M8 14l16 12 16-12" fill="none" stroke="#fff" stroke-width="3"/><path d="M34 30l6 8-9-2z" fill="#fff"/></svg>
-      <h3>Phishing y ciberestafa</h3>
-    </div>
+    <div class="bar"><svg class="ico" viewBox="0 0 48 48"><path d="M8 14h32v20H8z" fill="none" stroke="#fff" stroke-width="3"/><path d="M8 14l16 12 16-12" fill="none" stroke="#fff" stroke-width="3"/></svg><h3>Phishing y ciberestafa</h3></div>
     <div class="body">
       <div class="grid2">
         <div class="block">
           <h4>Qué es</h4>
-          <p>Te engañan para robarte <b>contraseñas, datos o dinero</b>: correos y SMS falsos (<i>smishing</i>),
-          webs clonadas, llamadas (<i>vishing</i>) o alguien que <b>se hace pasar por ti</b> (suplantación).</p>
-          <h4>Cómo actuar</h4>
-          <ul class="tight">
-            <li>No pinches enlaces ni des datos; verifica remitente y URL.</li>
-            <li>Activa la verificación en dos pasos.</li>
-            <li>Guarda pruebas y cuéntaselo a un adulto de confianza.</li>
-          </ul>
+          <p>Te engañan para robarte <b>contraseñas, datos o dinero</b>: correos y SMS falsos (<i>smishing</i>), webs clonadas, llamadas (<i>vishing</i>) o alguien que <b>se hace pasar por ti</b>.</p>
+          <h4>Cómo te protege la ley</h4>
+          <div class="law"><b>Art. 249 CP — Estafa informática</b>: castiga lograr una transferencia no consentida manipulando sistemas o usar tus tarjetas sin permiso.</div>
+          <div class="law"><b>Art. 197 CP</b>: si acceden a tus cuentas o datos. <b>LOPDGDD</b>: protege tus datos personales.</div>
         </div>
         <div class="block">
-          <h4>Cómo te protege la ley (España)</h4>
-          <div class="law"><b>Art. 249 CP — Estafa informática</b> (reforma LO 14/2022): castiga conseguir una
-          transferencia no consentida manipulando sistemas, y el uso fraudulento de tarjetas/medios de pago. Prisión de 6 meses a 3 años.</div>
-          <div class="law"><b>Art. 248 CP — Estafa</b>: el engaño "clásico" que te induce a pagar o entregar algo.</div>
-          <div class="law"><b>Art. 197 CP</b>: si acceden a tus cuentas o datos personales (descubrimiento y revelación de secretos).</div>
-          <div class="law"><b>LOPDGDD (LO 3/2018) + RGPD</b>: tus datos personales están protegidos y tienes derechos sobre ellos.</div>
-          <span class="pill">Suplantar tu identidad = varios delitos según el caso</span>
+          <h4>Cómo actuar</h4>
+          <ul class="tight"><li>No pinches enlaces ni des datos; verifica remitente y URL.</li><li>Activa la verificación en dos pasos.</li><li>Guarda pruebas y cuéntaselo a un adulto.</li></ul>
+          <div class="pen">
+            <h4>⚖️ Qué te puede caer si lo haces</h4>
+            <div class="rows">
+              <div class="r"><span class="fine">6 meses – 3 años de cárcel</span><span>Estafa informática (art. 249 CP).</span></div>
+              <div class="r"><span class="fine">1 – 6 años</span><span>Si es agravada (gran cuantía, muchas víctimas…) (art. 250 CP).</span></div>
+              <div class="r"><span class="fine">1 – 4 años + multa</span><span>Si además entras en cuentas/datos ajenos (art. 197 CP).</span></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -226,31 +181,27 @@
 
   <!-- ACECHO -->
   <div class="topic st nobreak">
-    <div class="bar">
-      <svg class="ico" viewBox="0 0 48 48"><circle cx="24" cy="20" r="8" fill="none" stroke="#fff" stroke-width="3"/><path d="M10 40c2-8 8-12 14-12s12 4 14 12" fill="none" stroke="#fff" stroke-width="3"/><circle cx="37" cy="12" r="6" fill="none" stroke="#fff" stroke-width="2.5"/><path d="M41 16l4 4" stroke="#fff" stroke-width="2.5"/></svg>
-      <h3>Acecho (stalking) y ciberacoso</h3>
-    </div>
+    <div class="bar"><svg class="ico" viewBox="0 0 48 48"><circle cx="24" cy="20" r="8" fill="none" stroke="#fff" stroke-width="3"/><path d="M10 40c2-8 8-12 14-12s12 4 14 12" fill="none" stroke="#fff" stroke-width="3"/><circle cx="37" cy="12" r="6" fill="none" stroke="#fff" stroke-width="2.5"/><path d="M41 16l4 4" stroke="#fff" stroke-width="2.5"/></svg><h3>Acecho (stalking) y ciberacoso</h3></div>
     <div class="body">
       <div class="grid2">
         <div class="block">
           <h4>Qué es</h4>
-          <p>Alguien te <b>vigila, persigue o contacta de forma insistente</b>, te controla, o usa tus datos para
-          hostigarte, hasta <b>alterar tu vida diaria</b>. Si es un adulto con fines sexuales, es <i>grooming</i>.</p>
-          <h4>Cómo actuar</h4>
-          <ul class="tight">
-            <li>No respondas ni sigas el juego; bloquea.</li>
-            <li>Guarda pruebas (capturas con fecha).</li>
-            <li>Cuéntaselo a un adulto y denuncia.</li>
-          </ul>
+          <p>Alguien te <b>vigila, persigue o contacta de forma insistente</b>, te controla o usa tus datos para hostigarte, hasta <b>alterar tu vida diaria</b>. Si un adulto contacta con fines sexuales, es <i>grooming</i>.</p>
+          <h4>Cómo te protege la ley</h4>
+          <div class="law"><b>Art. 172 ter CP — Acecho</b>: castiga acosar de forma insistente y reiterada (vigilar, perseguir, contactar) alterando gravemente tu vida.</div>
+          <div class="law"><b>LOPIVI (LO 8/2021)</b>: protección integral frente a la violencia, también la digital.</div>
         </div>
         <div class="block">
-          <h4>Cómo te protege la ley (España)</h4>
-          <div class="law"><b>Art. 172 ter CP — Acecho/stalking</b> (introducido por LO 1/2015): castiga acosar de forma
-          insistente y reiterada (vigilar, perseguir, contactar, usar tus datos) alterando gravemente tu vida. Agravado si eres especialmente vulnerable por la edad.</div>
-          <div class="law"><b>Ciberacoso</b>: no tiene artículo propio; se encuadra en el 172 ter y, según la conducta, en
-          amenazas (169), coacciones (172) o contra la integridad moral (173).</div>
-          <div class="law"><b>Grooming</b>: contactar con un menor con fines sexuales es delito; el anteproyecto de 2024 lo refuerza como agravante.</div>
-          <div class="law"><b>LOPIVI (LO 8/2021)</b>: protección integral frente a la violencia, también la digital. Si quien acosa es menor, responde con medidas educativas (LORPM, LO 5/2000).</div>
+          <h4>Cómo actuar</h4>
+          <ul class="tight"><li>No respondas ni sigas el juego; bloquea.</li><li>Guarda pruebas (capturas con fecha).</li><li>Cuéntaselo a un adulto y denuncia.</li></ul>
+          <div class="pen">
+            <h4>⚖️ Qué te puede caer si lo haces</h4>
+            <div class="rows">
+              <div class="r"><span class="fine">3 meses – 2 años</span><span>Acecho (art. 172 ter CP), o multa de 6 a 24 meses.</span></div>
+              <div class="r"><span class="fine">6 meses – 2 años</span><span>Si la víctima es vulnerable por su edad (menor).</span></div>
+              <div class="r"><span class="fine">1 – 3 años</span><span>Grooming: contactar a un menor con fines sexuales (art. 183 CP).</span></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -258,328 +209,288 @@
 
   <!-- DEEPFAKES -->
   <div class="topic df nobreak">
-    <div class="bar">
-      <svg class="ico" viewBox="0 0 48 48"><circle cx="18" cy="24" r="10" fill="none" stroke="#fff" stroke-width="3"/><circle cx="32" cy="24" r="10" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="4 3"/><path d="M6 38h36" stroke="#fff" stroke-width="3"/></svg>
-      <h3>Deepfakes e imágenes falsas</h3>
-    </div>
+    <div class="bar"><svg class="ico" viewBox="0 0 48 48"><circle cx="18" cy="24" r="10" fill="none" stroke="#fff" stroke-width="3"/><circle cx="32" cy="24" r="10" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="4 3"/><path d="M6 38h36" stroke="#fff" stroke-width="3"/></svg><h3>Deepfakes e imágenes falsas</h3></div>
     <div class="body">
       <div class="grid2">
         <div class="block">
           <h4>Qué es</h4>
-          <p>Imágenes, vídeos o audios <b>manipulados con IA</b> que te ponen diciendo o haciendo algo que no hiciste.
-          El caso más grave es el <b>deepfake sexual</b>.</p>
-          <h4>Cómo actuar</h4>
-          <ul class="tight">
-            <li><b>No lo reenvíes</b>: difundir también puede ser delito.</li>
-            <li>Guarda pruebas y repórtalo a la plataforma.</li>
-            <li>Denuncia y usa el Canal Prioritario de la AEPD.</li>
-          </ul>
+          <p>Imágenes, vídeos o audios <b>manipulados con IA</b> que ponen a alguien diciendo o haciendo algo que no hizo. El caso más grave es el <b>deepfake sexual</b>.</p>
+          <h4>Cómo te protege la ley</h4>
+          <div class="law"><b>Art. 189 CP</b>: un deepfake sexual con el rostro de un menor se persigue como <b>pornografía infantil</b> (incluye imágenes realistas).</div>
+          <div class="law"><b>Art. 197.7 CP</b>: difundir imágenes íntimas sin permiso. <b>LO 1/1982</b>: honor, intimidad y propia imagen.</div>
         </div>
         <div class="block">
-          <h4>Cómo te protege la ley (España)</h4>
-          <div class="law"><b>Art. 189 CP</b>: un deepfake sexual con el rostro de un menor se persigue como
-          <b>pornografía infantil</b> (incluye imágenes realistas), con penas graves.</div>
-          <div class="law"><b>Art. 197.7 CP</b>: difundir imágenes íntimas reales sin permiso.</div>
-          <div class="law"><b>LO 1/1982</b>: derecho al honor, la intimidad y la <b>propia imagen</b> (también vía civil).</div>
-          <div class="law"><b>Novedades en tramitación</b>: la Ley de IA prohíbe expresamente los deepfakes sexuales, y la Ley de
-          protección de menores en entornos digitales eleva a <b>16 años</b> la edad para consentir el uso de la propia imagen/datos.</div>
+          <h4>Cómo actuar</h4>
+          <ul class="tight"><li><b>No lo reenvíes</b>: difundir también es delito.</li><li>Guarda pruebas y repórtalo a la plataforma.</li><li>Denuncia y usa el Canal Prioritario de la AEPD.</li></ul>
+          <div class="pen">
+            <h4>⚖️ Qué te puede caer si lo haces</h4>
+            <div class="rows">
+              <div class="r"><span class="fine">1 – 5 años</span><span>Crear o difundir un deepfake sexual de un menor (art. 189 CP); más en casos graves.</span></div>
+              <div class="r"><span class="fine">3 meses – 1 año</span><span>Difundir imágenes íntimas sin permiso (art. 197.7 CP); sube si la víctima es menor.</span></div>
+              <div class="r"><span class="fine">3 meses – 1 año</span><span>Tener guardado material sexual de menores a sabiendas (art. 189 CP).</span></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- CÓMO DENUNCIAR -->
+  <!-- MENORES -->
+  <div class="note minor nobreak">
+    <b>¿Y si quien lo hace es menor de edad?</b> De 14 a 17 años no se va a una cárcel de adultos, pero <b>sí hay consecuencias</b>:
+    la Ley del Menor (LORPM, LO 5/2000) prevé medidas como <b>libertad vigilada</b>, <b>trabajos en beneficio de la comunidad</b> e
+    <b>internamiento en un centro</b> (hasta varios años en los delitos más graves), además de <b>responsabilidad civil</b> (indemnizar a la víctima; responden también los padres).
+    Por debajo de 14 años no hay responsabilidad penal, pero sí medidas de protección.
+  </div>
+
+  <!-- DENUNCIA -->
   <div class="help nobreak">
     <h3>🆘 Qué puedes hacer y dónde denunciar</h3>
     <div class="items">
       <div class="it"><b>Adulto de confianza</b> — familia, profesor/a u orientador/a: el primer paso siempre.</div>
       <div class="it"><b>Policía Nacional / Guardia Civil</b> — unidades de ciberdelincuencia (GDT). Denuncia presencial.</div>
-      <div class="it"><b>INCIBE · 017</b> — Línea de Ayuda en Ciberseguridad (gratuita) e <b>IS4K</b> para menores y familias. Orienta; no tramita denuncias.</div>
-      <div class="it"><b>AEPD · Canal Prioritario</b> — retirada urgente de contenido sexual o violento, sobre todo de menores (base: LOPIVI).</div>
+      <div class="it"><b>INCIBE · 017</b> — Línea de Ayuda en Ciberseguridad (gratuita) e <b>IS4K</b> para menores y familias. Orienta.</div>
+      <div class="it"><b>AEPD · Canal Prioritario</b> — retirada urgente de contenido sexual o violento, sobre todo de menores.</div>
       <div class="it"><b>Fiscalía (de Menores)</b> — cuando hay un menor implicado.</div>
       <div class="it"><b>112</b> — si hay riesgo inmediato para la persona.</div>
     </div>
   </div>
 </section>
 
-<!-- ============== 2. EJEMPLOS ============== -->
+<!-- 2. JUEGOS -->
 <section>
-  <div class="sec-head"><div class="sec-num">2</div><h2>Ejemplos (contenido de los juegos)</h2></div>
-  <p class="lead">Cada ejemplo es a la vez una explicación y un <b>reto jugable</b>: así se verá el contenido dentro del juego.
-  La opción correcta lleva su explicación y el artículo de la ley.</p>
+  <div class="sec-head"><div class="sec-num">2</div><h2>Los juegos interactivos</h2></div>
+  <p class="lead">Nada de cuestionarios: se aprende <b>jugando e interactuando</b> —arrastrando, inspeccionando, decidiendo— con consecuencias
+  inmediatas. Cada juego conecta el peligro con el artículo de la ley y sus penas.</p>
 
-  <!-- Phishing ejemplos -->
-  <div class="ex ph nobreak">
-    <div class="h"><span>Phishing · «¿Real o trampa?»</span><span>Dificultad: media</span></div>
+  <!-- G1 Caza-phishing -->
+  <div class="game g1 nobreak">
+    <div class="h"><h3>🎣 Caza-phishing</h3><span class="type">Arrastrar · inspeccionar · contrarreloj</span></div>
     <div class="c">
-      <div class="scene">Recibes un SMS: «Tu paquete está retenido. Paga 1,99 € de aduana aquí: <b>correos-es.info/pago</b>». Tú no esperas ningún paquete.</div>
-      <div class="q">¿Qué haces?</div>
-      <div class="opt ok"><span class="k">A</span><div><span class="tag-ok">✓ Correcto.</span> No pincho, lo borro y, si dudo, entro a la web oficial escribiendo yo la dirección. El dominio raro (<code>.info</code>) delata la trampa. <br><small class="muted">Marco legal: estafa informática, art. 249 CP.</small></div></div>
-      <div class="opt no"><span class="k">B</span><div><span class="tag-no">✗ No.</span> Pincho y meto la tarjeta para que no se pierda el paquete. → Así es como roban tus datos.</div></div>
+      <div>
+        <h4>Cómo se juega</h4>
+        <p>Entras en una <b>bandeja de entrada simulada</b>. Pasas el ratón por cada mensaje para <b>revelar la URL o el remitente real</b>,
+        <b>arrastras a la papelera</b> los fraudes y dejas pasar los legítimos. Aciertos = puntos; cada fallo "roba" datos de tu avatar.
+        Rondas que suben de velocidad.</p>
+        <span class="chip">Tema: Phishing</span><span class="chip">Edad: 10–16</span><span class="chip">Mecánica: drag &amp; drop + hover</span>
+      </div>
+      <div>
+        <h4>Qué aprende</h4>
+        <ul class="tight"><li>Detectar dominios falsos y urgencia sospechosa.</li><li>No dar datos; verificar antes de pinchar.</li></ul>
+        <h4>Gancho legal</h4>
+        <p class="muted">Al acertar, aparece: «esto es estafa informática — <b>art. 249 CP, 6 meses–3 años</b>».</p>
+      </div>
     </div>
   </div>
 
-  <div class="ex ph nobreak">
-    <div class="h"><span>Suplantación · «Decide y descubre»</span><span>Dificultad: fácil</span></div>
+  <!-- G2 Detector deepfakes -->
+  <div class="game g2 nobreak">
+    <div class="h"><h3>🔍 Detector de deepfakes</h3><span class="type">Marcar zonas · medidor de confianza</span></div>
     <div class="c">
-      <div class="scene">Alguien crea un perfil con tu foto y tu nombre y empieza a escribir a tus amigos pidiéndoles dinero.</div>
-      <div class="q">Primera decisión:</div>
-      <div class="opt ok"><span class="k">A</span><div><span class="tag-ok">✓ Correcto.</span> Hago capturas, aviso a mis amigos de que no soy yo y lo reporto a la plataforma y a un adulto. <br><small class="muted">Suplantarte puede ser estafa (248/249 CP) y afectar a tus datos (LOPDGDD).</small></div></div>
-      <div class="opt no"><span class="k">B</span><div><span class="tag-no">✗ No.</span> No hago nada, ya se cansará. → El daño crece y pierdes pruebas.</div></div>
+      <div>
+        <h4>Cómo se juega</h4>
+        <p>Aparece una imagen o vídeo corto. <b>Pinchas sobre las zonas sospechosas</b> (labios desincronizados, manos raras, luz incoherente)
+        y decides «real» o «IA». Un <b>medidor de confianza</b> reacciona a tus marcas y el juego te muestra las pistas que fallaste.</p>
+        <span class="chip">Tema: Deepfakes</span><span class="chip">Edad: 12–16</span><span class="chip">Mecánica: hotspots + decisión</span>
+      </div>
+      <div>
+        <h4>Qué aprende</h4>
+        <ul class="tight"><li>Señales típicas de manipulación con IA.</li><li>Por qué <b>no reenviar</b> aunque parezca "para avisar".</li></ul>
+        <h4>Gancho legal</h4>
+        <p class="muted">«Difundir un deepfake sexual de un menor = <b>art. 189 CP, 1–5 años</b>».</p>
+      </div>
     </div>
   </div>
 
-  <!-- Acecho ejemplo -->
-  <div class="ex st nobreak">
-    <div class="h"><span>Acecho · «Decide y descubre»</span><span>Dificultad: media</span></div>
+  <!-- G3 Decide y descubre -->
+  <div class="game g3 nobreak">
+    <div class="h"><h3>🧭 Decide y descubre</h3><span class="type">Historia ramificada · consecuencias</span></div>
     <div class="c">
-      <div class="scene">Una persona que conociste en un juego online te escribe cada día, sabe por dónde te mueves y se enfada si no contestas. Empiezas a agobiarte.</div>
-      <div class="q">¿Qué camino eliges?</div>
-      <div class="opt ok"><span class="k">A</span><div><span class="tag-ok">✓ Correcto.</span> Dejo de compartir mi ubicación, bloqueo, guardo los mensajes y se lo cuento a un adulto. Si sigue, se denuncia. <br><small class="muted">Marco legal: acecho/stalking, art. 172 ter CP; agravado por mi edad.</small></div></div>
-      <div class="opt no"><span class="k">B</span><div><span class="tag-no">✗ No.</span> Le contesto para que no se enfade. → Alimenta el acoso y lo normaliza.</div></div>
+      <div>
+        <h4>Cómo se juega</h4>
+        <p>Una <b>historia interactiva</b>: en cada escena eliges qué hacer y la trama <b>cambia según tu decisión</b> (buen final / mal final).
+        Un medidor de "seguridad" sube o baja. El camino bueno refuerza: <b>no contestar → guardar pruebas → contar a un adulto → denunciar</b>.</p>
+        <span class="chip">Tema: Acecho / grooming</span><span class="chip">Edad: 11–16</span><span class="chip">Mecánica: árbol de decisiones</span>
+      </div>
+      <div>
+        <h4>Qué aprende</h4>
+        <ul class="tight"><li>Reconocer el acecho y cortar el contacto.</li><li>Los pasos para protegerse y pedir ayuda.</li></ul>
+        <h4>Gancho legal</h4>
+        <p class="muted">«El acecho es delito — <b>art. 172 ter CP, 3 meses–2 años</b> (más si la víctima es menor)».</p>
+      </div>
     </div>
   </div>
 
-  <!-- Deepfake ejemplo -->
-  <div class="ex df nobreak">
-    <div class="h"><span>Deepfakes · «¿Real o trampa?»</span><span>Dificultad: difícil</span></div>
+  <!-- G4 Escudo legal -->
+  <div class="game g4 nobreak">
+    <div class="h"><h3>🛡️ Escudo legal</h3><span class="type">Emparejar · derecho ↔ situación</span></div>
     <div class="c">
-      <div class="scene">Circula por el grupo de clase un vídeo tuyo "diciendo" cosas que nunca dijiste. Se mueve raro la boca y la luz de la cara no cuadra.</div>
-      <div class="q">¿Qué haces?</div>
-      <div class="opt ok"><span class="k">A</span><div><span class="tag-ok">✓ Correcto.</span> No lo reenvío, aviso de que es falso, guardo pruebas y lo denuncio (y AEPD si fuera contenido sexual). Señales: labios desincronizados y luz incoherente. <br><small class="muted">Marco legal: art. 197.7 CP; si es sexual y hay un menor, art. 189 CP; propia imagen, LO 1/1982.</small></div></div>
-      <div class="opt no"><span class="k">B</span><div><span class="tag-no">✗ No.</span> Lo reenvío "para avisar". → Reenviar también puede ser delito y multiplica el daño.</div></div>
+      <div>
+        <h4>Cómo se juega</h4>
+        <p>Juego de <b>emparejar</b>: te aparecen situaciones a un lado y <b>derechos/leyes que te protegen</b> al otro; conectas cada situación con el escudo
+        legal correcto y descubres la pena asociada. Sirve de repaso tras los otros juegos.</p>
+        <span class="chip">Tema: Los tres</span><span class="chip">Edad: 12–16</span><span class="chip">Mecánica: matching + cartas</span>
+      </div>
+      <div>
+        <h4>Qué aprende</h4>
+        <ul class="tight"><li>Qué ley te ampara en cada caso.</li><li>Fija las consecuencias (efecto disuasorio).</li></ul>
+        <h4>Gancho legal</h4>
+        <p class="muted">Cada pareja revela el artículo y su pena, y recuerda la <b>Ley del Menor</b> si el autor es menor.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ============== 3. PLAN ============== -->
+<!-- 3. PLAN -->
 <section>
   <div class="sec-head"><div class="sec-num">3</div><h2>Plan de implementación</h2></div>
-  <p class="lead">Cómo pasamos de los datos legales a un juego jugable, y en qué fases lo construimos.</p>
+  <p class="lead">Cómo pasamos de los datos legales a un <b>juego interactivo</b> jugable, y en qué fases lo construimos.
+  Apostamos por mecánicas interactivas aunque la generación sea más compleja.</p>
 
   <h3 style="margin-top:6px">Cómo funciona la máquina que genera los juegos</h3>
-  <div class="mock-wrap nobreak">
-    <!-- Pipeline SVG -->
+  <div class="nobreak">
     <svg width="100%" viewBox="0 0 760 210" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial">
-      <defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6 z" fill="#2541B2"/></marker></defs>
-      <!-- row 1 -->
-      <g>
-        <rect x="8" y="20" width="150" height="66" rx="10" fill="#EAEEFB" stroke="#2541B2"/>
-        <text x="83" y="44" text-anchor="middle" font-size="12" font-weight="700" fill="#1B2240">1 · Parámetros</text>
-        <text x="83" y="62" text-anchor="middle" font-size="9" fill="#4A5273">tema · edad · tipo</text>
-        <text x="83" y="74" text-anchor="middle" font-size="9" fill="#4A5273">dificultad · nº · accesible</text>
-      </g>
-      <line x1="162" y1="53" x2="196" y2="53" stroke="#2541B2" stroke-width="2.5" marker-end="url(#ar)"/>
-      <g>
-        <rect x="200" y="20" width="160" height="66" rx="10" fill="#E4F6F3" stroke="#0FA896"/>
-        <text x="280" y="44" text-anchor="middle" font-size="12" font-weight="700" fill="#1B2240">2 · Selección</text>
-        <text x="280" y="62" text-anchor="middle" font-size="9" fill="#4A5273">banco de contenido legal</text>
-        <text x="280" y="74" text-anchor="middle" font-size="9" fill="#4A5273">filtra por tema+edad+nivel</text>
-      </g>
-      <line x1="364" y1="53" x2="398" y2="53" stroke="#2541B2" stroke-width="2.5" marker-end="url(#ar)"/>
-      <g>
-        <rect x="402" y="20" width="160" height="66" rx="10" fill="#EEE7F8" stroke="#6B3FB5"/>
-        <text x="482" y="44" text-anchor="middle" font-size="12" font-weight="700" fill="#1B2240">3 · Montaje</text>
-        <text x="482" y="62" text-anchor="middle" font-size="9" fill="#4A5273">plantilla del tipo de juego</text>
-        <text x="482" y="74" text-anchor="middle" font-size="9" fill="#4A5273">baraja / árbol de decisiones</text>
-      </g>
-      <line x1="566" y1="53" x2="600" y2="53" stroke="#2541B2" stroke-width="2.5" marker-end="url(#ar)"/>
-      <g>
-        <rect x="604" y="20" width="148" height="66" rx="10" fill="#FDECE0" stroke="#F2792B"/>
-        <text x="678" y="44" text-anchor="middle" font-size="12" font-weight="700" fill="#1B2240">4 · JSON</text>
-        <text x="678" y="62" text-anchor="middle" font-size="9" fill="#4A5273">config validada</text>
-        <text x="678" y="74" text-anchor="middle" font-size="9" fill="#4A5273">(contra el schema)</text>
-      </g>
-      <!-- down arrow -->
-      <line x1="678" y1="86" x2="678" y2="118" stroke="#2541B2" stroke-width="2.5" marker-end="url(#ar)"/>
-      <!-- row 2 -->
-      <g>
-        <rect x="430" y="122" width="322" height="66" rx="10" fill="#2541B2"/>
-        <text x="591" y="146" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">5 · Motor web</text>
-        <text x="591" y="164" text-anchor="middle" font-size="9" fill="#D6DEFF">lee el JSON y lo hace jugable</text>
-        <text x="591" y="176" text-anchor="middle" font-size="9" fill="#D6DEFF">registra el progreso del alumno</text>
-      </g>
-      <line x1="430" y1="155" x2="396" y2="155" stroke="#2541B2" stroke-width="2.5" marker-end="url(#ar)"/>
-      <g>
-        <rect x="200" y="122" width="196" height="66" rx="10" fill="#FFF6E6" stroke="#F2792B" stroke-dasharray="5 4"/>
-        <text x="298" y="144" text-anchor="middle" font-size="11" font-weight="700" fill="#1B2240">6 · Refuerzo con IA (opcional)</text>
-        <text x="298" y="162" text-anchor="middle" font-size="9" fill="#4A5273">mascota que resuelve dudas +</text>
-        <text x="298" y="174" text-anchor="middle" font-size="9" fill="#4A5273">nuevos ítems que revisa una persona</text>
-      </g>
+      <defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6 z" fill="#6FB73A"/></marker></defs>
+      <rect x="8" y="20" width="150" height="66" rx="10" fill="#E7F2FD" stroke="#2F8FE6"/><text x="83" y="44" text-anchor="middle" font-size="12" font-weight="700" fill="#1B2240">1 · Parámetros</text><text x="83" y="62" text-anchor="middle" font-size="9" fill="#4A5273">tema · edad · juego</text><text x="83" y="74" text-anchor="middle" font-size="9" fill="#4A5273">dificultad · nº · accesible</text>
+      <line x1="162" y1="53" x2="196" y2="53" stroke="#6FB73A" stroke-width="2.5" marker-end="url(#ar)"/>
+      <rect x="200" y="20" width="160" height="66" rx="10" fill="#EBF6E0" stroke="#6FB73A"/><text x="280" y="44" text-anchor="middle" font-size="12" font-weight="700" fill="#1B2240">2 · Selección</text><text x="280" y="62" text-anchor="middle" font-size="9" fill="#4A5273">banco de contenido legal</text><text x="280" y="74" text-anchor="middle" font-size="9" fill="#4A5273">filtra tema+edad+nivel</text>
+      <line x1="364" y1="53" x2="398" y2="53" stroke="#6FB73A" stroke-width="2.5" marker-end="url(#ar)"/>
+      <rect x="402" y="20" width="160" height="66" rx="10" fill="#F8E6F1" stroke="#B13E86"/><text x="482" y="44" text-anchor="middle" font-size="12" font-weight="700" fill="#1B2240">3 · Montaje</text><text x="482" y="62" text-anchor="middle" font-size="9" fill="#4A5273">plantilla de mecánica</text><text x="482" y="74" text-anchor="middle" font-size="9" fill="#4A5273">items / hotspots / árbol</text>
+      <line x1="566" y1="53" x2="600" y2="53" stroke="#6FB73A" stroke-width="2.5" marker-end="url(#ar)"/>
+      <rect x="604" y="20" width="148" height="66" rx="10" fill="#FDECE0" stroke="#E8872B"/><text x="678" y="44" text-anchor="middle" font-size="12" font-weight="700" fill="#1B2240">4 · JSON</text><text x="678" y="62" text-anchor="middle" font-size="9" fill="#4A5273">config interactiva</text><text x="678" y="74" text-anchor="middle" font-size="9" fill="#4A5273">validada (schema)</text>
+      <line x1="678" y1="86" x2="678" y2="118" stroke="#6FB73A" stroke-width="2.5" marker-end="url(#ar)"/>
+      <rect x="430" y="122" width="322" height="66" rx="10" fill="#2F8FE6"/><text x="591" y="146" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">5 · Motor web (interactivo)</text><text x="591" y="164" text-anchor="middle" font-size="9" fill="#DCEBFB">arrastrar / marcar / decidir</text><text x="591" y="176" text-anchor="middle" font-size="9" fill="#DCEBFB">registra el progreso</text>
+      <line x1="430" y1="155" x2="396" y2="155" stroke="#6FB73A" stroke-width="2.5" marker-end="url(#ar)"/>
+      <rect x="200" y="122" width="196" height="66" rx="10" fill="#FFF6E6" stroke="#E8872B" stroke-dasharray="5 4"/><text x="298" y="144" text-anchor="middle" font-size="11" font-weight="700" fill="#1B2240">6 · Refuerzo con IA (opcional)</text><text x="298" y="162" text-anchor="middle" font-size="9" fill="#4A5273">chatbot que resuelve dudas +</text><text x="298" y="174" text-anchor="middle" font-size="9" fill="#4A5273">nuevos ítems revisados por una persona</text>
     </svg>
-    <div class="legend">El banco de contenido se nutre de la <b>extracción legal</b> (p. ej. BOE) y de ítems curados con su artículo de ley y su «cómo denuncio».</div>
+    <div class="legend">El banco de contenido se nutre de la <b>extracción legal</b> (p. ej. BOE) y de ítems curados con su artículo, su <b>pena</b> y su «cómo denuncio».</div>
   </div>
 
-  <h3 style="margin-top:12px">Pasos del generador (resumen)</h3>
+  <h3 style="margin-top:12px">Pasos del generador</h3>
   <div class="steps nobreak">
-    <div class="step"><div class="b"></div><div><h4>Entrada de parámetros</h4>El profesor elige tema, curso/edad, tipo de juego, dificultad, nº de retos y modo accesible.</div></div>
-    <div class="step"><div class="b"></div><div><h4>Selección de contenido</h4>Se filtran del banco los ítems que cumplen los criterios; si faltan, se completa con niveles cercanos.</div></div>
-    <div class="step"><div class="b"></div><div><h4>Montaje según plantilla</h4>Se baraja (quiz / «¿Real o trampa?») o se encadena el árbol de decisiones («Decide y descubre»).</div></div>
-    <div class="step"><div class="b"></div><div><h4>Serialización a JSON y validación</h4>Se produce el JSON del juego y se valida contra el <code>schema</code> para que el motor lo reciba siempre bien formado.</div></div>
-    <div class="step"><div class="b"></div><div><h4>Render en la web</h4>El motor lee el JSON, lo hace jugable y guarda el progreso. Nada de lógica legal "a fuego" en el frontend.</div></div>
+    <div class="step"><div class="b"></div><div><h4>Entrada de parámetros</h4>El profesor elige tema, curso/edad, <b>tipo de juego</b> (caza-phishing, detector, decide y descubre, escudo legal), dificultad, nº de retos y modo accesible.</div></div>
+    <div class="step"><div class="b"></div><div><h4>Selección de contenido</h4>Se filtran del banco los ítems que cumplen los criterios (situación + artículo + pena + feedback).</div></div>
+    <div class="step"><div class="b"></div><div><h4>Montaje según la mecánica</h4>Cada tipo de juego tiene su plantilla: lista de correos (caza-phishing), imagen + <i>hotspots</i> (detector), árbol de decisiones (decide y descubre) o pares (escudo legal).</div></div>
+    <div class="step"><div class="b"></div><div><h4>Serialización a JSON y validación</h4>Se produce el JSON del juego interactivo y se valida contra el <code>schema</code> para que el motor lo reciba bien formado.</div></div>
+    <div class="step"><div class="b"></div><div><h4>Render interactivo en la web</h4>El motor lee el JSON y lo hace jugable (arrastrar, marcar, decidir) y guarda el progreso del alumno.</div></div>
   </div>
 
   <h3 style="margin-top:12px">Hoja de ruta por fases</h3>
   <table class="nobreak">
     <tr><th style="width:70px">Fase</th><th>Entregable</th><th style="width:90px">Estado</th></tr>
-    <tr><td>Fase 0</td><td>Extracción de datos legales (BOE) + modelos + generador de quiz base</td><td class="done">Hecho</td></tr>
-    <tr><td>Fase 1</td><td>Banco de contenido legal por tema (phishing, acecho, deepfakes) con fuente y «cómo denuncio»</td><td>Siguiente</td></tr>
-    <tr><td>Fase 2</td><td>Tipo de juego «escenario» (árbol de decisiones) en el modelo y el schema</td><td>Pendiente</td></tr>
-    <tr><td>Fase 3</td><td>Motor web que consume el JSON (los dos tipos de juego)</td><td>Pendiente</td></tr>
+    <tr><td>Fase 0</td><td>Extracción de datos legales (BOE) + modelos + generador base</td><td class="done">Hecho</td></tr>
+    <tr><td>Fase 1</td><td>Banco de contenido por tema con artículo, pena y «cómo denuncio»</td><td>Siguiente</td></tr>
+    <tr><td>Fase 2</td><td>Modelos + schema de las mecánicas interactivas (items, hotspots, árbol)</td><td>Pendiente</td></tr>
+    <tr><td>Fase 3</td><td>Motor web interactivo (los cuatro juegos)</td><td>Pendiente</td></tr>
     <tr><td>Fase 4</td><td>Panel del profesor (parámetros) + compartir/exportar juego</td><td>Pendiente</td></tr>
-    <tr><td>Fase 5</td><td>Mascota chatbot (dudas) + modo accesible (dislexia/neurodivergencia)</td><td>Pendiente</td></tr>
+    <tr><td>Fase 5</td><td>Chatbot de dudas + modo accesible (dislexia/neurodivergencia)</td><td>Pendiente</td></tr>
   </table>
 
-  <h3 style="margin-top:12px">El contrato: JSON de un juego (ejemplo)</h3>
+  <h3 style="margin-top:12px">El contrato: JSON de un juego interactivo (ejemplo «Caza-phishing»)</h3>
   <pre class="nobreak"><span class="k-key">{</span>
-  <span class="k-key">"id"</span>: <span class="k-str">"phishing-real_o_trampa-4821"</span>,
-  <span class="k-key">"titulo"</span>: <span class="k-str">"Chavales Legales — Phishing"</span>,
-  <span class="k-key">"tipo"</span>: <span class="k-str">"real_o_trampa"</span>,  <span class="k-key">"tema"</span>: <span class="k-str">"phishing"</span>,
-  <span class="k-key">"edad_min"</span>: <span class="k-num">12</span>, <span class="k-key">"edad_max"</span>: <span class="k-num">14</span>, <span class="k-key">"dificultad"</span>: <span class="k-str">"media"</span>, <span class="k-key">"accesible"</span>: <span class="k-num">true</span>,
-  <span class="k-key">"retos"</span>: [
-    <span class="k-key">{</span> <span class="k-key">"enunciado"</span>: <span class="k-str">"SMS: 'Tu paquete está retenido...'"</span>,
-      <span class="k-key">"opciones"</span>: [
-        <span class="k-key">{</span><span class="k-key">"texto"</span>:<span class="k-str">"No pincho y verifico"</span>, <span class="k-key">"correcta"</span>:<span class="k-num">true</span>,
-         <span class="k-key">"retroalimentacion"</span>:<span class="k-str">"El dominio .info delata la trampa"</span><span class="k-key">}</span>, ...
-      ],
-      <span class="k-key">"fuente_legal"</span>: <span class="k-str">"Art. 249 CP (estafa informática)"</span> <span class="k-key">}</span>
+  <span class="k-key">"id"</span>: <span class="k-str">"phishing-caza-4821"</span>, <span class="k-key">"tipo"</span>: <span class="k-str">"caza_phishing"</span>, <span class="k-key">"tema"</span>: <span class="k-str">"phishing"</span>,
+  <span class="k-key">"edad_min"</span>: <span class="k-num">10</span>, <span class="k-key">"edad_max"</span>: <span class="k-num">14</span>, <span class="k-key">"dificultad"</span>: <span class="k-str">"media"</span>, <span class="k-key">"accesible"</span>: <span class="k-num">true</span>,
+  <span class="k-key">"bandeja"</span>: [
+    <span class="k-key">{</span> <span class="k-key">"remitente"</span>: <span class="k-str">"seguridad@tu-banco.verify-id.com"</span>,
+      <span class="k-key">"asunto"</span>: <span class="k-str">"Verifica tu cuenta en 24h"</span>,
+      <span class="k-key">"es_fraude"</span>: <span class="k-num">true</span>,
+      <span class="k-key">"pista"</span>: <span class="k-str">"dominio falso + urgencia"</span>,
+      <span class="k-key">"ley"</span>: <span class="k-str">"Art. 249 CP"</span>, <span class="k-key">"pena"</span>: <span class="k-str">"6 meses–3 años"</span> <span class="k-key">}</span>, ...
   ]
 <span class="k-key">}</span></pre>
 </section>
 
-<!-- ============== 4. DISEÑO WEB ============== -->
+<!-- 4. DISEÑO -->
 <section>
   <div class="sec-head"><div class="sec-num">4</div><h2>Diseño de la web (mockups)</h2></div>
-  <p class="lead">Propuesta visual. La web tiene dos caras: el <b>panel del profesor</b> (crea y comparte juegos) y el
-  <b>juego del alumno</b>. Paleta amable pero seria; mascota "Lex" como guía.</p>
+  <p class="lead">Dos caras: el <b>panel del profesor</b> (crea y comparte juegos) y los <b>juegos del alumno</b>. Paleta de la marca; guía con el icono del mazo.</p>
 
-  <!-- MOCKUP 1: HOME / PANEL PROFESOR -->
-  <div class="mock-cap">Pantalla 1 · Panel del profesor <span>— punto de partida</span></div>
-  <div class="mock-wrap nobreak">
+  <div class="mock-cap">Pantalla 1 · Panel del profesor</div>
+  <div class="nobreak">
     <svg width="100%" viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial">
       <rect x="0" y="0" width="760" height="300" rx="12" fill="#F5F7FB" stroke="#E2E7F0"/>
-      <!-- topbar -->
-      <rect x="0" y="0" width="760" height="44" rx="12" fill="#2541B2"/><rect x="0" y="22" width="760" height="22" fill="#2541B2"/>
-      <circle cx="26" cy="22" r="11" fill="#FFC24B"/><text x="44" y="27" font-size="13" font-weight="800" fill="#fff">Chavales Legales</text>
-      <text x="610" y="27" font-size="10" fill="#D6DEFF">Panel del profesor ▾</text>
-      <!-- hero -->
-      <rect x="16" y="58" width="470" height="100" rx="12" fill="#fff" stroke="#E2E7F0"/>
-      <text x="34" y="90" font-size="16" font-weight="800" fill="#1B2240">Enseña sus derechos digitales jugando</text>
-      <text x="34" y="112" font-size="10.5" fill="#4A5273">Crea un juego a medida de tu clase en un minuto.</text>
-      <rect x="34" y="122" width="150" height="26" rx="13" fill="#0FA896"/><text x="109" y="139" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">+ Crear juego</text>
-      <!-- mascota -->
-      <g transform="translate(410,70)"><path d="M34 2 L64 12 V36 C64 54 50 66 34 72 C18 66 4 54 4 36 V12 Z" fill="#FFC24B" stroke="#fff" stroke-width="2"/><circle cx="26" cy="32" r="4.5" fill="#1B2240"/><circle cx="42" cy="32" r="4.5" fill="#1B2240"/><path d="M26 46 Q34 52 42 46" stroke="#1B2240" stroke-width="3" fill="none" stroke-linecap="round"/></g>
-      <!-- cards temas -->
+      <rect x="0" y="0" width="760" height="44" rx="12" fill="#86D04F"/><rect x="0" y="22" width="760" height="22" fill="#86D04F"/>
+      <circle cx="24" cy="22" r="12" fill="#fff"/><g transform="translate(16,14) rotate(-35 8 8)"><rect x="3" y="0" width="12" height="7" rx="2" fill="#86D04F"/><rect x="8" y="6" width="3" height="11" rx="1.5" fill="#86D04F"/></g>
+      <text x="44" y="27" font-size="13" font-weight="800" fill="#fff">Chavales Legales</text><text x="610" y="27" font-size="10" fill="#eafbe0">Panel del profesor ▾</text>
+      <rect x="16" y="58" width="470" height="100" rx="12" fill="#fff" stroke="#E2E7F0"/><text x="34" y="90" font-size="16" font-weight="800" fill="#1B2240">Enseña sus derechos digitales jugando</text><text x="34" y="112" font-size="10.5" fill="#4A5273">Crea un juego interactivo a medida de tu clase en un minuto.</text>
+      <rect x="34" y="122" width="160" height="26" rx="13" fill="#4FA9F3"/><text x="114" y="139" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">+ Crear juego</text>
+      <circle cx="452" cy="100" r="26" fill="#86D04F"/><g transform="translate(438,86) rotate(-35 14 14)"><rect x="6" y="2" width="20" height="11" rx="3" fill="#fff"/><rect x="14" y="11" width="5" height="18" rx="2.5" fill="#fff"/></g>
       <text x="500" y="74" font-size="11" font-weight="800" fill="#1B2240">Temas</text>
-      <rect x="500" y="82" width="244" height="24" rx="7" fill="#EAEEFB" stroke="#2541B2"/><text x="512" y="98" font-size="10" font-weight="700" fill="#2541B2">⚖️ Phishing / ciberestafa</text>
-      <rect x="500" y="112" width="244" height="24" rx="7" fill="#EEE7F8" stroke="#6B3FB5"/><text x="512" y="128" font-size="10" font-weight="700" fill="#6B3FB5">🛰️ Acecho (stalking)</text>
+      <rect x="500" y="82" width="244" height="24" rx="7" fill="#E7F2FD" stroke="#2F8FE6"/><text x="512" y="98" font-size="10" font-weight="700" fill="#2F8FE6">⚖️ Phishing / ciberestafa</text>
+      <rect x="500" y="112" width="244" height="24" rx="7" fill="#F8E6F1" stroke="#B13E86"/><text x="512" y="128" font-size="10" font-weight="700" fill="#B13E86">🛰️ Acecho (stalking)</text>
       <rect x="500" y="142" width="244" height="24" rx="7" fill="#FBE7E8" stroke="#D7363D"/><text x="512" y="158" font-size="10" font-weight="700" fill="#D7363D">🎭 Deepfakes</text>
-      <!-- recientes -->
       <text x="34" y="186" font-size="11" font-weight="800" fill="#1B2240">Tus juegos recientes</text>
-      <rect x="16" y="194" width="236" height="88" rx="10" fill="#fff" stroke="#E2E7F0"/><text x="30" y="216" font-size="10.5" font-weight="700" fill="#1B2240">Phishing · 1º ESO</text><text x="30" y="233" font-size="9" fill="#4A5273">8 retos · ¿Real o trampa?</text><rect x="30" y="245" width="70" height="20" rx="10" fill="#EAEEFB"/><text x="65" y="259" text-anchor="middle" font-size="9" font-weight="700" fill="#2541B2">Abrir</text>
-      <rect x="262" y="194" width="236" height="88" rx="10" fill="#fff" stroke="#E2E7F0"/><text x="276" y="216" font-size="10.5" font-weight="700" fill="#1B2240">Acecho · 2º ESO</text><text x="276" y="233" font-size="9" fill="#4A5273">6 retos · Decide y descubre</text><rect x="276" y="245" width="70" height="20" rx="10" fill="#EEE7F8"/><text x="311" y="259" text-anchor="middle" font-size="9" font-weight="700" fill="#6B3FB5">Abrir</text>
-      <rect x="508" y="194" width="236" height="88" rx="10" fill="#fff" stroke="#E2E7F0"/><text x="522" y="216" font-size="10.5" font-weight="700" fill="#1B2240">Deepfakes · 3º ESO</text><text x="522" y="233" font-size="9" fill="#4A5273">5 retos · ¿Real o trampa?</text><rect x="522" y="245" width="70" height="20" rx="10" fill="#FBE7E8"/><text x="557" y="259" text-anchor="middle" font-size="9" font-weight="700" fill="#D7363D">Abrir</text>
+      <rect x="16" y="194" width="236" height="88" rx="10" fill="#fff" stroke="#E2E7F0"/><text x="30" y="216" font-size="10.5" font-weight="700" fill="#1B2240">Phishing · 1º ESO</text><text x="30" y="233" font-size="9" fill="#4A5273">Caza-phishing · 8 rondas</text><rect x="30" y="245" width="70" height="20" rx="10" fill="#E7F2FD"/><text x="65" y="259" text-anchor="middle" font-size="9" font-weight="700" fill="#2F8FE6">Abrir</text>
+      <rect x="262" y="194" width="236" height="88" rx="10" fill="#fff" stroke="#E2E7F0"/><text x="276" y="216" font-size="10.5" font-weight="700" fill="#1B2240">Acecho · 2º ESO</text><text x="276" y="233" font-size="9" fill="#4A5273">Decide y descubre</text><rect x="276" y="245" width="70" height="20" rx="10" fill="#F8E6F1"/><text x="311" y="259" text-anchor="middle" font-size="9" font-weight="700" fill="#B13E86">Abrir</text>
+      <rect x="508" y="194" width="236" height="88" rx="10" fill="#fff" stroke="#E2E7F0"/><text x="522" y="216" font-size="10.5" font-weight="700" fill="#1B2240">Deepfakes · 3º ESO</text><text x="522" y="233" font-size="9" fill="#4A5273">Detector de deepfakes</text><rect x="522" y="245" width="70" height="20" rx="10" fill="#FBE7E8"/><text x="557" y="259" text-anchor="middle" font-size="9" font-weight="700" fill="#D7363D">Abrir</text>
     </svg>
   </div>
 
-  <!-- MOCKUP 2: GENERADOR -->
   <div class="mock-cap">Pantalla 2 · Generador de juego <span>— los parámetros que alimentan la máquina</span></div>
-  <div class="mock-wrap nobreak">
-    <svg width="100%" viewBox="0 0 760 260" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial">
-      <rect x="0" y="0" width="760" height="260" rx="12" fill="#fff" stroke="#E2E7F0"/>
-      <text x="24" y="36" font-size="15" font-weight="800" fill="#1B2240">Crear un juego</text>
-      <text x="24" y="54" font-size="10" fill="#4A5273">Elige los parámetros. La máquina montará el juego y su JSON.</text>
-      <!-- left: fields -->
+  <div class="nobreak">
+    <svg width="100%" viewBox="0 0 760 250" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial">
+      <rect x="0" y="0" width="760" height="250" rx="12" fill="#fff" stroke="#E2E7F0"/>
+      <text x="24" y="34" font-size="15" font-weight="800" fill="#1B2240">Crear un juego</text><text x="24" y="52" font-size="10" fill="#4A5273">Elige los parámetros. La máquina montará el juego interactivo y su JSON.</text>
       <g font-size="10">
-        <text x="24" y="86" font-weight="700" fill="#1B2240">Tema</text>
-        <rect x="24" y="92" width="150" height="26" rx="7" fill="#EAEEFB" stroke="#2541B2"/><text x="34" y="109" fill="#2541B2" font-weight="700">Phishing ▾</text>
-        <text x="200" y="86" font-weight="700" fill="#1B2240">Curso / edad</text>
-        <rect x="200" y="92" width="150" height="26" rx="7" fill="#F5F7FB" stroke="#E2E7F0"/><text x="210" y="109" fill="#4A5273">1º ESO (12–13) ▾</text>
-
-        <text x="24" y="140" font-weight="700" fill="#1B2240">Tipo de juego</text>
-        <rect x="24" y="146" width="150" height="26" rx="7" fill="#F5F7FB" stroke="#E2E7F0"/><text x="34" y="163" fill="#4A5273">¿Real o trampa? ▾</text>
-        <text x="200" y="140" font-weight="700" fill="#1B2240">Dificultad</text>
-        <rect x="200" y="146" width="46" height="26" rx="7" fill="#E4F6F3" stroke="#0FA896"/><text x="233" y="163" text-anchor="end" fill="#0FA896" font-weight="700">Fácil</text>
-        <rect x="250" y="146" width="50" height="26" rx="7" fill="#F5F7FB" stroke="#E2E7F0"/><text x="275" y="163" text-anchor="middle" fill="#4A5273">Media</text>
-        <rect x="304" y="146" width="46" height="26" rx="7" fill="#F5F7FB" stroke="#E2E7F0"/><text x="327" y="163" text-anchor="middle" fill="#4A5273">Difícil</text>
-
-        <text x="24" y="194" font-weight="700" fill="#1B2240">Nº de retos</text>
-        <rect x="24" y="200" width="150" height="26" rx="7" fill="#F5F7FB" stroke="#E2E7F0"/><text x="34" y="217" fill="#4A5273">8</text>
-        <text x="200" y="194" font-weight="700" fill="#1B2240">Modo accesible</text>
-        <rect x="200" y="200" width="44" height="24" rx="12" fill="#0FA896"/><circle cx="234" cy="212" r="9" fill="#fff"/>
-        <text x="252" y="217" fill="#4A5273">Dislexia / lectura fácil</text>
+        <text x="24" y="82" font-weight="700" fill="#1B2240">Tema</text><rect x="24" y="88" width="150" height="26" rx="7" fill="#E7F2FD" stroke="#2F8FE6"/><text x="34" y="105" fill="#2F8FE6" font-weight="700">Phishing ▾</text>
+        <text x="200" y="82" font-weight="700" fill="#1B2240">Curso / edad</text><rect x="200" y="88" width="150" height="26" rx="7" fill="#F5F7FB" stroke="#E2E7F0"/><text x="210" y="105" fill="#4A5273">1º ESO (12–13) ▾</text>
+        <text x="24" y="136" font-weight="700" fill="#1B2240">Tipo de juego</text><rect x="24" y="142" width="326" height="26" rx="7" fill="#EBF6E0" stroke="#6FB73A"/><text x="34" y="159" fill="#4b7a1f" font-weight="700">🎣 Caza-phishing ▾ · (detector / decide y descubre / escudo legal)</text>
+        <text x="24" y="190" font-weight="700" fill="#1B2240">Dificultad</text><rect x="24" y="196" width="46" height="26" rx="7" fill="#EBF6E0" stroke="#6FB73A"/><text x="47" y="213" text-anchor="middle" fill="#4b7a1f" font-weight="700">Fácil</text><rect x="74" y="196" width="50" height="26" rx="7" fill="#F5F7FB" stroke="#E2E7F0"/><text x="99" y="213" text-anchor="middle" fill="#4A5273">Media</text><rect x="128" y="196" width="50" height="26" rx="7" fill="#F5F7FB" stroke="#E2E7F0"/><text x="153" y="213" text-anchor="middle" fill="#4A5273">Difícil</text>
+        <text x="200" y="190" font-weight="700" fill="#1B2240">Modo accesible</text><rect x="200" y="198" width="44" height="22" rx="11" fill="#6FB73A"/><circle cx="233" cy="209" r="8" fill="#fff"/><text x="252" y="214" fill="#4A5273">Lectura fácil / dislexia</text>
       </g>
-      <!-- right: preview -->
-      <rect x="430" y="76" width="306" height="150" rx="10" fill="#F5F7FB" stroke="#E2E7F0"/>
-      <text x="446" y="98" font-size="10" font-weight="800" fill="#1B2240">Vista previa</text>
-      <rect x="446" y="106" width="274" height="40" rx="7" fill="#fff" stroke="#E2E7F0"/><text x="458" y="124" font-size="9" fill="#4A5273">SMS: "Tu paquete está retenido..."</text><text x="458" y="138" font-size="9" fill="#9AA3BE">¿Real o trampa?</text>
-      <rect x="446" y="152" width="132" height="24" rx="7" fill="#E5F2EA" stroke="#2E8B57"/><text x="512" y="168" text-anchor="middle" font-size="9" font-weight="700" fill="#2E8B57">Trampa</text>
-      <rect x="588" y="152" width="132" height="24" rx="7" fill="#fff" stroke="#E2E7F0"/><text x="654" y="168" text-anchor="middle" font-size="9" fill="#4A5273">Real</text>
-      <text x="446" y="196" font-size="8.5" fill="#9AA3BE">Art. 249 CP · estafa informática</text>
-      <!-- generar -->
-      <rect x="430" y="186" width="0" height="0"/>
-      <rect x="560" y="200" width="176" height="30" rx="15" fill="#F2792B"/><text x="648" y="220" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">⚙️ Generar juego</text>
+      <rect x="430" y="74" width="306" height="128" rx="10" fill="#F5F7FB" stroke="#E2E7F0"/><text x="446" y="96" font-size="10" font-weight="800" fill="#1B2240">Vista previa</text>
+      <rect x="446" y="104" width="274" height="34" rx="7" fill="#fff" stroke="#E2E7F0"/><text x="458" y="120" font-size="9" fill="#4A5273">✉ seguridad@tu-banco.verify-id.com</text><text x="458" y="133" font-size="8.5" fill="#D7363D">arrástrame a la papelera si es fraude</text>
+      <rect x="446" y="146" width="274" height="34" rx="7" fill="#fff" stroke="#E2E7F0"/><text x="458" y="162" font-size="9" fill="#4A5273">✉ info@biblioteca-colegio.es</text><text x="458" y="175" font-size="8.5" fill="#6FB73A">este parece legítimo</text>
+      <rect x="560" y="210" width="176" height="30" rx="15" fill="#F870B0"/><text x="648" y="230" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">⚙️ Generar juego</text>
     </svg>
   </div>
 
-  <!-- MOCKUP 3 + 4 -->
-  <div class="mock-cap">Pantalla 3 · Juego «¿Real o trampa?» <span>— phishing y deepfakes</span></div>
-  <div class="mock-wrap nobreak">
+  <div class="mock-cap">Pantalla 3 · Juego «Caza-phishing» <span>— arrastrar e inspeccionar</span></div>
+  <div class="nobreak">
     <svg width="100%" viewBox="0 0 760 236" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial">
-      <rect x="0" y="0" width="760" height="236" rx="12" fill="#EAEEFB"/>
-      <!-- progress -->
-      <rect x="24" y="22" width="712" height="10" rx="5" fill="#fff"/><rect x="24" y="22" width="320" height="10" rx="5" fill="#2541B2"/>
-      <text x="24" y="52" font-size="10" font-weight="700" fill="#2541B2">Reto 3 de 8</text><text x="736" y="52" text-anchor="end" font-size="10" font-weight="700" fill="#2541B2">★ 120 pts</text>
-      <!-- card -->
-      <rect x="150" y="64" width="460" height="92" rx="12" fill="#fff" stroke="#E2E7F0"/>
-      <text x="172" y="90" font-size="11" font-weight="800" fill="#1B2240">📧 "Tu banco: verifica tu cuenta o se bloqueará"</text>
-      <text x="172" y="110" font-size="9.5" fill="#4A5273">De: seguridad@tu-banco-online.verify-id.com</text>
-      <text x="172" y="128" font-size="9.5" fill="#4A5273">"Haz clic aquí en menos de 24h para no perder el acceso."</text>
-      <text x="172" y="146" font-size="9" fill="#D7363D" font-weight="700">Pista: mira bien el dominio del remitente…</text>
-      <!-- buttons -->
-      <rect x="150" y="170" width="222" height="40" rx="10" fill="#FBE7E8" stroke="#D7363D"/><text x="261" y="195" text-anchor="middle" font-size="12" font-weight="800" fill="#D7363D">🚩 Es una TRAMPA</text>
-      <rect x="388" y="170" width="222" height="40" rx="10" fill="#E5F2EA" stroke="#2E8B57"/><text x="499" y="195" text-anchor="middle" font-size="12" font-weight="800" fill="#2E8B57">✅ Es REAL</text>
-      <!-- mascota helper -->
-      <g transform="translate(646,150)"><path d="M26 2 L50 10 V30 C50 44 39 54 26 59 C13 54 2 44 2 30 V10 Z" fill="#FFC24B" stroke="#fff" stroke-width="2"/><circle cx="20" cy="27" r="3.6" fill="#1B2240"/><circle cx="32" cy="27" r="3.6" fill="#1B2240"/><path d="M20 38 Q26 43 32 38" stroke="#1B2240" stroke-width="2.5" fill="none" stroke-linecap="round"/></g>
-      <text x="628" y="228" text-anchor="middle" font-size="8.5" fill="#4A5273">Lex te ayuda</text>
+      <rect x="0" y="0" width="760" height="236" rx="12" fill="#E7F2FD"/>
+      <rect x="24" y="20" width="520" height="10" rx="5" fill="#fff"/><rect x="24" y="20" width="230" height="10" rx="5" fill="#2F8FE6"/>
+      <text x="24" y="50" font-size="10" font-weight="700" fill="#2F8FE6">Ronda 3 de 8</text><text x="300" y="50" font-size="10" font-weight="700" fill="#2F8FE6">★ 120 pts</text><text x="544" y="50" font-size="10" font-weight="700" fill="#D7363D">⏱ 00:14</text>
+      <!-- inbox -->
+      <rect x="24" y="62" width="470" height="150" rx="10" fill="#fff" stroke="#E2E7F0"/>
+      <rect x="36" y="72" width="446" height="40" rx="7" fill="#FBE7E8" stroke="#D7363D"/><text x="48" y="90" font-size="9.5" font-weight="700" fill="#1B2240">"Tu banco: verifica o se bloquea"</text><text x="48" y="104" font-size="8.5" fill="#D7363D">seguridad@tu-banco.verify-id.com ← URL real al pasar el ratón</text>
+      <rect x="36" y="118" width="446" height="40" rx="7" fill="#fff" stroke="#E2E7F0"/><text x="48" y="136" font-size="9.5" font-weight="700" fill="#1B2240">"Reunión de tutoría el jueves"</text><text x="48" y="150" font-size="8.5" fill="#6FB73A">tutoria@colegio.edu.es</text>
+      <rect x="36" y="164" width="446" height="40" rx="7" fill="#FFF6E6" stroke="#E8872B"/><text x="48" y="182" font-size="9.5" font-weight="700" fill="#1B2240">"Has ganado un móvil, reclama aquí"</text><text x="48" y="196" font-size="8.5" fill="#E8872B">premios@win-now.top</text>
+      <!-- papelera -->
+      <rect x="512" y="84" width="224" height="104" rx="12" fill="#fff" stroke="#D7363D" stroke-dasharray="6 5"/><text x="624" y="130" text-anchor="middle" font-size="26">🗑️</text><text x="624" y="156" text-anchor="middle" font-size="10" font-weight="700" fill="#D7363D">Arrastra aquí los fraudes</text>
+      <!-- helper -->
+      <circle cx="704" cy="206" r="16" fill="#86D04F"/><g transform="translate(695,197) rotate(-35 9 9)"><rect x="3" y="1" width="12" height="7" rx="2" fill="#fff"/><rect x="9" y="7" width="3" height="11" rx="1.5" fill="#fff"/></g>
     </svg>
   </div>
 
-  <div class="mock-cap">Pantalla 4 · Juego «Decide y descubre» <span>— acecho / stalking (narrativa ramificada)</span></div>
-  <div class="mock-wrap nobreak">
-    <svg width="100%" viewBox="0 0 760 236" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial">
-      <rect x="0" y="0" width="760" height="236" rx="12" fill="#EEE7F8"/>
-      <text x="24" y="38" font-size="12" font-weight="800" fill="#6B3FB5">Capítulo 2 · "El mensaje que no para"</text>
-      <!-- scene -->
-      <rect x="24" y="52" width="712" height="64" rx="12" fill="#fff" stroke="#E2E7F0"/>
-      <text x="44" y="78" font-size="10.5" fill="#1B2240">Esa persona del juego online te escribe otra vez y dice que sabe por dónde</text>
-      <text x="44" y="96" font-size="10.5" fill="#1B2240">sales del insti. Te empiezas a agobiar. <b>¿Qué haces?</b></text>
-      <!-- options -->
-      <rect x="24" y="128" width="712" height="30" rx="9" fill="#E5F2EA" stroke="#2E8B57"/><text x="40" y="148" font-size="10.5" font-weight="700" fill="#2E8B57">A · Dejo de compartir ubicación, bloqueo y guardo los mensajes</text>
-      <rect x="24" y="164" width="712" height="30" rx="9" fill="#fff" stroke="#E2E7F0"/><text x="40" y="184" font-size="10.5" fill="#4A5273">B · Le contesto para que no se enfade</text>
-      <rect x="24" y="200" width="712" height="30" rx="9" fill="#fff" stroke="#E2E7F0"/><text x="40" y="220" font-size="10.5" fill="#4A5273">C · No hago nada y espero a que pare</text>
+  <div class="mock-cap">Pantalla 4 · Juego «Decide y descubre» <span>— acecho (historia interactiva ramificada)</span></div>
+  <div class="nobreak">
+    <svg width="100%" viewBox="0 0 760 212" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial">
+      <rect x="0" y="0" width="760" height="212" rx="12" fill="#F8E6F1"/>
+      <text x="24" y="34" font-size="12" font-weight="800" fill="#B13E86">Capítulo 2 · "El mensaje que no para"</text>
+      <rect x="520" y="16" width="216" height="16" rx="8" fill="#fff"/><rect x="520" y="16" width="150" height="16" rx="8" fill="#6FB73A"/><text x="628" y="28" text-anchor="middle" font-size="8.5" font-weight="700" fill="#2b5a16">Seguridad</text>
+      <rect x="24" y="44" width="712" height="56" rx="12" fill="#fff" stroke="#E2E7F0"/><text x="44" y="68" font-size="10.5" fill="#1B2240">Esa persona del juego online te escribe otra vez y dice que sabe por dónde sales</text><text x="44" y="86" font-size="10.5" fill="#1B2240">del insti. Te agobias. <b>Elige qué haces:</b></text>
+      <rect x="24" y="112" width="712" height="28" rx="9" fill="#EBF6E0" stroke="#6FB73A"/><text x="40" y="131" font-size="10.5" font-weight="700" fill="#4b7a1f">A · Dejo de compartir ubicación, bloqueo y guardo los mensajes</text>
+      <rect x="24" y="146" width="712" height="28" rx="9" fill="#fff" stroke="#E2E7F0"/><text x="40" y="165" font-size="10.5" fill="#4A5273">B · Le contesto para que no se enfade</text>
+      <rect x="24" y="180" width="712" height="26" rx="9" fill="#fff" stroke="#E2E7F0"/><text x="40" y="198" font-size="10.5" fill="#4A5273">C · No hago nada y espero a que pare</text>
     </svg>
-    <div class="legend">Cada opción lleva a una consecuencia y a una mini-explicación legal; el "camino bueno" refuerza <b>guardar pruebas → contar a un adulto → denunciar</b> (art. 172 ter CP).</div>
+    <div class="legend">Cada opción lleva a una consecuencia y a una mini-pista legal; el camino bueno refuerza <b>guardar pruebas → contar a un adulto → denunciar</b> (art. 172 ter CP).</div>
   </div>
 
-  <div class="foot-note">
-    <b>Notas de diseño.</b> Paleta por tema (azul = phishing, violeta = acecho, rojo = deepfakes) para orientar de un vistazo.
-    Mascota "Lex" (un escudo) como guía y como chatbot de dudas. Modo accesible: tipografía amplia, frases cortas y lectura fácil
-    para alumnado con dislexia u otra neurodivergencia. Mockups orientativos (no es la UI final).
-  </div>
+  <div class="designnote"><b>Notas de diseño.</b> Paleta de la marca (verde, azul, rosa, amarillo, crema) y color por tema para orientar de un vistazo.
+  Icono del mazo como guía y chatbot de dudas. Modo accesible: tipografía amplia, frases cortas y lectura fácil para alumnado con dislexia u otra neurodivergencia.</div>
 
-  <h3 style="margin-top:14px">Fuentes consultadas (marco legal)</h3>
+  <h3 style="margin-top:14px">Fuentes del marco legal</h3>
   <div class="src">
-    <p>Art. 249 CP (estafa informática, LO 14/2022): iberley.es/legislacion/articulo-249-codigo-penal</p>
-    <p>Reforma penal LO 14/2022: perezllorca.com (nota jurídica)</p>
-    <p>Art. 172 ter CP (acecho): ebuah.uah.es/dspace/handle/10017/65720</p>
-    <p>Deepfake sexual y art. 189 CP: riull.ull.es (TFG) · ireneabogada.com</p>
-    <p>Difusión de imágenes y art. 197.7: topdelitossexuales.es</p>
-    <p>Anteproyecto Ley de IA (deepfakes sexuales): publico.es</p>
-    <p>Ley de protección de menores en entornos digitales (2024): cuatrecasas.com</p>
+    <p>Art. 249 CP (estafa informática): iberley.es</p>
+    <p>Art. 172 ter CP (acecho): lawandtrends.com · iberley.es</p>
+    <p>Art. 189 CP (pornografía infantil / imágenes realistas): iberley.es · vlex.es</p>
+    <p>Art. 197.7 CP (difusión de imágenes íntimas): legalitas.com</p>
+    <p>Grooming (art. 183 CP, tras LO 10/2022): ebuah.uah.es · vlex.com</p>
+    <p>LORPM (LO 5/2000), responsabilidad penal de menores: diposit.ub.edu</p>
     <p>Canal Prioritario AEPD / LOPIVI: elderecho.com · maldita.es</p>
-    <p>Orientación INCIBE / IS4K: genbeta.com</p>
-    <p>Detalle de referentes y juegos: ver docs/06_REFERENTES_INTERNACIONALES.md</p>
+    <p>Referentes y juegos internacionales: docs/06_REFERENTES_INTERNACIONALES.md</p>
   </div>
+</section>
 </body>
 </html>

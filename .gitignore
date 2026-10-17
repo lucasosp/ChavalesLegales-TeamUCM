@@ -38,3 +38,4 @@ Thumbs.db
 !entregables/
 !entregables/*.pdf
 !entregables/*.html
+!entregables/*.png
