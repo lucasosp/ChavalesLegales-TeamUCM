@@ -33,3 +33,8 @@ data/processed/*
 .idea/
 .DS_Store
 Thumbs.db
+
+# Entregables: versionar PDFs/HTML del dossier (excepción a *.pdf)
+!entregables/
+!entregables/*.pdf
+!entregables/*.html
