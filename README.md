@@ -76,3 +76,4 @@ El directorio `/docs` contiene el contexto fundamental del proyecto Chavales Leg
 * `docs/04_CONVENCIONES_CODIGO.md`: Enumera los estándares de programación, validaciones y manejo de errores. **Las reglas de este archivo son de cumplimiento obligatorio para evitar refactorizaciones**.
 * `docs/05_TODO_ESTADO.md`: Actúa como punto de sincronización del progreso actual, listando tareas completadas, en desarrollo y bugs activos.
 * `docs/CHAVALES_LEGALES_IDEAS.md`: Registro de brainstorming humano y reflexiones de diseño. **La IA no implementará características descritas aquí a menos que estén categorizadas explícitamente como aprobadas o en progreso en el TODO, o estén descritas en el prompt del usuario**.
+* `docs/06_REFERENTES_INTERNACIONALES.md`: Investigación de apps/juegos de otros países (phishing, stalking, deepfakes) y qué mecánicas de juego reutilizar.
