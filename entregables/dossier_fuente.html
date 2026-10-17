@@ -91,6 +91,19 @@
   .game .c{padding:13px 16px;display:grid;grid-template-columns:1.15fr 1fr;gap:14px}
   .game .c h4{font-size:9.2pt;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin-bottom:3px}
   .chip{display:inline-block;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:8.6pt;font-weight:700;margin:2px 4px 2px 0}
+  /* catálogo de juegos por grupo */
+  .gcat{margin:14px 0}
+  .gcat .gh{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+  .gcat .gh .dot{width:16px;height:16px;border-radius:5px;flex:0 0 auto}
+  .gcat .gh h3{font-size:12.5pt;font-weight:800} .gcat .gh .cnt{margin-left:auto;font-size:8.6pt;color:var(--ink-soft);font-weight:700}
+  .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .gmini{border:1px solid var(--line);border-radius:11px;overflow:hidden;display:flex;flex-direction:column}
+  .gmini .t{padding:8px 10px;color:#fff;font-weight:800;font-size:9.8pt;display:flex;align-items:center;gap:6px;line-height:1.15}
+  .gmini .bd{padding:9px 10px;font-size:8.8pt;flex:1} .gmini .bd b{color:var(--ink)}
+  .gmini .mech{display:inline-block;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:1px 8px;font-size:7.6pt;font-weight:700;margin-bottom:6px;color:var(--ink-soft)}
+  .gmini .coop{background:var(--teal-soft);border-color:#BBE6DF;color:var(--teal)}
+  .gmini .hook{margin-top:7px;border-top:1px dashed var(--line);padding-top:5px;font-size:7.9pt;color:var(--ink-soft)} .gmini .hook b{color:var(--ink)}
+  .gmini.ph .t{background:var(--blue)} .gmini.st .t{background:var(--violet)} .gmini.df .t{background:var(--red)} .gmini.co .t{background:var(--teal)}
 
   /* plan */
   .steps{display:grid;gap:9px;margin-top:8px;counter-reset:s}
@@ -137,7 +150,7 @@
   <div class="sec-head"><div class="sec-num">§</div><h2>Índice</h2></div>
   <div class="toc">
     <div class="row"><div class="n">1</div><div><div class="t">El lado legal: cómo estás protegido y qué pasa si lo haces</div><div class="d">Phishing, acecho y deepfakes + artículos de la ley española + penas (cárcel/multa) + cómo denunciar.</div></div></div>
-    <div class="row"><div class="n">2</div><div><div class="t">Los juegos interactivos</div><div class="d">Cuatro formatos jugables (arrastrar, inspeccionar, decidir) con los que se aprende cada tema.</div></div></div>
+    <div class="row"><div class="n">2</div><div><div class="t">Los juegos interactivos</div><div class="d">Varios juegos por problema (phishing, acecho, deepfakes) + juegos cooperativos para ayudarnos.</div></div></div>
     <div class="row"><div class="n">3</div><div><div class="t">Plan de implementación</div><div class="d">Pasos del proyecto y cómo la máquina transforma parámetros en un juego interactivo.</div></div></div>
     <div class="row"><div class="n">4</div><div><div class="t">Diseño de la web</div><div class="d">Mockups: panel del profesor, generador y los juegos interactivos.</div></div></div>
   </div>
@@ -261,82 +274,69 @@
 <section>
   <div class="sec-head"><div class="sec-num">2</div><h2>Los juegos interactivos</h2></div>
   <p class="lead">Nada de cuestionarios: se aprende <b>jugando e interactuando</b> —arrastrando, inspeccionando, decidiendo— con consecuencias
-  inmediatas. Cada juego conecta el peligro con el artículo de la ley y sus penas.</p>
+  inmediatas. Hay <b>varios juegos por cada problema</b> y un grupo de <b>juegos en equipo</b> para ayudarnos y no callarnos.</p>
 
-  <!-- G1 Caza-phishing -->
-  <div class="game g1 nobreak">
-    <div class="h"><h3>🎣 Caza-phishing</h3><span class="type">Arrastrar · inspeccionar · contrarreloj</span></div>
-    <div class="c">
-      <div>
-        <h4>Cómo se juega</h4>
-        <p>Entras en una <b>bandeja de entrada simulada</b>. Pasas el ratón por cada mensaje para <b>revelar la URL o el remitente real</b>,
-        <b>arrastras a la papelera</b> los fraudes y dejas pasar los legítimos. Aciertos = puntos; cada fallo "roba" datos de tu avatar.
-        Rondas que suben de velocidad.</p>
-        <span class="chip">Tema: Phishing</span><span class="chip">Edad: 10–16</span><span class="chip">Mecánica: drag &amp; drop + hover</span>
-      </div>
-      <div>
-        <h4>Qué aprende</h4>
-        <ul class="tight"><li>Detectar dominios falsos y urgencia sospechosa.</li><li>No dar datos; verificar antes de pinchar.</li></ul>
-        <h4>Gancho legal</h4>
-        <p class="muted">Al acertar, aparece: «esto es estafa informática — <b>art. 249 CP, 6 meses–3 años</b>».</p>
-      </div>
+  <!-- PHISHING -->
+  <div class="gcat nobreak">
+    <div class="gh"><span class="dot" style="background:var(--blue)"></span><h3>⚖️ Phishing / ciberestafa</h3><span class="cnt">3 juegos</span></div>
+    <div class="g3">
+      <div class="gmini ph"><div class="t">🎣 Caza-phishing</div><div class="bd"><span class="mech">arrastrar + hover · contrarreloj</span>
+        Bandeja de entrada simulada: pasa el ratón para ver la <b>URL real</b> y <b>arrastra a la papelera</b> los fraudes. Cada fallo "roba" datos de tu avatar.
+        <div class="hook"><b>Art. 249 CP</b> · 6 m–3 años</div></div></div>
+      <div class="gmini ph"><div class="t">🔗 Inspector de enlaces</div><div class="bd"><span class="mech">marcar segmentos</span>
+        Una URL ampliada: <b>marca las partes tramposas</b> (dominio falso, subdominios, candado falso) y reconstruye la dirección legítima.
+        <div class="hook"><b>Art. 249 CP</b> · estafa informática</div></div></div>
+      <div class="gmini ph"><div class="t">🔐 Blindaje de cuenta</div><div class="bd"><span class="mech">construir + defender</span>
+        <b>Crea una contraseña fuerte</b> con piezas y activa el <b>doble factor</b> para frenar oleadas de intentos de acceso. Medidor de seguridad.
+        <div class="hook"><b>Art. 197 CP</b> · 1–4 años si entran en tu cuenta</div></div></div>
     </div>
   </div>
 
-  <!-- G2 Detector deepfakes -->
-  <div class="game g2 nobreak">
-    <div class="h"><h3>🔍 Detector de deepfakes</h3><span class="type">Marcar zonas · medidor de confianza</span></div>
-    <div class="c">
-      <div>
-        <h4>Cómo se juega</h4>
-        <p>Aparece una imagen o vídeo corto. <b>Pinchas sobre las zonas sospechosas</b> (labios desincronizados, manos raras, luz incoherente)
-        y decides «real» o «IA». Un <b>medidor de confianza</b> reacciona a tus marcas y el juego te muestra las pistas que fallaste.</p>
-        <span class="chip">Tema: Deepfakes</span><span class="chip">Edad: 12–16</span><span class="chip">Mecánica: hotspots + decisión</span>
-      </div>
-      <div>
-        <h4>Qué aprende</h4>
-        <ul class="tight"><li>Señales típicas de manipulación con IA.</li><li>Por qué <b>no reenviar</b> aunque parezca "para avisar".</li></ul>
-        <h4>Gancho legal</h4>
-        <p class="muted">«Difundir un deepfake sexual de un menor = <b>art. 189 CP, 1–5 años</b>».</p>
-      </div>
+  <!-- ACECHO -->
+  <div class="gcat nobreak">
+    <div class="gh"><span class="dot" style="background:var(--violet)"></span><h3>🛰️ Acecho (stalking) y grooming</h3><span class="cnt">3 juegos</span></div>
+    <div class="g3">
+      <div class="gmini st"><div class="t">🧭 Decide y descubre</div><div class="bd"><span class="mech">historia ramificada</span>
+        Historia interactiva: tus decisiones <b>cambian el final</b>. El camino bueno refuerza <b>no contestar → pruebas → avisar → denunciar</b>.
+        <div class="hook"><b>Art. 172 ter CP</b> · 3 m–2 años</div></div></div>
+      <div class="gmini st"><div class="t">🔒 Huella bajo control</div><div class="bd"><span class="mech">arrastrar privacidad</span>
+        Tu perfil: <b>arrastra el candado</b> a lo que debe ser privado (ubicación, rutina, colegio) y baja tu "nivel de exposición".
+        <div class="hook"><b>LOPDGDD</b> · tus datos te pertenecen</div></div></div>
+      <div class="gmini st"><div class="t">💬 ¿Amigo o anzuelo?</div><div class="bd"><span class="mech">detectar señales en chat</span>
+        Chat con un desconocido: <b>marca las señales de grooming</b> (halagos, secretismo, pedir fotos, aislarte) y decide cuándo cortar y a quién avisar.
+        <div class="hook"><b>Art. 183 CP</b> · grooming, 1–3 años</div></div></div>
     </div>
   </div>
 
-  <!-- G3 Decide y descubre -->
-  <div class="game g3 nobreak">
-    <div class="h"><h3>🧭 Decide y descubre</h3><span class="type">Historia ramificada · consecuencias</span></div>
-    <div class="c">
-      <div>
-        <h4>Cómo se juega</h4>
-        <p>Una <b>historia interactiva</b>: en cada escena eliges qué hacer y la trama <b>cambia según tu decisión</b> (buen final / mal final).
-        Un medidor de "seguridad" sube o baja. El camino bueno refuerza: <b>no contestar → guardar pruebas → contar a un adulto → denunciar</b>.</p>
-        <span class="chip">Tema: Acecho / grooming</span><span class="chip">Edad: 11–16</span><span class="chip">Mecánica: árbol de decisiones</span>
-      </div>
-      <div>
-        <h4>Qué aprende</h4>
-        <ul class="tight"><li>Reconocer el acecho y cortar el contacto.</li><li>Los pasos para protegerse y pedir ayuda.</li></ul>
-        <h4>Gancho legal</h4>
-        <p class="muted">«El acecho es delito — <b>art. 172 ter CP, 3 meses–2 años</b> (más si la víctima es menor)».</p>
-      </div>
+  <!-- DEEPFAKES -->
+  <div class="gcat nobreak">
+    <div class="gh"><span class="dot" style="background:var(--red)"></span><h3>🎭 Deepfakes</h3><span class="cnt">3 juegos</span></div>
+    <div class="g3">
+      <div class="gmini df"><div class="t">🔍 Detector de deepfakes</div><div class="bd"><span class="mech">marcar zonas + decidir</span>
+        <b>Pincha las zonas sospechosas</b> (labios, manos, luz) y decide «real» o «IA». Un medidor de confianza reacciona y te enseña las pistas que fallaste.
+        <div class="hook"><b>Art. 189 CP</b> · 1–5 años (deepfake sexual de menor)</div></div></div>
+      <div class="gmini df"><div class="t">🔁 STOP al reenvío</div><div class="bd"><span class="mech">simulación de cadena</span>
+        Te llega un deepfake en el grupo: decides en cada paso (parar, avisar, reportar) y <b>ves cómo se frena o se dispara</b> el daño.
+        <div class="hook"><b>Art. 197.7 CP</b> · reenviar también es delito</div></div></div>
+      <div class="gmini df"><div class="t">🃏 Real o IA</div><div class="bd"><span class="mech">comparar / deslizar</span>
+        Pares de imágenes real vs. IA: <b>desliza</b> tu respuesta y aprende las pistas. Incluye un mini-taller de "cómo se hace" para reconocerlos (pre-bunking).
+        <div class="hook">Alfabetización en IA · <b>LO 1/1982</b> (propia imagen)</div></div></div>
     </div>
   </div>
 
-  <!-- G4 Escudo legal -->
-  <div class="game g4 nobreak">
-    <div class="h"><h3>🛡️ Escudo legal</h3><span class="type">Emparejar · derecho ↔ situación</span></div>
-    <div class="c">
-      <div>
-        <h4>Cómo se juega</h4>
-        <p>Juego de <b>emparejar</b>: te aparecen situaciones a un lado y <b>derechos/leyes que te protegen</b> al otro; conectas cada situación con el escudo
-        legal correcto y descubres la pena asociada. Sirve de repaso tras los otros juegos.</p>
-        <span class="chip">Tema: Los tres</span><span class="chip">Edad: 12–16</span><span class="chip">Mecánica: matching + cartas</span>
-      </div>
-      <div>
-        <h4>Qué aprende</h4>
-        <ul class="tight"><li>Qué ley te ampara en cada caso.</li><li>Fija las consecuencias (efecto disuasorio).</li></ul>
-        <h4>Gancho legal</h4>
-        <p class="muted">Cada pareja revela el artículo y su pena, y recuerda la <b>Ley del Menor</b> si el autor es menor.</p>
-      </div>
+  <!-- COOPERATIVOS -->
+  <div class="gcat nobreak">
+    <div class="gh"><span class="dot" style="background:var(--teal)"></span><h3>🤝 Juntos: en equipo y nos ayudamos</h3><span class="cnt">3 juegos</span></div>
+    <div class="g3">
+      <div class="gmini co"><div class="t">🤝 Dúo legal</div><div class="bd"><span class="mech coop">2 jugadores · cooperativo</span>
+        Por parejas: uno tiene las cartas de <b>la LEY</b> (artículo + pena) y otro las de <b>la ACCIÓN</b> (qué hacer). Ante un caso, <b>hablando entre los dos</b>, juntan la ley y la acción correctas; solo puntúan si ambas encajan.
+        <div class="hook">Defenderse = conocer tu derecho <b>y</b> saber actuar</div></div></div>
+      <div class="gmini co"><div class="t">📣 No te calles</div><div class="bd"><span class="mech coop">testigo → aliado</span>
+        Le pasa a un compañero y tú eres testigo: eliges cómo <b>apoyar</b> (no reenviar, acompañar, decirle que no es su culpa, avisar a un adulto, reportar). El silencio lo deja solo; el apoyo sube el medidor.
+        <div class="hook">De espectador a aliado · no quedarse callado</div></div></div>
+      <div class="gmini co"><div class="t">🔗 Cadena de ayuda</div><div class="bd"><span class="mech coop">en equipo / aula</span>
+        En grupo <b>ordenáis entre todos</b> la cadena correcta de ayuda ante un caso (parar → guardar pruebas → acompañar → contar a un adulto → denunciar); cada persona aporta un eslabón.
+        <div class="hook">Entre todos protegemos mejor</div></div></div>
     </div>
   </div>
 </section>
@@ -368,9 +368,9 @@
 
   <h3 style="margin-top:12px">Pasos del generador</h3>
   <div class="steps nobreak">
-    <div class="step"><div class="b"></div><div><h4>Entrada de parámetros</h4>El profesor elige tema, curso/edad, <b>tipo de juego</b> (caza-phishing, detector, decide y descubre, escudo legal), dificultad, nº de retos y modo accesible.</div></div>
+    <div class="step"><div class="b"></div><div><h4>Entrada de parámetros</h4>El profesor elige tema, curso/edad, <b>tipo de juego</b> (del catálogo por problema, individuales o <b>cooperativos</b>), dificultad, nº de retos y modo accesible.</div></div>
     <div class="step"><div class="b"></div><div><h4>Selección de contenido</h4>Se filtran del banco los ítems que cumplen los criterios (situación + artículo + pena + feedback).</div></div>
-    <div class="step"><div class="b"></div><div><h4>Montaje según la mecánica</h4>Cada tipo de juego tiene su plantilla: lista de correos (caza-phishing), imagen + <i>hotspots</i> (detector), árbol de decisiones (decide y descubre) o pares (escudo legal).</div></div>
+    <div class="step"><div class="b"></div><div><h4>Montaje según la mecánica</h4>Cada tipo de juego tiene su plantilla: lista de correos, <i>hotspots</i> sobre imagen, árbol de decisiones, arrastrar-y-soltar, cartas emparejadas o roles por parejas (cooperativo).</div></div>
     <div class="step"><div class="b"></div><div><h4>Serialización a JSON y validación</h4>Se produce el JSON del juego interactivo y se valida contra el <code>schema</code> para que el motor lo reciba bien formado.</div></div>
     <div class="step"><div class="b"></div><div><h4>Render interactivo en la web</h4>El motor lee el JSON y lo hace jugable (arrastrar, marcar, decidir) y guarda el progreso del alumno.</div></div>
   </div>
@@ -381,7 +381,7 @@
     <tr><td>Fase 0</td><td>Extracción de datos legales (BOE) + modelos + generador base</td><td class="done">Hecho</td></tr>
     <tr><td>Fase 1</td><td>Banco de contenido por tema con artículo, pena y «cómo denuncio»</td><td>Siguiente</td></tr>
     <tr><td>Fase 2</td><td>Modelos + schema de las mecánicas interactivas (items, hotspots, árbol)</td><td>Pendiente</td></tr>
-    <tr><td>Fase 3</td><td>Motor web interactivo (los cuatro juegos)</td><td>Pendiente</td></tr>
+    <tr><td>Fase 3</td><td>Motor web interactivo (catálogo por problema + modo cooperativo/aula)</td><td>Pendiente</td></tr>
     <tr><td>Fase 4</td><td>Panel del profesor (parámetros) + compartir/exportar juego</td><td>Pendiente</td></tr>
     <tr><td>Fase 5</td><td>Chatbot de dudas + modo accesible (dislexia/neurodivergencia)</td><td>Pendiente</td></tr>
   </table>
