@@ -77,3 +77,14 @@ El directorio `/docs` contiene el contexto fundamental del proyecto Chavales Leg
 * `docs/05_TODO_ESTADO.md`: Actúa como punto de sincronización del progreso actual, listando tareas completadas, en desarrollo y bugs activos.
 * `docs/CHAVALES_LEGALES_IDEAS.md`: Registro de brainstorming humano y reflexiones de diseño. **La IA no implementará características descritas aquí a menos que estén categorizadas explícitamente como aprobadas o en progreso en el TODO, o estén descritas en el prompt del usuario**.
 * `docs/06_REFERENTES_INTERNACIONALES.md`: Investigación de apps/juegos de otros países (phishing, stalking, deepfakes) y qué mecánicas de juego reutilizar.
+
+## Web (frontend + backend)
+
+```bash
+pip install -r backend/requirements.txt
+uvicorn main:app --app-dir backend --reload --port 8000   # API en :8000
+npm install --prefix frontend && npm run dev              # Web en :3000 (/api → :8000)
+```
+
+- `backend/main.py`: FastAPI con `/api/temas`, `/api/temas/{id}` y `POST /api/juegos` (usa el generador).
+- `frontend/`: Next.js (App Router). Portada en `app/page.jsx` (hero + tarjetas por tema).
