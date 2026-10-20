@@ -1,42 +1,36 @@
-import TemaCard from '../components/TemaCard'
+import Link from 'next/link'
 
-const API_URL = process.env.API_URL || 'http://localhost:8000'
+const MODOS = [
+  { href: '/historia', icono: '📖', titulo: 'Modo historia', texto: 'Vive una aventura y decide qué hacer. ¡Cada elección cuenta!' },
+  { href: '/preguntas', icono: '❓', titulo: 'Preguntas', texto: 'Pon a prueba lo que sabes sobre internet seguro.' },
+  { href: '/cooperativo', icono: '🤝', titulo: 'Cooperativo', texto: 'Juega con un amigo o amiga: os turnáis y sumáis puntos juntos.' },
+]
 
-async function getTemas() {
-  try {
-    const r = await fetch(`${API_URL}/api/temas`, { cache: 'no-store' })
-    return r.ok ? r.json() : null
-  } catch {
-    return null
-  }
-}
-
-export default async function Home() {
-  const temas = await getTemas()
-
+export default function Home() {
   return (
     <>
-      <header className="hero">
-        <div className="hero__in">
-          <p className="eyebrow">Team UCM</p>
-          <h1>Chavales <em>Legales</em></h1>
-          <p className="lead">Aprende a defenderte en internet jugando: qué dice la ley,
-            cómo protegerte y a quién pedir ayuda.</p>
-          <a className="btn" href="#temas">Empezar</a>
+      <section className="hero">
+        <div>
+          <p className="eyebrow">Aprende jugando</p>
+          <h1>¡Hola, soy el <span>Juez Mono</span>!</h1>
+          <p className="lead">Te enseño a protegerte en internet: trampas por mensaje, acoso y vídeos falsos.
+            ¿Te atreves a ser un Chaval Legal?</p>
+          <Link className="btn" href="/historia">¡Empezar a jugar!</Link>
         </div>
-      </header>
+        <img className="hero__img" src="/mascota.jpg" alt="Juez Mono, la mascota" />
+      </section>
 
-      <main id="temas" className="wrap">
-        <h2>Elige un reto</h2>
-        {!temas && <p className="error">API no disponible. Arranca el backend en el puerto 8000.</p>}
-        <section className="nav">
-          {temas?.map((t, i) => <TemaCard key={t.id} tema={t} n={i + 1} />)}
-        </section>
-      </main>
-
-      <footer className="wrap foot">
-        ¿Necesitas ayuda? INCIBE <strong>017</strong> · AEPD Canal Prioritario · Policía / Guardia Civil
-      </footer>
+      <h2>Elige un juego</h2>
+      <section className="cards">
+        {MODOS.map(m => (
+          <Link key={m.href} href={m.href} className="card">
+            <span className="card__ico">{m.icono}</span>
+            <h3>{m.titulo}</h3>
+            <p>{m.texto}</p>
+            <span className="card__go">Jugar →</span>
+          </Link>
+        ))}
+      </section>
     </>
   )
 }

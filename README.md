@@ -86,5 +86,5 @@ uvicorn main:app --app-dir backend --reload --port 8000   # API en :8000
 npm install --prefix frontend && npm run dev              # Web en :3000 (/api → :8000)
 ```
 
-- `backend/main.py`: FastAPI con `/api/temas`, `/api/temas/{id}` y `POST /api/juegos` (usa el generador).
-- `frontend/`: Next.js (App Router). Portada en `app/page.jsx` (hero + tarjetas por tema).
+- `backend/main.py` + `backend/contenido.py`: FastAPI, `GET /api/juegos/{historia|preguntas|cooperativo}`.
+- `frontend/`: Next.js (App Router). `app/page.jsx` (portada), `app/historia`, `app/preguntas`, `app/cooperativo`; componentes en `components/` (Header, Footer, Juez = mascota).

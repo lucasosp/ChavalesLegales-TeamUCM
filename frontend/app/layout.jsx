@@ -1,16 +1,22 @@
 import './globals.css'
+import Header from '../components/Header'
+import Footer from '../components/Footer'
 
 export const metadata = {
-  title: 'Chavales Legales · Team UCM',
-  description: 'Juegos interactivos para que los menores conozcan la ley frente al phishing, el acecho online y los deepfakes.',
+  title: 'Chavales Legales',
+  description: 'Juegos para que niños y niñas aprendan a protegerse en internet: phishing, acoso y deepfakes.',
 }
 
-export const viewport = { themeColor: '#0B1026' }
+export const viewport = { themeColor: '#3B0D1C' }
 
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body>
+        <Header />
+        <main className="wrap">{children}</main>
+        <Footer />
+      </body>
     </html>
   )
 }
