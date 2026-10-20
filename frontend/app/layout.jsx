@@ -7,7 +7,7 @@ export const metadata = {
   description: 'Juegos para que niños y niñas aprendan a protegerse en internet: phishing, acoso y deepfakes.',
 }
 
-export const viewport = { themeColor: '#3B0D1C' }
+export const viewport = { themeColor: "#2A0A14" }
 
 export default function RootLayout({ children }) {
   return (
