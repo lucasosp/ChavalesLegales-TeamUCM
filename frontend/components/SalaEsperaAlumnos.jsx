@@ -116,7 +116,6 @@ export default function SalaEsperaAlumnos({
 }) {
   const isLive = Array.isArray(externalStudents)
   const cleanPin = rawCleanPin || (pin ? String(pin).replace(/\s+/g, '') : '')
-  const displayUrl = roomUrl || (cleanPin ? `http://localhost:3001/profesores/sala/${cleanPin}` : '')
 
   // Modal de personalización: cerrado al entrar (se genera uno random automáticamente estilo Kahoot)
     // Estado para la capacidad del aula y modo infinito
@@ -1081,25 +1080,6 @@ export default function SalaEsperaAlumnos({
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            {displayUrl && (
-              <div
-                style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  border: '1.5px solid rgba(255, 255, 255, 0.25)',
-                  borderRadius: 14,
-                  padding: '6px 14px',
-                  textAlign: 'right',
-                }}
-              >
-                <span style={{ display: 'block', fontSize: 10, fontWeight: 800, color: '#FACC15', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                  Enlace de sala
-                </span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#FFFFFF', letterSpacing: '0.02em', fontFamily: 'monospace' }}>
-                  {displayUrl}
-                </span>
-              </div>
-            )}
-
             <div className="sala-pin-pill">
               <span className="sala-pin-label">CÓDIGO PIN</span>
               <span className="sala-pin-value">{pin || cleanPin}</span>
@@ -1221,15 +1201,14 @@ export default function SalaEsperaAlumnos({
                 type="button"
                 className="btn-sala-iniciar"
                 onClick={onIniciar}
-                disabled={students.length === 0}
-                title={students.length === 0 ? 'Esperando alumnos' : 'Iniciar la actividad'}
+                title="Iniciar la actividad"
               >
                 Iniciar partida ({students.length})
               </button>
             ) : !isHost ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span style={{ fontSize: 13, color: '#64748B', fontWeight: 600 }}>
-                  Esperando a que el profesor inicie la partida...
+                  Esperando a que el profesor lance un juego a la clase...
                 </span>
                 {onVolver && (
                   <button

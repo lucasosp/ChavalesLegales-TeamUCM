@@ -27,12 +27,19 @@ export function createGameSocket({ url, onMessage, onOpen, onClose, onError }) {
   let ws = null
   let pingInterval = null
   let isClosedManually = false
+  const sendQueue = []
 
   function connect() {
     try {
       ws = new WebSocket(url)
 
       ws.onopen = (e) => {
+        // Enviar mensajes en cola acumulados antes de completar la conexión
+        while (sendQueue.length > 0 && ws.readyState === WebSocket.OPEN) {
+          const queued = sendQueue.shift()
+          ws.send(JSON.stringify(queued))
+        }
+
         // Enviar ping cada 15 segundos para evitar que proxies cierren la conexión
         pingInterval = setInterval(() => {
           if (ws && ws.readyState === WebSocket.OPEN) {
@@ -76,8 +83,14 @@ export function createGameSocket({ url, onMessage, onOpen, onClose, onError }) {
 
   return {
     send: (action, payload = {}) => {
+      const message = { action, ...payload }
       if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ action, ...payload }))
+        ws.send(JSON.stringify(message))
+        return true
+      }
+      // Encolar si todavía está conectando
+      if (!ws || ws.readyState === WebSocket.CONNECTING) {
+        sendQueue.push(message)
         return true
       }
       return false

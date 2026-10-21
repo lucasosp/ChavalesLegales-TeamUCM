@@ -18,7 +18,7 @@ try {
   await cp(path.join(projectRoot, "public"), path.join(tempRoot, "public"), {
     recursive: true,
   });
-  await unlink(path.join(tempRoot, "public/assets/backgrounds/clubroom.svg"));
+  await unlink(path.join(tempRoot, "public/assets/backgrounds/photos/library.jpg"));
 
   const report = await validateContent({ root: tempRoot });
 
