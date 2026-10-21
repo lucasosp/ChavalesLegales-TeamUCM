@@ -21,6 +21,7 @@ export class VisualNovelView {
   #chatMessages = [];
   #chatIndex = 0;
   #chatSelf = null;
+  #chatAdvanceBlockedUntil = 0;
   #interactionLocked = false;
   #interstitialComplete = null;
   #minigameComplete = null;
@@ -30,6 +31,17 @@ export class VisualNovelView {
   #minigameChecked = false;
   #rightsVisible = false;
   #rights = null;
+  #lessonComplete = null;
+  #quizComplete = null;
+  #quizQuestions = [];
+  #quizIndex = 0;
+  #quizAnswers = [];
+  #quizAnswered = false;
+  #quizSummary = false;
+  #quizTitle = "";
+  #noticeTimer = null;
+  #interactionLockBeforeNotice = false;
+  #locationTimer = null;
 
   /**
    * @param {HTMLElement} root
@@ -40,7 +52,9 @@ export class VisualNovelView {
    *   onExit?: () => void,
    *   title?: string,
    *   resolveCharacter?: (character: { id: string, expression: string }) => string,
+   *   resolveCharacterName?: (characterId: string) => string,
    *   resolveBackground?: (sceneId: string) => string | null,
+   *   resolveSceneLabel?: (sceneId: string) => string,
    *   rights?: Record<string, any> | null,
    * }} callbacks
    */
@@ -53,7 +67,9 @@ export class VisualNovelView {
       onExit = null,
       title = "Visual Novel",
       resolveCharacter = defaultCharacterSource,
+      resolveCharacterName = defaultCharacterName,
       resolveBackground = null,
+      resolveSceneLabel = defaultSceneLabel,
       rights = null,
     },
   ) {
@@ -66,7 +82,9 @@ export class VisualNovelView {
     this.onRestart = onRestart;
     this.onExit = onExit;
     this.resolveCharacter = resolveCharacter;
+    this.resolveCharacterName = resolveCharacterName;
     this.resolveBackground = resolveBackground;
+    this.resolveSceneLabel = resolveSceneLabel;
     this.rights = rights;
     this.root = root;
     this.#onKeyDown = (event) => this.#handleKeyDown(event);
@@ -79,6 +97,15 @@ export class VisualNovelView {
       character: root.querySelector("[data-character]"),
       sprite: root.querySelector("[data-sprite]"),
       brand: root.querySelector("[data-brand]"),
+      locationChip: root.querySelector("[data-location-chip]"),
+      perspectiveBadge: root.querySelector("[data-perspective-badge]"),
+      locationBanner: root.querySelector("[data-location-banner]"),
+      locationText: root.querySelector("[data-location-text]"),
+      notice: root.querySelector("[data-notice]"),
+      noticeTitle: root.querySelector("[data-notice-title]"),
+      noticeText: root.querySelector("[data-notice-text]"),
+      noticeLesson: root.querySelector("[data-notice-lesson]"),
+      noticeClose: root.querySelector("[data-notice-close]"),
       panel: root.querySelector("[data-panel]"),
       speaker: root.querySelector("[data-speaker-name]"),
       text: root.querySelector("[data-text]"),
@@ -102,6 +129,20 @@ export class VisualNovelView {
       minigameFeedback: root.querySelector("[data-minigame-feedback]"),
       minigameCheck: root.querySelector("[data-minigame-check]"),
       minigameContinue: root.querySelector("[data-minigame-continue]"),
+      quiz: root.querySelector("[data-quiz]"),
+      quizKicker: root.querySelector("[data-quiz-kicker]"),
+      quizTitle: root.querySelector("[data-quiz-title]"),
+      quizPrompt: root.querySelector("[data-quiz-prompt]"),
+      quizProgress: root.querySelector("[data-quiz-progress]"),
+      quizOptions: root.querySelector("[data-quiz-options]"),
+      quizFeedback: root.querySelector("[data-quiz-feedback]"),
+      quizNext: root.querySelector("[data-quiz-next]"),
+      lesson: root.querySelector("[data-lesson]"),
+      lessonTitle: root.querySelector("[data-lesson-title]"),
+      lessonChoice: root.querySelector("[data-lesson-choice]"),
+      lessonConsequence: root.querySelector("[data-lesson-consequence]"),
+      lessonTeach: root.querySelector("[data-lesson-teach]"),
+      lessonClose: root.querySelector("[data-lesson-close]"),
       library: root.querySelector("[data-library]"),
       restart: root.querySelector("[data-restart]"),
       ending: root.querySelector("[data-ending]"),
@@ -133,18 +174,20 @@ export class VisualNovelView {
     clearInterval(this.#chatTimer);
     this.#choiceReadyTimer = null;
     this.#chatTimer = null;
+    this.#hideNotice();
+    clearTimeout(this.#locationTimer);
     this.typewriter.stop();
   }
 
   /* ------------------------------------------------------------ story events */
 
-  showDialogue({ speaker, text, tone, stage }) {
+  showDialogue({ speaker, remote, text, tone, stage }) {
     this.#resetTransientOverlays();
     this.#leaveEnding();
     this.#awaitingChoice = false;
     this.#clearChoices();
     this.#applyStage(stage);
-    this.#setSpeaker(speaker);
+    this.#setSpeaker(speaker, remote);
     this.refs.announcement.textContent = `${speaker ? `${speaker}: ` : ""}${text}`;
 
     this.refs.panel.classList.toggle("is-narration", tone === "narration");
@@ -158,12 +201,12 @@ export class VisualNovelView {
     });
   }
 
-  showChoices({ speaker, prompt, tone, options, stage }) {
+  showChoices({ speaker, remote, prompt, tone, options, stage }) {
     this.#resetTransientOverlays();
     this.#leaveEnding();
     this.#awaitingChoice = false;
     this.#applyStage(stage);
-    this.#setSpeaker(speaker);
+    this.#setSpeaker(speaker, remote);
     this.refs.announcement.textContent = `${speaker ? `${speaker}: ` : ""}${prompt}`;
     this.#clearChoices();
 
@@ -223,6 +266,7 @@ export class VisualNovelView {
     this.refs.chatLog.replaceChildren();
     this.refs.chatHint.hidden = true;
     this.refs.chatSkip.hidden = false;
+    this.#chatAdvanceBlockedUntil = 0;
 
     this.#chatSelf = self ?? null;
     this.#chatMessages = Array.isArray(messages) ? messages : [];
@@ -250,7 +294,7 @@ export class VisualNovelView {
     this.refs.chatLog.append(this.#createChatBubble(message, this.#chatSelf));
     this.refs.chatLog.scrollTop = this.refs.chatLog.scrollHeight;
 
-    if (this.#chatIndex >= this.#chatMessages.length) this.#finishChat();
+    if (this.#chatIndex >= this.#chatMessages.length) this.#finishChat({ natural: true });
     else {
       const delay = Math.min(4200, Math.max(1400, (message.text?.length ?? 0) * 45));
       this.#chatTimer = setTimeout(() => this.#revealChatMessage(), delay);
@@ -268,15 +312,24 @@ export class VisualNovelView {
     }
 
     this.refs.chatLog.scrollTop = this.refs.chatLog.scrollHeight;
-    this.#finishChat();
+    this.#finishChat({ natural: false });
   }
 
-  #finishChat() {
+  #finishChat({ natural = false } = {}) {
     clearInterval(this.#chatTimer);
     this.#chatTimer = null;
     this.#chatRevealing = false;
     this.refs.chatHint.hidden = false;
     this.refs.chatSkip.hidden = true;
+
+    // If the conversation ended on its own, protect the next beat from an
+    // accidental space/Enter that was already on its way. Skipping the chat
+    // explicitly does not add this delay, so the player can still spam past.
+    this.#chatAdvanceBlockedUntil = natural ? performance.now() + 500 : 0;
+  }
+
+  #isAdvanceBuffered() {
+    return performance.now() < this.#chatAdvanceBlockedUntil;
   }
 
   #clearChat() {
@@ -286,6 +339,7 @@ export class VisualNovelView {
     this.#chatMessages = [];
     this.#chatIndex = 0;
     this.#chatSelf = null;
+    this.#chatAdvanceBlockedUntil = 0;
     this.refs.chat.hidden = true;
     this.refs.chatLog.replaceChildren();
     this.refs.chatHint.hidden = true;
@@ -378,6 +432,208 @@ export class VisualNovelView {
     this.#interactionLocked = false;
     this.refs.panel.hidden = false;
     complete?.();
+  }
+
+  /* ------------------------------------------------------ reconduction */
+
+  showNotice(payload) {
+    this.#hideNotice();
+    this.refs.noticeTitle.textContent = payload.title ?? "Aviso";
+    this.refs.noticeText.textContent = payload.text ?? "";
+    this.refs.noticeText.hidden = !payload.text;
+    this.refs.noticeLesson.textContent = payload.lesson ?? "";
+    this.refs.noticeLesson.hidden = !payload.lesson;
+    this.refs.notice.hidden = false;
+    this.refs.notice.setAttribute("aria-hidden", "false");
+    this.#interactionLockBeforeNotice = this.#interactionLocked;
+    this.#interactionLocked = true;
+    // The modal stays until the player reads the warning and continues.
+    this.refs.noticeClose.focus({ preventScroll: true });
+  }
+
+  #hideNotice() {
+    clearTimeout(this.#noticeTimer);
+    this.#noticeTimer = null;
+    this.refs.notice.hidden = true;
+    this.refs.notice.setAttribute("aria-hidden", "true");
+    this.#interactionLocked = this.#interactionLockBeforeNotice;
+    this.#interactionLockBeforeNotice = false;
+    if (document.activeElement === this.refs.noticeClose) this.refs.noticeClose.blur();
+  }
+
+  showLesson(payload, onComplete) {
+    this.#resetTransientOverlays();
+    this.#applyStage(payload.stage);
+    this.refs.panel.hidden = true;
+    this.#interactionLocked = true;
+    this.#lessonComplete = onComplete;
+
+    this.refs.lesson.hidden = false;
+    this.refs.lesson.setAttribute("aria-hidden", "false");
+    this.refs.lessonTitle.textContent = payload.title ?? "Hay otra forma de hacerlo";
+    this.refs.lessonChoice.textContent = payload.label ? `Elegiste: «${payload.label}»` : "";
+    this.refs.lessonChoice.hidden = !payload.label;
+    this.refs.lessonConsequence.textContent = payload.consequence ?? "";
+    this.refs.lessonConsequence.hidden = !payload.consequence;
+    this.refs.lessonTeach.textContent = payload.lesson ?? "";
+    this.refs.lessonTeach.hidden = !payload.lesson;
+    this.refs.lessonClose.focus({ preventScroll: true });
+  }
+
+  #closeLesson() {
+    if (this.refs.lesson.hidden) return;
+    this.refs.lesson.hidden = true;
+    this.refs.lesson.setAttribute("aria-hidden", "true");
+    this.refs.panel.hidden = false;
+    this.#interactionLocked = false;
+    const complete = this.#lessonComplete;
+    this.#lessonComplete = null;
+    complete?.();
+  }
+
+  /* ---------------------------------------------------------------- quiz */
+
+  showQuiz(payload, onComplete) {
+    this.#resetTransientOverlays();
+    this.#applyStage(payload.stage);
+    this.refs.panel.hidden = true;
+    this.#interactionLocked = true;
+    this.#quizComplete = onComplete;
+    this.#quizQuestions = Array.isArray(payload.questions) ? payload.questions : [];
+    this.#quizIndex = 0;
+    this.#quizAnswers = [];
+    this.#quizAnswered = false;
+    this.#quizSummary = false;
+    this.#quizTitle = payload.title ?? "Cuatro ideas para llevarte";
+
+    this.refs.quiz.hidden = false;
+    this.refs.quiz.setAttribute("aria-hidden", "false");
+    this.refs.quizTitle.textContent = this.#quizTitle;
+    this.refs.quizPrompt.textContent = payload.prompt ?? "";
+    this.#renderQuizQuestion();
+  }
+
+  #renderQuizQuestion() {
+    const question = this.#quizQuestions[this.#quizIndex];
+    if (!question) {
+      this.#renderQuizSummary();
+      return;
+    }
+
+    this.#quizAnswered = false;
+    this.refs.quizKicker.textContent = question.voice
+      ? `Taller de Elena · pregunta de ${question.voice}`
+      : "Taller de Elena · pregunta";
+    this.refs.quizPrompt.textContent = question.question ?? "";
+    this.refs.quizProgress.textContent = `Pregunta ${this.#quizIndex + 1} de ${this.#quizQuestions.length}`;
+    this.refs.quizOptions.replaceChildren();
+    this.refs.quizFeedback.hidden = true;
+    this.refs.quizFeedback.replaceChildren();
+    this.refs.quizNext.hidden = true;
+
+    for (const option of question.options ?? []) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "quiz-option";
+      button.dataset.optionId = option.id;
+      button.textContent = option.label ?? "";
+      button.addEventListener("click", () => this.#answerQuiz(question, option, button));
+      this.refs.quizOptions.append(button);
+    }
+
+    this.refs.quizOptions.querySelector("button")?.focus({ preventScroll: true });
+  }
+
+  #answerQuiz(question, option, button) {
+    if (this.#quizAnswered) return;
+    this.#quizAnswered = true;
+    this.#quizAnswers.push({ questionId: question.id, optionId: option.id });
+
+    for (const candidate of this.refs.quizOptions.querySelectorAll(".quiz-option")) {
+      candidate.disabled = true;
+      const definition = question.options?.find(
+        (item) => item.id === candidate.dataset.optionId,
+      );
+      if (definition?.correct) candidate.classList.add("is-correct");
+    }
+
+    if (!option.correct) button.classList.add("is-wrong");
+
+    const feedback = this.refs.quizFeedback;
+    feedback.replaceChildren();
+    const result = document.createElement("p");
+    result.className = option.correct ? "is-good" : "is-bad";
+    result.textContent = option.correct
+      ? "Correcto. " + (option.feedback ?? question.explanation ?? "")
+      : "No exactamente. " +
+        (question.options?.find((item) => item.correct)?.label ?? "") +
+        ". " +
+        (question.explanation ?? "");
+    feedback.append(result);
+    if (option.feedback && !option.correct) {
+      const nuance = document.createElement("p");
+      nuance.textContent = option.feedback;
+      feedback.append(nuance);
+    }
+    feedback.hidden = false;
+
+    const last = this.#quizIndex >= this.#quizQuestions.length - 1;
+    this.refs.quizNext.textContent = last ? "Ver resultado" : "Siguiente pregunta";
+    this.refs.quizNext.hidden = false;
+    this.refs.quizNext.focus({ preventScroll: true });
+  }
+
+  #advanceQuiz() {
+    if (!this.#quizAnswered) return;
+    if (this.#quizSummary) {
+      this.#completeQuiz();
+      return;
+    }
+    if (this.#quizIndex >= this.#quizQuestions.length - 1) {
+      this.#renderQuizSummary();
+      return;
+    }
+    this.#quizIndex += 1;
+    this.#renderQuizQuestion();
+  }
+
+  #renderQuizSummary() {
+    const correct = this.#quizAnswers.filter((answer) => {
+      const question = this.#quizQuestions.find((item) => item.id === answer.questionId);
+      return Boolean(question?.options?.find((option) => option.id === answer.optionId)?.correct);
+    }).length;
+
+    this.#quizAnswered = true;
+    this.#quizSummary = true;
+    this.refs.quizKicker.textContent = "Taller de Elena · cierre";
+    this.refs.quizPrompt.textContent = "No hay nota ni castigo. Lo importante es que puedas reconocer estas ideas y pedir ayuda.";
+    this.refs.quizProgress.textContent = `${correct} de ${this.#quizQuestions.length} ideas reconocidas`;
+    this.refs.quizOptions.replaceChildren();
+
+    const feedback = this.refs.quizFeedback;
+    feedback.replaceChildren();
+    const summary = document.createElement("p");
+    summary.className = "is-good";
+    summary.textContent =
+      correct === this.#quizQuestions.length
+        ? "Has reconocido todas las ideas clave. Puedes repasarlas siempre que quieras."
+        : "Puedes volver a la libreta y repasar las ideas que aún bailan. Pedir ayuda no exige acertarlo todo.";
+    feedback.append(summary);
+    feedback.hidden = false;
+
+    this.refs.quizNext.textContent = "Continuar";
+    this.refs.quizNext.hidden = false;
+    this.refs.quizNext.focus({ preventScroll: true });
+  }
+
+  #completeQuiz() {
+    const complete = this.#quizComplete;
+    this.#quizComplete = null;
+    this.refs.quiz.hidden = true;
+    this.refs.quiz.setAttribute("aria-hidden", "true");
+    this.refs.panel.hidden = false;
+    this.#interactionLocked = false;
+    complete?.(this.#quizAnswers.map((answer) => ({ ...answer })));
   }
 
   /* ------------------------------------------------------------ minigame */
@@ -597,6 +853,20 @@ export class VisualNovelView {
     this.#clearChat();
     this.refs.interstitial.hidden = true;
     this.refs.interstitial.setAttribute("aria-hidden", "true");
+    this.refs.quiz.hidden = true;
+    this.refs.quiz.setAttribute("aria-hidden", "true");
+    this.refs.quizFeedback.hidden = true;
+    this.refs.quizFeedback.replaceChildren();
+    this.refs.quizOptions.replaceChildren();
+    this.refs.quizNext.hidden = true;
+    this.refs.lesson.hidden = true;
+    this.refs.lesson.setAttribute("aria-hidden", "true");
+    this.#lessonComplete = null;
+    this.#quizComplete = null;
+    this.#quizQuestions = [];
+    this.#quizAnswers = [];
+    this.#quizSummary = false;
+    this.#hideNotice();
     this.refs.minigame.hidden = true;
     this.refs.minigame.setAttribute("aria-hidden", "true");
     this.refs.minigameFeedback.hidden = true;
@@ -612,8 +882,14 @@ export class VisualNovelView {
   /* ------------------------------------------------------------------ helpers */
 
   #bindEvents() {
-    this.refs.advance.addEventListener("click", () => this.onAdvance());
-    this.refs.chatHint.addEventListener("click", () => this.onAdvance());
+    this.refs.advance.addEventListener("click", (event) => {
+      if (event.detail === 0 && this.#isAdvanceBuffered()) return;
+      this.onAdvance();
+    });
+    this.refs.chatHint.addEventListener("click", (event) => {
+      if (event.detail === 0 && this.#isAdvanceBuffered()) return;
+      this.onAdvance();
+    });
     this.refs.chatSkip.addEventListener("click", () => this.#skipChat());
     this.refs.scene.addEventListener("click", (event) => {
       if (event.target.closest("button")) return;
@@ -649,6 +925,16 @@ export class VisualNovelView {
     });
 
     this.refs.interstitialNext.addEventListener("click", () => this.#completeInterstitial());
+    this.refs.quizNext.addEventListener("click", () => this.#advanceQuiz());
+    this.refs.lessonClose.addEventListener("click", () => this.#closeLesson());
+    this.refs.noticeClose.addEventListener("click", () => {
+      this.#hideNotice();
+      const choice = this.refs.choices.querySelector(".choice");
+      if (choice) choice.focus({ preventScroll: true });
+      else if (!this.refs.advance.hidden) this.refs.advance.focus({ preventScroll: true });
+      else if (!this.refs.chatHint.hidden) this.refs.chatHint.focus({ preventScroll: true });
+      else if (!this.refs.interstitial.hidden) this.refs.interstitialNext.focus({ preventScroll: true });
+    });
     this.refs.minigameCheck.addEventListener("click", () => this.#checkMinigame());
     this.refs.minigameContinue.addEventListener("click", () => this.#completeMinigame());
     this.refs.endingRights.addEventListener("click", () => this.#openRights());
@@ -657,6 +943,21 @@ export class VisualNovelView {
 
   #handleKeyDown(event) {
     if (event.repeat) return;
+    if (!this.refs.notice.hidden) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        this.#hideNotice();
+        this.refs.choices.querySelector(".choice")?.focus({ preventScroll: true });
+      } else if (event.key === "Tab") {
+        event.preventDefault();
+        this.refs.noticeClose.focus({ preventScroll: true });
+      }
+      return;
+    }
+    if (!this.refs.lesson.hidden || !this.refs.quiz.hidden) {
+      if (event.key === "Escape") event.preventDefault();
+      return;
+    }
     if (this.#rightsVisible && event.key === "Tab") {
       const controls = [...this.refs.rights.querySelectorAll("a, button")];
       const first = controls[0];
@@ -682,14 +983,16 @@ export class VisualNovelView {
 
     event.preventDefault();
 
+    if (this.#isAdvanceBuffered()) return;
     if (this.#awaitingChoice || this.#endingVisible) return;
     this.onAdvance();
   }
 
-  #setSpeaker(name) {
+  #setSpeaker(name, remote = false) {
     if (!name) {
       this.refs.speaker.hidden = true;
       this.refs.speaker.textContent = "";
+      this.refs.speaker.classList.remove("is-voice");
       delete this.refs.speaker.dataset.speaker;
       return;
     }
@@ -697,12 +1000,31 @@ export class VisualNovelView {
     this.refs.speaker.hidden = false;
     this.refs.speaker.textContent = name;
     this.refs.speaker.dataset.speaker = name.toLowerCase();
+    const normalized = name
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+    const onStage = new Set([
+      "maya",
+      "sofi",
+      "lucia",
+      "elena",
+      "mama",
+      "papa",
+      "madre",
+      "padre",
+      "profesor",
+      "companera",
+      "companero",
+    ]);
+    this.refs.speaker.classList.toggle("is-voice", remote || !onStage.has(normalized));
   }
 
   #applyStage(stage) {
     if (!stage) return;
 
     this.#setBackground(stage.background);
+    this.#setPerspective(stage.perspective, stage.mood);
 
     if (!stage.character) {
       this.#characterKey = null;
@@ -726,6 +1048,9 @@ export class VisualNovelView {
     if (source) {
       if (this.refs.sprite.getAttribute("src") !== source) {
         this.refs.sprite.src = source;
+        this.refs.sprite.classList.remove("sprite-swap");
+        void this.refs.sprite.offsetWidth;
+        this.refs.sprite.classList.add("sprite-swap");
       }
       this.refs.sprite.alt = "";
     } else {
@@ -740,6 +1065,24 @@ export class VisualNovelView {
       console.warn(error);
       return null;
     }
+  }
+
+  #setPerspective(perspective, mood) {
+    const labels = {
+      maya: "Maya · en casa",
+      sofi: "Sofi · en el colegio",
+      elena: "Elena · taller",
+      red: "Red de apoyo",
+    };
+
+    this.refs.scene.dataset.mood = mood ?? "neutral";
+    if (perspective) this.refs.scene.dataset.perspective = perspective;
+    else delete this.refs.scene.dataset.perspective;
+
+    const label = perspective ? labels[perspective] : null;
+    this.refs.perspectiveBadge.hidden = !label;
+    this.refs.perspectiveBadge.textContent = label ?? "";
+    this.refs.perspectiveBadge.dataset.perspective = perspective ?? "";
   }
 
   #setBackground(name) {
@@ -760,6 +1103,19 @@ export class VisualNovelView {
     previousLayer.classList.remove("is-active");
 
     this.#activeBackgroundLayer = nextIndex;
+    this.#showLocation(name);
+  }
+
+  #showLocation(name) {
+    const label = this.resolveSceneLabel?.(name) ?? name;
+    this.refs.locationChip.hidden = false;
+    this.refs.locationChip.textContent = label;
+    this.refs.locationText.textContent = label;
+    this.refs.locationBanner.hidden = false;
+    clearTimeout(this.#locationTimer);
+    this.#locationTimer = setTimeout(() => {
+      this.refs.locationBanner.hidden = true;
+    }, 2600);
   }
 
   #renderChoices(options) {
@@ -825,4 +1181,12 @@ export class VisualNovelView {
 
 function defaultCharacterSource({ id, expression }) {
   return `/assets/characters/${id}/${expression}.svg`;
+}
+
+function defaultCharacterName(characterId) {
+  return characterId;
+}
+
+function defaultSceneLabel(sceneId) {
+  return sceneId;
 }

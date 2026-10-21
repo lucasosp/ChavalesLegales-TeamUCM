@@ -14,7 +14,7 @@ let app = null;
 let session = 0;
 
 async function init() {
-  showLoading("No lo reenvíes");
+  showLoading("Dos voces");
 
   try {
     index = await loadStoryIndex();
@@ -74,7 +74,9 @@ async function startStory(entry) {
       title: content.title,
       saveStore: new LocalStorageSaveStore(`${entry.id}.save`),
       resolveCharacter: content.resolveCharacter,
+      resolveCharacterName: content.resolveCharacterName,
       resolveBackground: content.resolveBackground,
+      resolveSceneLabel: content.resolveSceneLabel,
       rights: content.rights,
       onExit: showLibrary,
     });

@@ -22,12 +22,28 @@ const NODE_TYPES = new Set([
   "chat",
   "interstitial",
   "minigame",
+  "quiz",
+  "reconduction",
 ]);
 const COMPARISONS = new Set(["eq", "neq", "gt", "gte", "lt", "lte"]);
 const LAYER_TYPES = new Set(["image", "character", "group", "effect", "text"]);
 const IMAGE_FITS = new Set(["cover", "contain", "stretch"]);
+const PERSPECTIVES = new Set(["maya", "sofi", "elena", "red"]);
+const MOODS = new Set(["neutral", "cold", "tense", "warm", "safe", "hope"]);
 
-const COMMON_NODE_KEYS = ["type", "scene", "cast", "flags", "transition", "audio", "tone"];
+const COMMON_NODE_KEYS = [
+  "type",
+  "scene",
+  "cast",
+  "flags",
+  "effects",
+  "transition",
+  "audio",
+  "tone",
+  "perspective",
+  "mood",
+  "remote",
+];
 const NODE_KEYS = {
   dialogue: [...COMMON_NODE_KEYS, "speaker", "text", "next"],
   choice: [...COMMON_NODE_KEYS, "speaker", "prompt", "options"],
@@ -36,6 +52,8 @@ const NODE_KEYS = {
   chat: [...COMMON_NODE_KEYS, "chatTitle", "self", "messages", "next"],
   interstitial: [...COMMON_NODE_KEYS, "kicker", "title", "text", "next"],
   minigame: [...COMMON_NODE_KEYS, "title", "prompt", "cards", "next", "mode"],
+  quiz: [...COMMON_NODE_KEYS, "title", "prompt", "questions", "next"],
+  reconduction: [...COMMON_NODE_KEYS, "title", "text", "lesson", "returnTo", "continueTo"],
 };
 
 export async function validateContent({ root = process.cwd() } = {}) {
@@ -879,6 +897,7 @@ function validateStory(storyDoc, tag, catalog, sceneIndex, ctx) {
         ctx.errors.push(`${at}.options must be a non-empty array`);
       } else {
         const optionIds = new Set();
+        let forwardOptions = 0;
         node.options.forEach((option, index) => {
           const optionAt = `${at}.options[${index}]`;
           if (!isObject(option)) {
@@ -886,11 +905,26 @@ function validateStory(storyDoc, tag, catalog, sceneIndex, ctx) {
             return;
           }
 
-          rejectUnknownKeys(option, ["id", "label", "next", "flags", "when"], optionAt, ctx);
+          rejectUnknownKeys(
+            option,
+            [
+              "id",
+              "label",
+              "next",
+              "flags",
+              "effects",
+              "when",
+              "safe",
+              "rewind",
+              "lesson",
+              "lessonTitle",
+              "consequence",
+            ],
+            optionAt,
+            ctx,
+          );
           requireString(option.id, `${optionAt}.id`, ctx);
           requireText(option.label, `${optionAt}.label`, ctx);
-          requireRef(option.next, `${optionAt}.next`, nodeIds, ctx);
-          if (option.next) outgoing.push(option.next);
 
           if (typeof option.id === "string") {
             if (optionIds.has(option.id)) {
@@ -900,10 +934,47 @@ function validateStory(storyDoc, tag, catalog, sceneIndex, ctx) {
           }
 
           validateFlags(option.flags, `${optionAt}.flags`, ctx, setFlags);
+          validateEffects(option.effects, `${optionAt}.effects`, ctx, setFlags);
           if (option.when !== undefined) {
             validateCondition(option.when, `${optionAt}.when`, nodeIds, readFlags, ctx);
           }
+
+          for (const key of ["safe", "rewind"]) {
+            if (option[key] !== undefined && typeof option[key] !== "boolean") {
+              ctx.errors.push(`${optionAt}.${key} must be a boolean`);
+            }
+          }
+          for (const key of ["lesson", "lessonTitle", "consequence"]) {
+            if (option[key] !== undefined) {
+              requireText(option[key], `${optionAt}.${key}`, ctx);
+            }
+          }
+
+          const isRewind =
+            option.safe === false || option.rewind === true || typeof option.lesson === "string";
+
+          if (isRewind) {
+            if (typeof option.lesson !== "string" && typeof option.consequence !== "string") {
+              ctx.errors.push(
+                `${optionAt} is a rewind option and needs a consequence or a lesson`,
+              );
+            }
+            // A rewind option may open a short consequence story; the
+            // reconduction node at its end returns to this decision.
+            if (option.next !== undefined) {
+              requireRef(option.next, `${optionAt}.next`, nodeIds, ctx);
+              if (option.next) outgoing.push(option.next);
+            }
+          } else {
+            forwardOptions += 1;
+            requireRef(option.next, `${optionAt}.next`, nodeIds, ctx);
+            if (option.next) outgoing.push(option.next);
+          }
         });
+
+        if (forwardOptions === 0) {
+          ctx.errors.push(`${at}.options needs at least one option that moves the story forward`);
+        }
       }
     }
 
@@ -1017,6 +1088,94 @@ function validateStory(storyDoc, tag, catalog, sceneIndex, ctx) {
       if (node.next) outgoing.push(node.next);
     }
 
+    if (node.type === "reconduction") {
+      requireText(node.title, `${at}.title`, ctx);
+      if (node.text !== undefined) requireText(node.text, `${at}.text`, ctx);
+      if (node.lesson !== undefined) requireText(node.lesson, `${at}.lesson`, ctx);
+      if (node.returnTo !== undefined) requireRef(node.returnTo, `${at}.returnTo`, nodeIds, ctx);
+      if (node.continueTo !== undefined) requireRef(node.continueTo, `${at}.continueTo`, nodeIds, ctx);
+    }
+
+    if (node.type === "quiz") {
+      requireText(node.title, `${at}.title`, ctx);
+      if (node.prompt !== undefined) requireText(node.prompt, `${at}.prompt`, ctx);
+
+      if (!Array.isArray(node.questions) || node.questions.length === 0) {
+        ctx.errors.push(`${at}.questions must be a non-empty array`);
+      } else {
+        const questionIds = new Set();
+        node.questions.forEach((question, index) => {
+          const questionAt = `${at}.questions[${index}]`;
+          if (!isObject(question)) {
+            ctx.errors.push(`${questionAt} must be an object`);
+            return;
+          }
+
+          rejectUnknownKeys(
+            question,
+            ["id", "question", "voice", "explanation", "flag", "options"],
+            questionAt,
+            ctx,
+          );
+          requireString(question.id, `${questionAt}.id`, ctx);
+          requireText(question.question, `${questionAt}.question`, ctx);
+          if (question.voice !== undefined) requireString(question.voice, `${questionAt}.voice`, ctx);
+          if (question.explanation !== undefined) {
+            requireText(question.explanation, `${questionAt}.explanation`, ctx);
+          }
+          if (question.flag !== undefined) {
+            requireString(question.flag, `${questionAt}.flag`, ctx);
+            setFlags.add(question.flag);
+          }
+          if (typeof question.id === "string") {
+            if (questionIds.has(question.id)) {
+              ctx.errors.push(`${questionAt}.id duplicates question id "${question.id}"`);
+            }
+            questionIds.add(question.id);
+          }
+
+          if (!Array.isArray(question.options) || question.options.length < 2) {
+            ctx.errors.push(`${questionAt}.options must have at least two options`);
+            return;
+          }
+
+          const optionIds = new Set();
+          let correct = 0;
+          question.options.forEach((option, optionIndex) => {
+            const optionAt = `${questionAt}.options[${optionIndex}]`;
+            if (!isObject(option)) {
+              ctx.errors.push(`${optionAt} must be an object`);
+              return;
+            }
+            rejectUnknownKeys(option, ["id", "label", "correct", "feedback"], optionAt, ctx);
+            requireString(option.id, `${optionAt}.id`, ctx);
+            requireText(option.label, `${optionAt}.label`, ctx);
+            if (typeof option.correct !== "boolean") {
+              ctx.errors.push(`${optionAt}.correct must be a boolean`);
+            } else if (option.correct) {
+              correct += 1;
+            }
+            if (option.feedback !== undefined) {
+              requireText(option.feedback, `${optionAt}.feedback`, ctx);
+            }
+            if (typeof option.id === "string") {
+              if (optionIds.has(option.id)) {
+                ctx.errors.push(`${optionAt}.id duplicates option id "${option.id}"`);
+              }
+              optionIds.add(option.id);
+            }
+          });
+
+          if (correct !== 1) {
+            ctx.errors.push(`${questionAt} must mark exactly one correct option`);
+          }
+        });
+      }
+
+      requireRef(node.next, `${at}.next`, nodeIds, ctx);
+      if (node.next) outgoing.push(node.next);
+    }
+
     edges.set(id, outgoing);
   }
 
@@ -1050,6 +1209,10 @@ function validateStory(storyDoc, tag, catalog, sceneIndex, ctx) {
 
     const endings = [...reachable].filter((id) => nodes[id]?.type === "ending");
     const canFinish = new Set(endings);
+    // A reconduction loops back to a decision that can still reach an ending.
+    for (const id of reachable) {
+      if (nodes[id]?.type === "reconduction") canFinish.add(id);
+    }
     let changed = true;
     while (changed) {
       changed = false;
@@ -1084,6 +1247,26 @@ function validateCommonNode(node, where, catalog, sceneIndex, ctx, setFlags) {
 
   if (node.flags !== undefined) {
     validateFlags(node.flags, `${where}.flags`, ctx, setFlags);
+  }
+
+  if (node.effects !== undefined) {
+    validateEffects(node.effects, `${where}.effects`, ctx, setFlags);
+  }
+
+  if (node.perspective !== undefined) {
+    if (typeof node.perspective !== "string" || !PERSPECTIVES.has(node.perspective)) {
+      ctx.errors.push(`${where}.perspective must be one of ${[...PERSPECTIVES].join(", ")}`);
+    }
+  }
+
+  if (node.mood !== undefined) {
+    if (typeof node.mood !== "string" || !MOODS.has(node.mood)) {
+      ctx.errors.push(`${where}.mood must be one of ${[...MOODS].join(", ")}`);
+    }
+  }
+
+  if (node.remote !== undefined && typeof node.remote !== "boolean") {
+    ctx.errors.push(`${where}.remote must be a boolean`);
   }
 
   if (node.transition !== undefined) {
@@ -1183,6 +1366,34 @@ function validateFlags(flags, where, ctx, setFlags) {
       ctx.errors.push(`${where}.${key} must be a string, number, boolean, or null`);
     }
     setFlags.add(key);
+  }
+}
+
+function validateEffects(effects, where, ctx, setFlags) {
+  if (effects === undefined) return;
+
+  if (!isObject(effects)) {
+    ctx.errors.push(`${where} must be an object`);
+    return;
+  }
+
+  for (const [key, value] of Object.entries(effects)) {
+    setFlags.add(key);
+    if (isObject(value)) {
+      rejectUnknownKeys(value, ["add"], `${where}.${key}`, ctx);
+      requireNumber(value.add, `${where}.${key}.add`, ctx);
+      continue;
+    }
+    if (
+      value !== null &&
+      typeof value !== "string" &&
+      typeof value !== "number" &&
+      typeof value !== "boolean"
+    ) {
+      ctx.errors.push(
+        `${where}.${key} must be a primitive or { add: number }`,
+      );
+    }
   }
 }
 

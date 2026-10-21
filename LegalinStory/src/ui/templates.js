@@ -17,11 +17,33 @@ export function appTemplate() {
 
         <header class="topbar">
           <span class="brand" data-brand></span>
+          <span class="location-chip" data-location-chip hidden></span>
+          <span class="perspective-badge" data-perspective-badge hidden></span>
           <div class="topbar-actions">
             <button class="library" type="button" data-library>Salir</button>
             <button class="restart" type="button" data-restart>Reiniciar</button>
           </div>
         </header>
+
+        <section class="notice" data-notice hidden aria-hidden="true">
+          <div class="notice-card" role="alertdialog" aria-modal="true" aria-labelledby="notice-title">
+            <p class="notice-kicker">Aviso</p>
+            <h2 class="notice-title" id="notice-title" data-notice-title></h2>
+            <p class="notice-text" data-notice-text></p>
+            <div class="notice-teach">
+              <p class="notice-teach-label">Para la próxima vez</p>
+              <p class="notice-lesson" data-notice-lesson></p>
+            </div>
+            <button class="notice-close" type="button" data-notice-close>
+              Continuar
+            </button>
+          </div>
+        </section>
+
+        <div class="location-banner" data-location-banner hidden>
+          <span class="location-banner-kicker">Ubicación</span>
+          <span class="location-banner-text" data-location-text></span>
+        </div>
 
         <div class="choices" data-choices hidden></div>
 
@@ -68,6 +90,38 @@ export function appTemplate() {
                 Continuar
               </button>
             </div>
+          </div>
+        </section>
+
+        <section class="quiz" data-quiz hidden aria-hidden="true">
+          <div class="quiz-card">
+            <p class="quiz-kicker" data-quiz-kicker>Taller de Elena · pregunta</p>
+            <h2 class="quiz-title" data-quiz-title></h2>
+            <p class="quiz-prompt" data-quiz-prompt></p>
+            <div class="quiz-progress" data-quiz-progress></div>
+            <div class="quiz-options" data-quiz-options></div>
+            <div class="quiz-feedback" data-quiz-feedback role="status" hidden></div>
+            <div class="quiz-actions">
+              <button class="minigame-button is-primary" type="button" data-quiz-next hidden>
+                Siguiente pregunta
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="lesson" data-lesson hidden aria-hidden="true">
+          <div class="lesson-card" role="dialog" aria-modal="true" aria-labelledby="lesson-title">
+            <p class="lesson-kicker">Reconducción · sin perder tu progreso</p>
+            <h2 class="lesson-title" id="lesson-title" data-lesson-title></h2>
+            <p class="lesson-choice" data-lesson-choice></p>
+            <div class="lesson-consequence" data-lesson-consequence></div>
+            <div class="lesson-teach">
+              <p class="lesson-teach-label">Para la próxima vez</p>
+              <p class="lesson-teach-text" data-lesson-teach></p>
+            </div>
+            <button class="lesson-button" type="button" data-lesson-close>
+              Volver a decidir
+            </button>
           </div>
         </section>
 

@@ -22,7 +22,9 @@ export class App {
    *   nodeTypes?: Record<string, { present: (node: any) => void, next?: (node: any) => string|null, auto?: boolean }>,
    *   onExit?: () => void,
    *   resolveCharacter?: (character: { id: string, expression: string }) => string,
+   *   resolveCharacterName?: (characterId: string) => string,
    *   resolveBackground?: (sceneId: string) => string | null,
+   *   resolveSceneLabel?: (sceneId: string) => string,
    *   rights?: Record<string, any> | null,
    * }} options
    */
@@ -35,7 +37,9 @@ export class App {
     nodeTypes = {},
     onExit = null,
     resolveCharacter,
+    resolveCharacterName,
     resolveBackground,
+    resolveSceneLabel,
     rights = null,
   }) {
     this.bus = new EventBus();
@@ -51,6 +55,10 @@ export class App {
       },
       minigame: {
         present: (node) => this.bus.emit("minigame", { ...node, stage: structuredClone(this.engine.stage), flags: { ...this.engine.flags } }),
+        next: (node) => node.next,
+      },
+      quiz: {
+        present: (node) => this.bus.emit("quiz", { ...node, stage: structuredClone(this.engine.stage), flags: { ...this.engine.flags } }),
         next: (node) => node.next,
       },
       ...nodeTypes,
@@ -71,7 +79,9 @@ export class App {
       onExit,
       title,
       resolveCharacter,
+      resolveCharacterName,
       resolveBackground,
+      resolveSceneLabel,
       rights,
     });
 
@@ -110,5 +120,12 @@ export class App {
     this.bus.on("minigame", (payload) =>
       this.view.showMinigame(payload, (selected) => this.engine.completeActivity(selected)),
     );
+    this.bus.on("quiz", (payload) =>
+      this.view.showQuiz(payload, (answers) => this.engine.completeQuiz(answers)),
+    );
+    this.bus.on("lesson", (payload) =>
+      this.view.showLesson(payload, () => this.engine.dismissLesson()),
+    );
+    this.bus.on("notice", (payload) => this.view.showNotice(payload));
   }
 }

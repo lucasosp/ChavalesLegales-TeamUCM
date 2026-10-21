@@ -10,8 +10,9 @@
     "preview": "vite preview",
     "assets:build": "node scripts/build-hana-svgs.mjs && node scripts/build-character-svgs.mjs",
     "validate": "node scripts/validate-content.mjs",
-    "test": "node scripts/validate-content.mjs && node scripts/validation-smoke.mjs && node scripts/ui-smoke.mjs && node scripts/library-smoke.mjs && node scripts/no-lo-reenvies-smoke.mjs && node scripts/no-soy-yo-smoke.mjs && node scripts/engine-regressions.mjs",
-    "story:build": "node scripts/build-no-lo-reenvies.mjs"
+    "test": "node scripts/validate-content.mjs && node scripts/validation-smoke.mjs && node scripts/ui-smoke.mjs && node scripts/library-smoke.mjs && node scripts/no-lo-reenvies-smoke.mjs && node scripts/no-soy-yo-smoke.mjs && node scripts/dos-voces-smoke.mjs && node scripts/dos-voces-endings-smoke.mjs && node scripts/input-buffer-smoke.mjs && node scripts/engine-regressions.mjs",
+    "story:build": "node scripts/build-no-lo-reenvies.mjs",
+    "story:build:dos-voces": "node scripts/build-dos-voces.mjs"
   },
   "devDependencies": {
     "jsdom": "^30.1.3",

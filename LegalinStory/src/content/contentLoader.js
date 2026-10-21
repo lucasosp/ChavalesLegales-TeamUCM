@@ -46,7 +46,10 @@ export async function loadStory(entry) {
     assets,
     rights,
     resolveCharacter: (character) => resolveCharacterAsset(assets, character),
+    resolveCharacterName: (characterId) =>
+      assets?.characters?.[characterId]?.displayName ?? characterId,
     resolveBackground: (sceneId) => resolveBackgroundAsset(scenes, assets, sceneId),
+    resolveSceneLabel: (sceneId) => scenes?.scenes?.[sceneId]?.label ?? sceneId,
   };
 }
 

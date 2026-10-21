@@ -1,7 +1,7 @@
 /**
- * Builds the cast of "No lo reenvíes" as SVG sprites.
+ * Builds the shared Chavales Legales cast as SVG sprites.
  *
- * One shared body template keeps the five characters visually consistent:
+ * One shared body template keeps the characters visually consistent:
  * school clothes, the same face geometry, and five expressions each.
  *
  *   node scripts/build-character-svgs.mjs
@@ -82,6 +82,129 @@ const CHARACTERS = {
     cardiganDark: "#4d2b34",
     shirt: "#efe6da",
     accent: "#8e6a5c",
+    glasses: true,
+    hairStyle: "bun",
+  },
+  maya: {
+    name: "Maya",
+    skin: "#e7b99f",
+    skinShade: "#c99a80",
+    hair: "#3a2530",
+    hairDark: "#24151d",
+    eyes: "#6f4b3f",
+    hoodie: "#4a5368",
+    hoodieDark: "#303747",
+    shirt: "#cfd6dd",
+    accent: "#7f91a8",
+    hairStyle: "wavy",
+  },
+  sofi: {
+    name: "Sofi",
+    skin: "#d7a07c",
+    skinShade: "#b98562",
+    hair: "#2f2320",
+    hairDark: "#1a1211",
+    eyes: "#557044",
+    blazer: "#33415e",
+    blazerDark: "#222c42",
+    shirt: "#f5efe6",
+    accent: "#e0a45f",
+    ribbon: true,
+    hairStyle: "ponytail",
+  },
+  elena: {
+    name: "Elena",
+    skin: "#e3b79c",
+    skinShade: "#c4967c",
+    hair: "#5a4038",
+    hairDark: "#38251f",
+    eyes: "#5d4a3d",
+    cardigan: "#4f6b62",
+    cardiganDark: "#354a44",
+    shirt: "#f0e9dc",
+    accent: "#b48d5b",
+    glasses: true,
+    hairStyle: "bun",
+  },
+  madre: {
+    name: "Mamá",
+    skin: "#dfb39a",
+    skinShade: "#c09177",
+    hair: "#4a342f",
+    hairDark: "#2d1f1c",
+    eyes: "#5c473b",
+    cardigan: "#6d5a63",
+    cardiganDark: "#4b3c43",
+    shirt: "#ebe3d8",
+    accent: "#a9858d",
+    hairStyle: "bun",
+  },
+  padre: {
+    name: "Papá",
+    skin: "#d5a68a",
+    skinShade: "#b78368",
+    hair: "#332b2a",
+    hairDark: "#1c1717",
+    eyes: "#4e3a32",
+    blazer: "#3c4452",
+    blazerDark: "#272d37",
+    shirt: "#d7dde4",
+    accent: "#667284",
+    tie: true,
+    hairStyle: "short",
+  },
+  profesor: {
+    name: "Profesor",
+    skin: "#d9ad92",
+    skinShade: "#b98a6e",
+    hair: "#463832",
+    hairDark: "#2a211e",
+    eyes: "#4f5b67",
+    cardigan: "#4a5d6b",
+    cardiganDark: "#33424d",
+    shirt: "#eae2d6",
+    accent: "#7d8d99",
+    glasses: true,
+    hairStyle: "short",
+  },
+  companera: {
+    name: "Compañera",
+    skin: "#e0b196",
+    skinShade: "#c08d72",
+    hair: "#3a2a2a",
+    hairDark: "#221717",
+    eyes: "#5a6650",
+    blazer: "#33415e",
+    blazerDark: "#222c42",
+    shirt: "#f2ece2",
+    accent: "#c98e62",
+    ribbon: true,
+    hairStyle: "ponytail",
+  },
+  companero: {
+    name: "Compañero",
+    skin: "#c99777",
+    skinShade: "#a97a5e",
+    hair: "#2e2524",
+    hairDark: "#191313",
+    eyes: "#4d505c",
+    hoodie: "#4a4350",
+    hoodieDark: "#302b35",
+    shirt: "#b8b2bd",
+    accent: "#7d7388",
+    hairStyle: "spiky",
+  },
+  lucia: {
+    name: "Lucía",
+    skin: "#d9a98c",
+    skinShade: "#bb8c70",
+    hair: "#4b332c",
+    hairDark: "#2c1c18",
+    eyes: "#4c5d6e",
+    cardigan: "#6b4b5e",
+    cardiganDark: "#4a3140",
+    shirt: "#efe6da",
+    accent: "#9b7d8e",
     glasses: true,
     hairStyle: "bun",
   },
@@ -361,7 +484,7 @@ function sprite(character, expression) {
   </style>
 
   <title id="${character.id}-title">${character.name} — ${expression}</title>
-  <desc id="${character.id}-desc">${character.name}, a character in No lo reenvíes.</desc>
+  <desc id="${character.id}-desc">${character.name}, a character in Chavales Legales.</desc>
 ${defs(character)}
 
   <g class="sp-sprite">

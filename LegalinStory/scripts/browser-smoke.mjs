@@ -7,6 +7,7 @@ let browser;
 try {
   await server.listen();
   const url = server.resolvedUrls.local[0];
+  const legacyUrl = `${url}?story=no-lo-reenvies`;
   browser = await chromium.launch({ channel: "chromium", headless: true });
   if (process.env.PLATFORM_URL) {
     const page = await browser.newPage({ reducedMotion: "reduce", viewport: { width: 390, height: 844 } });
@@ -17,9 +18,9 @@ try {
     await page.goto(process.env.PLATFORM_URL);
     await page.locator('a[href="/novela"]').first().click();
     const frame = page.frameLocator("#novela-frame");
-    await frame.getByRole("heading", { name: "No lo reenvíes", exact: true }).waitFor();
+    await frame.getByRole("heading", { name: "Dos voces", exact: true }).waitFor();
     await frame.getByRole("button", { name: "Continuar", exact: true }).click();
-    await frame.locator("[data-text]").filter({ hasText: "Sara" }).waitFor();
+    await frame.locator("[data-text]").filter({ hasText: "Antes de empezar" }).waitFor();
     assert.equal(await page.getByRole("link", { name: "Necesito ayuda", exact: true }).getAttribute("href"), "/necesito-ayuda");
     await frame.getByRole("button", { name: "Salir", exact: true }).click();
     await page.waitForURL(process.env.PLATFORM_URL.replace(/\/$/, "") + "/");
@@ -32,7 +33,7 @@ try {
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
     page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
-    await page.goto(url);
+    await page.goto(legacyUrl);
     await page.getByRole("button", { name: "Continuar", exact: true }).click();
     assert.equal(await page.locator("[data-speaker-name]").isVisible(), false);
     await page.keyboard.press("Enter");
@@ -94,7 +95,7 @@ try {
     await page.close();
   }
   const page = await browser.newPage({ reducedMotion: "no-preference" });
-  await page.goto(url);
+  await page.goto(legacyUrl);
   await page.evaluate(() => localStorage.setItem("no-lo-reenvies.save", JSON.stringify({ nodeId: "ch1-chat-1", flags: {}, seen: [], stage: {} })));
   await page.reload();
   await page.locator(".chat-row").first().waitFor();

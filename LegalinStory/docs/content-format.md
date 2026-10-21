@@ -7,7 +7,7 @@ shared between stories). Each answers a different question:
 | --- | --- | --- |
 | `novel.json` | What is this game? | Entry points, stage size, save key |
 | `assets.json` | What can appear? | Characters, backgrounds, audio, fonts |
-| `scene.json` | What does the screen look like? | Layer tree, positions, z-order, transitions |
+| `scene.json` | What does the screen look like? | Layer tree, positions, z-order, transitions, location label |
 | `story.json` | What happens? | Beats, text, choices, flags, routing |
 
 Story beats never contain file paths. They reference **scene ids**, **character
@@ -90,7 +90,9 @@ schema changes.
 ## 3. `scene.json` — scene graph
 
 Scenes are **presentation**, not narrative. They are templates: a beat may
-enter a scene, then patch one character's expression.
+enter a scene, then patch one character's expression. The `label` is shown in
+the location chip and in the room-change banner, so authors should give each
+scene a short, human-readable zone name.
 
 ```json
 {
@@ -206,6 +208,8 @@ moving the group moves the light.
 | `chat` | `messages[]`, `next` | Phone-style message scene |
 | `interstitial` | `title`, `next` | Full-screen chapter/perspective card |
 | `minigame` | `title`, `prompt`, `cards[]`, `next` | Card-selection activity |
+| `quiz` | `title`, `questions[]`, `next` | Guided questionnaire with feedback |
+| `reconduction` | `title`, `continueTo` | Warning notice + continuation to the next beat |
 
 ### Beat fields (all types except `ending`)
 
@@ -214,6 +218,14 @@ moving the group moves the light.
   `{ "expression": "smile" }`; `"hana": null` removes her; `at`, `flip`, and
   `z` can be patched too.
 - `flags` — merged into state when the node is entered.
+- `effects` — tiny data-only counter DSL, applied once when the node is first
+  entered: `{ "banderas_rojas": { "add": 1 }, "safePlace": true }`.
+- `perspective` — presentation hint inherited by following beats: `maya`,
+  `sofi`, `elena`, or `red`.
+- `remote` — the speaker is a phone/message/off-screen voice. The view shows a
+  “voz” badge and keeps the on-stage character unchanged.
+- `mood` — presentation hint inherited by following beats: `neutral`, `cold`,
+  `tense`, `warm`, `safe`, or `hope`.
 - `transition` — how this beat's visual changes apply (default: `cut`).
 - `audio` — `{ "music": "rain", "fade": 800 }` or `{ "sfx": "page-turn" }`.
 - `tone` — presentation hint (`narration`, `spoken`, `poem`), never logic.
@@ -274,6 +286,83 @@ intimate imagery in a chat asset.
   "next": "after-minigame"
 }
 ```
+
+`mode: "support"` turns the activity into an ungraded selection of supports.
+
+**`quiz`** — a guided, non-punitive questionnaire. Each question is answered
+one at a time and shows feedback immediately. The engine records `quizScore`,
+`quizTotal`, and `quizPerfect`; the story can branch on them.
+
+```json
+{
+  "type": "quiz",
+  "title": "Cuatro ideas para llevarte",
+  "prompt": "Responde con calma.",
+  "questions": [
+    {
+      "id": "q-digital",
+      "voice": "Maya",
+      "flag": "quizDigital",
+      "question": "Te llega una imagen manipulada tuya. ¿Qué haces primero?",
+      "explanation": "No reenvíes, guarda la prueba y pide ayuda.",
+      "options": [
+        { "id": "a", "label": "Borrarlo todo.", "correct": false, "feedback": "Puede destruir pruebas." },
+        { "id": "b", "label": "Guardar captura, reportar y avisar al centro.", "correct": true, "feedback": "Es el protocolo seguro." }
+      ]
+    }
+  ],
+  "next": "final-router"
+}
+```
+
+### Pedagogical consequence options
+
+A choice option may be a safe route or a risky consequence. The preferred shape
+is a short consequence story: the risky option points at three or four dialogue
+beats (narration plus spoken exchanges) that end in a `reconduction` node. The
+engine raises a blocking warning modal through the `notice` event, then continues
+to the node named in `continueTo`. It does not rewind to the original decision.
+
+```json
+{
+  "id": "risk",
+  "label": "Ponerse delante para que pare.",
+  "safe": false,
+  "next": "risk-mini-1",
+  "consequence": "La discusión se dirige ahora hacia ella.",
+  "lesson": "Interponerse puede aumentar el riesgo. Busca un momento seguro y avisa a un adulto.",
+  "lessonTitle": "Tu cuerpo no es un escudo"
+}
+```
+
+```json
+{
+  "type": "reconduction",
+  "title": "Tu cuerpo no es un escudo",
+  "text": "La discusión se dirige ahora hacia ella.",
+  "lesson": "Interponerse puede aumentar el riesgo.",
+  "continueTo": "after-the-consequence"
+}
+```
+
+A risky option without `next` keeps the older shortcut: the engine emits a
+`lesson` event immediately and the view shows the consequence card. The legacy
+`returnTo` field is kept only as a fallback for old saves.
+
+A safe option moves forward and may carry `flags` and/or `effects`:
+
+```json
+{
+  "id": "safe",
+  "label": "Guardar una captura y avisar al centro.",
+  "next": "after-evidence",
+  "effects": { "banderas_rojas": { "add": 1 }, "nivel_seguridad": { "add": 1 } }
+}
+```
+
+`effects` is data-only: `{ "flag": value }` sets a flag and
+`{ "flag": { "add": number } }` increments a numeric flag. A choice must have
+at least one forward option; risky options may omit `next`.
 
 ### Rights screen
 
@@ -347,8 +436,8 @@ Fail at load with the full path of the offender:
 1. `start` exists in `nodes`.
 2. Node ids are unique (guaranteed by the object key).
 3. Every `next` / `then` / `else` / option `next` points to a node.
-4. `ending` has no `next`; `dialogue`, `chat`, `interstitial`, and `minigame` do.
-   A `choice` routes through its options instead.
+4. `ending` has no `next`; `dialogue`, `chat`, `interstitial`, `minigame`, and
+   `quiz` do. A `choice` routes through its options instead.
 5. `text` / `prompt` / `label` are non-empty after trimming.
 6. Choice option ids are unique within the node.
 7. Every `scene` exists in `scenes`.
@@ -359,6 +448,12 @@ Fail at load with the full path of the offender:
 11. Every `when` references a flag that some node or option sets (warning),
     and every scene has at least one visible option after `when`.
 12. No `branch` is unreachable and no non-ending loop has no exit (warning).
+13. Every `quiz` question has at least two options and exactly one correct
+    option.
+14. Every `effects` entry is a primitive or `{ add: number }`.
+15. `perspective` and `mood` use the documented vocabularies.
+16. Every `choice` has at least one forward (non-risky) option.
+17. Every `reconduction` has a title and, when present, a valid `continueTo` (or legacy `returnTo`) node.
 
 JSON Schema handles shape; rules 1–6 and 8–10 need a small graph/reference
 validator that runs after parsing.
@@ -392,8 +487,8 @@ Entering a beat:
   `eval` and no JavaScript embedded in content.
 
 The runtime supports `dialogue`, `choice`, `branch`, `ending`, `chat`,
-`interstitial`, and `minigame`, plus the ending rights panel. Current limits:
-one rendered character per beat (its left/center/right `at` preset is applied),
-and a scene's first `image` layer becomes the background. Groups, effects,
-additional character layers, and audio are validated for future use but are not
-drawn or played yet.
+`interstitial`, `minigame`, `quiz`, `reconduction`, the ending rights panel,
+consequence mini-stories, and `effects`. Current limits: one rendered character per beat (its
+left/center/right `at` preset is applied), and a scene's first `image` layer
+becomes the background. Groups, effects, additional character layers, and audio
+are validated for future use but are not drawn or played yet.

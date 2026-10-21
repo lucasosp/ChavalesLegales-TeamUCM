@@ -1,20 +1,28 @@
 # LegalinStory
 
-Novela visual de Chavales Legales construida con JavaScript y Vite. Se abre
-directamente **No lo reenvíes**, la experiencia principal. El contenido vive en
-JSON y las ilustraciones en `public/assets`. Las historias de ejemplo anteriores
-se conservan como fixtures de regresión, fuera del catálogo publicado.
+Novela visual de Chavales Legales construida con JavaScript y Vite. La
+experiencia principal es **Dos voces**, una historia con perspectiva dual sobre
+violencia intrafamiliar, apoyo entre iguales y justicia amigable. El contenido
+vive en JSON y las ilustraciones en `public/assets`. Las historias anteriores se
+conservan como fixtures de regresión y siguen disponibles mediante
+`?story=<id>`.
 
 Contenido conservado en el repositorio:
 
-- **Between the Lines** — a short chapter about a girl, a poem, and an open door.
-- **The Locker Note** — a side story about a note that was never meant to be read.
-- **No lo reenvíes** — an educational visual novel about bullying, non-consensual
-  image sharing, protection of minors, and access to justice. It includes
-  messaging scenes, a perspective switch, a decision menu, an information
-  minigame, four endings, and a rights/resources screen.
+- **Dos voces** — la experiencia principal. Cinco capítulos, 19 decisiones (13 de
+  Maya y 6 de Sofi) y un cierre de dos preguntas. Dos modos de edad, mecánica de
+  error–aviso–continuación, dos escenas de mensajes del padre, cambios de
+  ubicación y de fondo, entradas y salidas narradas, la libreta de pruebas de
+  Maya, cuatro finales y panel de derechos. La historia se centra en la violencia
+  intrafamiliar y está pensada para unos 10 minutos de lectura.
+- **No lo reenvíes** — una novela visual educativa sobre bullying, difusión no
+  consentida de imágenes, protección de menores y acceso a la justicia.
 - **No soy yo** — una historia complementaria sobre ciberacoso, identidad y
-  pedir ayuda. La entrada principal sigue siendo **No lo reenvíes**.
+  pedir ayuda.
+- **Between the Lines** — un capítulo corto sobre una chica, un poema y una
+  puerta abierta.
+- **The Locker Note** — una historia paralela sobre una nota que nunca debía
+  leerse.
 
 ## Run it
 
@@ -40,10 +48,38 @@ Los apoyos de Sara se marcan juntos y se confirman una vez. No se puntúan.
 La actividad de evidencias permite corregir la selección y continuar tras
 comprobarla; modificar tarjetas invalida la comprobación anterior.
 
+**Dos voces** añade una mecánica de consecuencia: las opciones marcadas con
+`safe: false` (o con `lesson`) abren una minihistoria. Al terminar, un nodo
+`reconduction` muestra un aviso modal con la lección y continúa hacia la
+siguiente decisión, sin devolver al jugador a la misma elección. Las
+minihistorias combinan narración con diálogo hablado, no solo pensamientos
+internos. Las decisiones acumuladas y el cierre de dos preguntas llevan a
+**cuatro finales distintos**. Los contadores
+`banderas_rojas`, `nivel_seguridad`, `apoyo_emocional`, `confidencialidad` y
+`errores` se actualizan con el DSL `effects`. La perspectiva (`maya`, `sofi`,
+`elena`) y el tono visual (`cold`, `tense`, `warm`, `safe`, `hope`) se heredan
+como parte del escenario. La historia evita las pausas de relleno y el texto se
+revela a 26 caracteres por segundo para dar tiempo a leer.
+Cuando una conversación de chat termina sola, espacio/Enter se ignora durante
+0,5 s para no saltar el diálogo siguiente por accidente; si el chat se salta
+manualmente, no se añade esa espera y se puede seguir avanzando con pulsaciones
+rápidas.
+
+El generador `scripts/build-dos-voces.mjs` aplica después
+`scripts/dos-voces-adaptation.mjs`, una pasada de cohesión que convierte los
+intercambios de mensajes en escenas de chat, marca las voces telefónicas como
+`remote` y narra cada cambio de habitación antes de que ocurra. Después aplica
+`scripts/dos-voces-plain-language.mjs`, que acorta la narración y simplifica el
+vocabulario, y `scripts/dos-voces-simplify.mjs`, que retira la trama de la foto
+filtrada, los rumores de clase y el minijuego de la libreta. Así
+`npm run story:build:dos-voces` reproduce el mismo relato adaptado.
+
 Pruebas: `npm test` y `npm run build`. No hay scripts de lint ni typecheck.
-La batería recorre 270 rutas completas y comprueba los cuatro finales. Para
-pruebas de navegador opcionales instala Playwright y Chromium fuera del proyecto
-y ejecuta `scripts/browser-smoke.mjs` con `PLAYWRIGHT_MODULE_PATH` apuntando a
+La batería recorre las rutas completas de las historias, comprueba los finales
+y ejecuta recorridos específicos de **Dos voces** que incluyen consecuencias,
+chat, cierre de dos preguntas, los cuatro finales, perspectiva y panel de derechos. Para pruebas de navegador
+opcionales instala Playwright y Chromium fuera del proyecto y ejecuta
+`scripts/browser-smoke.mjs` con `PLAYWRIGHT_MODULE_PATH` apuntando a
 `playwright/index.mjs` y `PLAYWRIGHT_BROWSERS_PATH` a sus navegadores.
 Ver el informe de auditoría en `docs/visual-novel-audit.md`.
 
@@ -81,19 +117,29 @@ public/
 │   ├── shared/
 │   │   └── assets.json                # shared asset catalog
 │   └── stories/
-│       ├── between-the-lines/
+│       ├── dos-voces/
 │       │   ├── novel.json             # manifest: entry node, stage, save key
-│       │   ├── story.json             # story graph
-│       │   └── scene.json             # scene graph
+│       │   ├── story.json             # generated story graph
+│       │   ├── scene.json             # scene graph
+│       │   └── rights.json            # rights/resources screen
+│       ├── between-the-lines/
+│       │   ├── novel.json
+│       │   ├── story.json
+│       │   └── scene.json
 │       ├── the-locker-note/
 │       │   ├── novel.json
 │       │   ├── story.json
 │       │   └── scene.json
-│       └── no-lo-reenvies/
+│       ├── no-lo-reenvies/
+│       │   ├── novel.json
+│       │   ├── story.json
+│       │   ├── scene.json
+│       │   └── rights.json            # shared rights/resources screen
+│       └── no-soy-yo/
 │           ├── novel.json
 │           ├── story.json
 │           ├── scene.json
-│           └── rights.json            # shared rights/resources screen
+│           └── rights.json
 └── assets/
     ├── backgrounds/
     │   ├── classroom-dusk.svg
@@ -104,14 +150,22 @@ public/
     │   ├── bedroom-evening.svg
     │   ├── patio-day.svg
     │   ├── orientation-office.svg
-    │   └── quiet-room.svg
+    │   ├── quiet-room.svg
+    │   ├── home-living-cold.svg
+    │   ├── home-kitchen-cold.svg
+    │   ├── court-friendly.svg
+    │   └── shelter-room.svg
     └── characters/
+        ├── maya/
+        ├── sofi/
+        ├── madre/
+        ├── padre/
+        ├── profesor/
+        ├── companera/
+        ├── companero/
+        ├── elena/
+        ├── lucia/
         ├── hana/
-        │   ├── neutral.svg
-        │   ├── smile.svg
-        │   ├── happy.svg
-        │   ├── sad.svg
-        │   └── surprised.svg
         ├── sara/
         ├── julia/
         ├── sergio/
@@ -162,11 +216,34 @@ See [`docs/content-format.md`](docs/content-format.md) for the full format.
 Besides `dialogue`, `choice`, `branch`, and `ending`, the runtime understands:
 
 - `chat` — a phone-style conversation with timed message reveal, system
-  notices, and hidden/deleted content. Sensitive content is never rendered.
+  notices, and hidden/deleted content. The message text is always rendered as
+  readable text; only sensitive imagery is replaced by a censored preview.
+  **Dos voces** uses it for the class group, the father's messages and the
+  blackmail conversation.
 - `interstitial` — a full-screen chapter or perspective card.
 - `minigame` — a multi-select card activity with feedback. **No lo reenvíes**
   uses it to practise identifying useful information without redistributing
-  intimate content.
+  intimate content. **Dos voces** keeps the notebook as a story element, not as a minigame.
+- `quiz` — a guided, non-punitive questionnaire. Each question has options with
+  immediate feedback, and the engine records `quizScore`, `quizTotal`, and
+  `quizPerfect`. **Dos voces** uses it for the final workshop with Elena.
+- `reconduction` — an automatic story trigger that closes a consequence
+  mini-story, raises a blocking warning modal and continues to the node named
+  in `continueTo`. It does not send the player back to the decision.
+
+Choice options can also be pedagogical consequences: `safe: false`,
+`rewind: true`, or a `lesson` string. They open a short dialogue mini-story and
+end in a `reconduction` node, which shows a blocking warning modal and then
+continues forward. Safe options can carry `effects`, a
+tiny data-only DSL: `{ "banderas_rojas": { "add": 1 } }`
+increments a counter, `{ "confidencialidad": true }` sets a flag. Nodes and
+options may carry `perspective` (`maya`, `sofi`, `elena`, `red`) and `mood`
+(`neutral`, `cold`, `tense`, `warm`, `safe`, `hope`); the view uses them for the
+perspective badge and the cold/warm palette treatment. The scene `label` feeds
+the location chip and the room-change banner. Character entrances and exits are
+written as narration inside the story (for example, “Papá entra en el salón…”),
+not as a floating UI chip. Remote voices use `remote: true` and show a “voz”
+badge without swapping the on-stage sprite.
 
 An ending can point at a story-wide `rights.json` through
 `novel.json.content.rights`; the ending screen then exposes a **Conoce tus
@@ -247,12 +324,21 @@ src/
 scripts/
 ├── validate-content.mjs          # startup/build content validator
 ├── build-hana-svgs.mjs           # regenerates Hana's five SVGs
-├── build-character-svgs.mjs      # regenerates the No lo reenvíes cast
-├── build-no-lo-reenvies.mjs      # regenerates the story/scene/rights JSON
+├── build-character-svgs.mjs      # regenerates the full cast, including Maya/Sofi/Elena/Lucía
+├── build-no-lo-reenvies.mjs      # regenerates the no-lo-reenvies story/scene/rights JSON
+├── build-dos-voces.mjs           # regenerates Dos voces' story.json
+├── dos-voces-risk-dialogues.mjs  # specific spoken dialogue for each unsafe choice
+├── dos-voces-plain-language.mjs  # shorter prose and simpler vocabulary
+├── dos-voces-simplify.mjs        # removes photo plot, rumours and filler
 ├── validation-smoke.mjs          # proves missing assets fail validation
 ├── ui-smoke.mjs                  # engine/view smoke test
 ├── library-smoke.mjs             # published story HTTP loader + assets
-└── no-lo-reenvies-smoke.mjs      # chat, minigame, ending, rights coverage
+├── no-lo-reenvies-smoke.mjs      # chat, minigame, ending, rights coverage
+├── no-soy-yo-smoke.mjs           # cyberbullying story coverage
+├── dos-voces-smoke.mjs           # consequence notice, chat, quiz, perspective, rights
+├── dos-voces-endings-smoke.mjs   # four endings from decision profiles
+├── input-buffer-smoke.mjs        # post-chat keyboard buffer
+└── engine-regressions.mjs        # all routes, restart, save migration
 ```
 
 ### Design notes
@@ -274,11 +360,20 @@ pnpm test
 ```
 
 Runs the validator, a missing-asset validation test, the engine/view smoke test,
-an HTTP test that starts Vite and loads the published story, and a
-full playthrough of **No lo reenvíes** covering messaging scenes, the perspective
-switch, the multi-select needs menu, the minigame, the ending router, and the
-rights panel. Also explores all 270 complete decision routes and checks
+an HTTP test that starts Vite and loads the published story, full playthroughs of
+**No lo reenvíes** and **No soy yo**, a complete **Dos voces** route covering the
+pedagogical mini-story and notice, the message scenes, the two-question closing quiz and the rights panel,
+and an exploration of all **No lo reenvíes** decision routes. Also checks
 animation cleanup, restart and migration of saved progress.
+
+**Dos voces** is generated from `scripts/build-dos-voces.mjs`:
+
+```bash
+pnpm story:build:dos-voces
+```
+
+The script enforces the 32-decision count and writes `story.json`. Edit the
+script (or the generated JSON) and run the validator afterwards.
 
 ### Regenerating art and content
 

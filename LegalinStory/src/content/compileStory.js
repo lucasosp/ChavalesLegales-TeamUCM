@@ -65,6 +65,13 @@ function compileNode(id, node, context) {
     compiled.flags = { ...node.flags };
   }
 
+  if (node.effects && typeof node.effects === "object") {
+    compiled.effects = structuredClone(node.effects);
+  }
+
+  if (node.perspective !== undefined) compiled.perspective = node.perspective;
+  if (node.mood !== undefined) compiled.mood = node.mood;
+  if (node.remote !== undefined) compiled.remote = node.remote;
   if (node.tone !== undefined) compiled.tone = node.tone;
   if (node.speaker !== undefined) compiled.speaker = node.speaker;
   if (node.kicker !== undefined) compiled.kicker = node.kicker;
@@ -79,7 +86,13 @@ function compileNode(id, node, context) {
       label: option.label,
       next: option.next,
       ...(option.flags ? { flags: { ...option.flags } } : {}),
+      ...(option.effects ? { effects: structuredClone(option.effects) } : {}),
       ...(option.when ? { when: option.when } : {}),
+      ...(option.safe !== undefined ? { safe: option.safe } : {}),
+      ...(option.rewind !== undefined ? { rewind: option.rewind } : {}),
+      ...(option.consequence ? { consequence: option.consequence } : {}),
+      ...(option.lesson ? { lesson: option.lesson } : {}),
+      ...(option.lessonTitle ? { lessonTitle: option.lessonTitle } : {}),
     }));
   }
 
@@ -99,6 +112,21 @@ function compileNode(id, node, context) {
     compiled.mode = node.mode;
     compiled.prompt = node.prompt;
     compiled.cards = (node.cards ?? []).map((card) => ({ ...card }));
+  }
+
+  if (node.type === "reconduction") {
+    compiled.lesson = node.lesson;
+    compiled.returnTo = node.returnTo;
+    compiled.continueTo = node.continueTo;
+  }
+
+  if (node.type === "quiz") {
+    compiled.title = node.title;
+    compiled.prompt = node.prompt;
+    compiled.questions = (node.questions ?? []).map((question) => ({
+      ...question,
+      options: (question.options ?? []).map((option) => ({ ...option })),
+    }));
   }
 
   return compiled;

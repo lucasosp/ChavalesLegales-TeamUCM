@@ -2,6 +2,13 @@
   "version": 1,
   "stories": [
     {
+      "id": "dos-voces",
+      "title": "Dos voces",
+      "subtitle": "Una historia sobre violencia en casa, apoyo entre iguales y justicia amigable.",
+      "manifest": "stories/dos-voces/novel.json",
+      "cover": "assets/backgrounds/home-living-cold.svg"
+    },
+    {
       "id": "no-lo-reenvies",
       "title": "No lo reenvíes",
       "subtitle": "Una novela visual sobre acoso, intimidad y derecho a pedir ayuda.",

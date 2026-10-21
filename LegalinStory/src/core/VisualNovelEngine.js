@@ -12,6 +12,8 @@ import { evaluateCondition } from "./conditions.js";
  * @typedef {Object} Stage
  * @property {string|null} background
  * @property {CharacterState|null} character
+ * @property {string|null} perspective
+ * @property {string|null} mood
  */
 
 /**
@@ -20,6 +22,7 @@ import { evaluateCondition } from "./conditions.js";
  * @property {Record<string, unknown>} flags
  * @property {Stage} stage
  * @property {string[]} [seen]
+ * @property {number} [rewinds]
  */
 
 /**
@@ -64,7 +67,10 @@ export class VisualNovelEngine {
     this.nodeId = startId;
     this.flags = {};
     this.seen = new Set();
-    this.stage = { background: null, character: null };
+    this.stage = { background: null, character: null, perspective: null, mood: null };
+    this.rewinds = 0;
+    /** @type {null | { nodeId: string, flags: Record<string, unknown>, stage: Stage, seen: string[], rewinds: number }} */
+    this.checkpoint = null;
     this.isRunning = false;
     this.isFinished = false;
 
@@ -85,6 +91,9 @@ export class VisualNovelEngine {
     });
     this.registerNodeType("ending", {
       present: (node) => this.#presentEnding(node),
+    });
+    this.registerNodeType("reconduction", {
+      present: (node) => this.#presentReconduction(node),
     });
 
     // Custom node types must be available before validation inspects the story.
@@ -139,6 +148,8 @@ export class VisualNovelEngine {
       this.nodeId = saved.nodeId;
       this.flags = { ...savedFlags };
       this.seen = new Set(Array.isArray(saved.seen) ? saved.seen : []);
+      this.rewinds = Number.isFinite(saved.rewinds) ? saved.rewinds : 0;
+      this.checkpoint = normalizeCheckpoint(saved.checkpoint, this.story);
       this.stage = {
         background:
           typeof savedStage.background === "string" ? savedStage.background : null,
@@ -146,6 +157,9 @@ export class VisualNovelEngine {
           savedStage.character && typeof savedStage.character === "object"
             ? savedStage.character
             : null,
+        perspective:
+          typeof savedStage.perspective === "string" ? savedStage.perspective : null,
+        mood: typeof savedStage.mood === "string" ? savedStage.mood : null,
       };
     } else {
       this.#resetState();
@@ -184,6 +198,12 @@ export class VisualNovelEngine {
 
   /**
    * Pick an option on the current choice node.
+   *
+   * Pedagogical consequence: options marked as risky (`safe: false`,
+   * `rewind: true`, or with a `lesson`) open a short consequence story and
+   * move forward. The engine records the mistake in `errores`, and the
+   * reconduction node at the end shows a warning before continuing.
+   *
    * @param {string} optionId
    * @returns {boolean}
    */
@@ -196,8 +216,87 @@ export class VisualNovelEngine {
     const option = node.options.find((candidate) => candidate.id === optionId);
     if (!option || !this.#matches(option.when)) return false;
 
+    if (isRewindOption(option)) {
+      this.rewinds += 1;
+      this.flags = {
+        ...this.flags,
+        errores: Number(this.flags.errores ?? 0) + 1,
+      };
+
+      // Risky choices open a short consequence story and keep moving
+      // forward. The reconduction node at the end shows the warning and then
+      // continues to the next beat; it does not send the player back.
+      this.flags = { ...this.flags, ...(option.flags ?? {}) };
+      this.#applyEffects(option.effects);
+      if (option.next) {
+        this.checkpoint = null;
+        this.#goTo(option.next);
+        return true;
+      }
+
+      // Legacy authoring shortcut: a risky option without a mini-story still
+      // shows the lesson immediately.
+      this.#persist();
+      this.bus.emit("lesson", {
+        choiceId: this.nodeId,
+        optionId: option.id,
+        label: option.label,
+        title: option.lessonTitle ?? "Hay otra forma de hacerlo",
+        consequence: option.consequence ?? "",
+        lesson: option.lesson ?? "",
+        rewinds: this.rewinds,
+        stage: this.#stageSnapshot(),
+        flags: { ...this.flags },
+      });
+      return true;
+    }
+
     this.flags = { ...this.flags, ...(option.flags ?? {}) };
+    this.#applyEffects(option.effects);
     this.#goTo(option.next);
+    return true;
+  }
+
+  /** Legacy: close a lesson card and re-present the same decision. */
+  dismissLesson() {
+    if (!this.isRunning || this.isFinished) return false;
+    if (this.currentNode.type !== "choice") return false;
+    this.#presentChoice(this.currentNode);
+    return true;
+  }
+
+  /**
+   * Finish a quiz with the answers the player chose. The quiz always continues;
+   * it records the score so endings and teachers can reflect on it.
+   *
+   * @param {Array<{ questionId: string, optionId: string }>} answers
+   */
+  completeQuiz(answers) {
+    if (!this.isRunning || this.isFinished || this.currentNode.type !== "quiz") return false;
+    if (!Array.isArray(answers)) return false;
+
+    const node = this.currentNode;
+    const questions = Array.isArray(node.questions) ? node.questions : [];
+    const answerMap = new Map(answers.map((answer) => [answer?.questionId, answer?.optionId]));
+    let score = 0;
+
+    for (const question of questions) {
+      const option = question.options?.find(
+        (candidate) => candidate.id === answerMap.get(question.id),
+      );
+      const correct = Boolean(option?.correct);
+      if (correct) score += 1;
+      if (question.flag) this.flags[question.flag] = correct;
+    }
+
+    this.flags = {
+      ...this.flags,
+      quizScore: score,
+      quizTotal: questions.length,
+      quizPerfect: questions.length > 0 && score === questions.length,
+    };
+
+    this.#goTo(node.next);
     return true;
   }
 
@@ -238,9 +337,16 @@ export class VisualNovelEngine {
             ? null
             : { ...(this.stage.character ?? {}), ...node.character };
       }
+      if (typeof node.perspective === "string") {
+        this.stage.perspective = node.perspective;
+      }
+      if (typeof node.mood === "string") {
+        this.stage.mood = node.mood;
+      }
       if (node.flags && typeof node.flags === "object") {
         this.flags = { ...this.flags, ...node.flags };
       }
+      if (!this.seen.has(this.nodeId)) this.#applyEffects(node.effects);
       this.seen.add(this.nodeId);
 
       const handler = this.nodeHandlers.get(node.type);
@@ -272,6 +378,7 @@ export class VisualNovelEngine {
     this.bus.emit("dialogue", {
       id: node.id,
       speaker: node.speaker ?? null,
+      remote: node.remote === true,
       text: node.text,
       tone: node.tone ?? (node.speaker ? "spoken" : "narration"),
       stage: this.#stageSnapshot(),
@@ -309,12 +416,82 @@ export class VisualNovelEngine {
     });
   }
 
+  /**
+   * End of an unsafe mini-story: show the warning over the next beat. New
+   * content uses `continueTo` so the story moves forward. The old checkpoint
+   * fallback is kept for saves created before this behaviour changed.
+   */
+  #presentReconduction(node) {
+    const checkpoint = this.checkpoint;
+    const notice = {
+      title: node.title ?? "Aviso",
+      text: node.text ?? "",
+      lesson: node.lesson ?? "",
+      rewinds: this.rewinds,
+      kind: "reconduction",
+    };
+
+    const continueTo =
+      typeof node.continueTo === "string" && this.story[node.continueTo]
+        ? node.continueTo
+        : null;
+
+    if (continueTo) {
+      this.checkpoint = null;
+      this.nodeId = continueTo;
+      this.#presentCurrentNode();
+      this.bus.emit("notice", notice);
+      return;
+    }
+
+    if (!checkpoint) {
+      const returnTo =
+        typeof node.returnTo === "string" && this.story[node.returnTo]
+          ? node.returnTo
+          : null;
+      if (returnTo) {
+        this.nodeId = returnTo;
+        this.#presentCurrentNode();
+        this.bus.emit("notice", notice);
+        return;
+      }
+
+      // Defensive fallback: never trap the player in a dead end.
+      this.bus.emit("notice", notice);
+      this.bus.emit("lesson", {
+        choiceId: this.nodeId,
+        optionId: null,
+        label: "",
+        title: notice.title,
+        consequence: notice.text,
+        lesson: notice.lesson,
+        rewinds: this.rewinds,
+        stage: this.#stageSnapshot(),
+        flags: { ...this.flags },
+      });
+      return;
+    }
+
+    this.nodeId = checkpoint.nodeId;
+    this.flags = { ...checkpoint.flags };
+    this.stage = cloneStage(checkpoint.stage);
+    this.seen = new Set(checkpoint.seen);
+    this.rewinds = checkpoint.rewinds;
+    this.checkpoint = null;
+
+    // Present the original decision first, then raise the notice on top of it.
+    this.#presentCurrentNode();
+    this.bus.emit("notice", notice);
+  }
+
   #persist() {
     this.saveStore?.save({
       nodeId: this.nodeId,
       flags: this.flags,
       stage: this.stage,
       seen: [...this.seen],
+      rewinds: this.rewinds,
+      checkpoint: this.checkpoint,
     });
   }
 
@@ -322,6 +499,8 @@ export class VisualNovelEngine {
     return {
       background: this.stage.background,
       character: this.stage.character ? { ...this.stage.character } : null,
+      perspective: this.stage.perspective,
+      mood: this.stage.mood,
     };
   }
 
@@ -329,7 +508,28 @@ export class VisualNovelEngine {
     this.nodeId = this.startId;
     this.flags = {};
     this.seen = new Set();
-    this.stage = { background: null, character: null };
+    this.stage = { background: null, character: null, perspective: null, mood: null };
+    this.rewinds = 0;
+    this.checkpoint = null;
+  }
+
+  /**
+   * Apply a small declarative effect DSL: `{ flag: value }` replaces a flag and
+   * `{ flag: { add: 1 } }` increments a numeric flag. Content stays data-only.
+   */
+  #applyEffects(effects) {
+    if (!effects || typeof effects !== "object" || Array.isArray(effects)) return;
+
+    for (const [key, value] of Object.entries(effects)) {
+      if (value && typeof value === "object" && !Array.isArray(value) && "add" in value) {
+        const delta = Number(value.add);
+        if (Number.isFinite(delta)) {
+          this.flags[key] = Number(this.flags[key] ?? 0) + delta;
+        }
+        continue;
+      }
+      this.flags[key] = value;
+    }
   }
 
   #matches(condition) {
@@ -370,6 +570,7 @@ export class VisualNovelEngine {
         }
 
         const optionIds = new Set();
+        let hasForwardOption = false;
         for (const option of node.options) {
           if (!option.id) throw new Error(`${where} has an option without id`);
           if (optionIds.has(option.id)) {
@@ -380,9 +581,18 @@ export class VisualNovelEngine {
           if (typeof option.label !== "string" || option.label.trim().length === 0) {
             throw new Error(`${where} option "${option.id}" needs a label`);
           }
-          if (!this.story[option.next]) {
+          if (isRewindOption(option)) {
+            if (!option.next) continue;
+          } else {
+            hasForwardOption = true;
+          }
+          if (!option.next || !this.story[option.next]) {
             throw new Error(`${where} option "${option.id}" points to a missing node`);
           }
+        }
+
+        if (!hasForwardOption) {
+          throw new Error(`${where} needs at least one option that moves the story forward`);
         }
       }
 
@@ -401,4 +611,42 @@ export class VisualNovelEngine {
       }
     }
   }
+}
+
+function isRewindOption(option) {
+  return (
+    option?.safe === false ||
+    option?.rewind === true ||
+    typeof option?.lesson === "string"
+  );
+}
+
+function cloneStage(stage) {
+  if (!stage || typeof stage !== "object") {
+    return { background: null, character: null, perspective: null, mood: null };
+  }
+  return {
+    background: typeof stage.background === "string" ? stage.background : null,
+    character:
+      stage.character && typeof stage.character === "object"
+        ? { ...stage.character }
+        : null,
+    perspective: typeof stage.perspective === "string" ? stage.perspective : null,
+    mood: typeof stage.mood === "string" ? stage.mood : null,
+  };
+}
+
+function normalizeCheckpoint(checkpoint, story) {
+  if (!checkpoint || typeof checkpoint !== "object") return null;
+  if (typeof checkpoint.nodeId !== "string" || !story[checkpoint.nodeId]) return null;
+  return {
+    nodeId: checkpoint.nodeId,
+    flags:
+      checkpoint.flags && typeof checkpoint.flags === "object" && !Array.isArray(checkpoint.flags)
+        ? { ...checkpoint.flags }
+        : {},
+    stage: cloneStage(checkpoint.stage),
+    seen: Array.isArray(checkpoint.seen) ? checkpoint.seen.filter((id) => typeof id === "string") : [],
+    rewinds: Number.isFinite(checkpoint.rewinds) ? checkpoint.rewinds : 0,
+  };
 }
