@@ -1,10 +1,50 @@
 # ChavalesLegales-TeamUCM
 
-Herramientas en **Python** para el proyecto *Chavales Legales*: extracción de
-datos legales (legislación y jurisprudencia española sobre menores y
-tecnología) y un generador de juegos didácticos. La aplicación web la
-desarrolla el resto del equipo por separado; este repo aporta los **datos** y
-el **contenido**.
+Aplicación educativa con Next.js, un motor de novela visual en JavaScript y
+herramientas Python de extracción legal y generación de juegos.
+
+La experiencia principal es **Sara · Mi historia sigue**: seis capítulos para
+acompañar a una adolescente durante la protección, el apoyo socioeducativo y un
+procedimiento judicial ficticio. Recorrido de demostración previsto para 10–15
+minutos, con decisiones que reconvergen y referencias posteriores.
+
+## Demo de Sara
+
+```bash
+npm install --prefix LegalinStory
+npm install --prefix frontend
+npm run dev
+```
+
+Abrir **http://localhost:3000/novela** o **/sara**. La historia funciona sin
+backend ni servicios de IA. También puede ejecutarse sola con
+`npm --prefix LegalinStory run dev` (Vite, normalmente puerto 5173).
+
+El progreso permanece en memoria salvo que se active el guardado local. Pausa
+permite borrarlo, reiniciar y salir. Las opciones de demostración de la portada
+permiten fijar una resolución con o sin condena antes de jugar.
+
+```bash
+npm --prefix LegalinStory test
+npm run build
+```
+
+La suite comprueba el motor anterior y el nuevo caso, incluidos retroceso,
+reinicio y consecuencias diferidas. El build integra la novela en Next.js y
+ejecuta sus comprobaciones de lint y tipos. Para pruebas de navegador:
+`npm --prefix LegalinStory run test:browser` requiere Playwright y Chromium
+instalados; puede indicarse `PLAYWRIGHT_MODULE_PATH` si están fuera del proyecto.
+
+Editar el guion en `LegalinStory/scripts/build-sara.mjs` y las explicaciones
+verificables en `LegalinStory/public/content/stories/sara/legal.json`. Después:
+`npm --prefix LegalinStory run story:sara`. Si Next ya está abierto, regenerar la
+copia integrada con `node frontend/scripts/prepare-novel.mjs` y recargar el iframe.
+Con `next start`, reiniciar el servidor después de regenerar esa copia.
+
+La auditoría breve está en [docs/MVP_AUDIT.md](docs/MVP_AUDIT.md), los detalles
+técnicos en [docs/MVP_IMPLEMENTATION.md](docs/MVP_IMPLEMENTATION.md) y los
+pendientes en [MVP_GAPS.md](MVP_GAPS.md). El uso con menores reales requiere la
+validación jurídica y pedagógica que se identifica allí.
 
 ## Estructura del proyecto
 

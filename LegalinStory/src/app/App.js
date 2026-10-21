@@ -41,8 +41,10 @@ export class App {
     resolveBackground,
     resolveSceneLabel,
     rights = null,
+    initialFlags = {},
   }) {
     this.bus = new EventBus();
+    this.paused = false;
 
     const storyNodeTypes = {
       chat: {
@@ -70,11 +72,12 @@ export class App {
       bus: this.bus,
       saveStore,
       nodeTypes: storyNodeTypes,
+      initialFlags,
     });
 
     this.view = new VisualNovelView(root, {
       onAdvance: () => this.advance(),
-      onChoose: (optionId) => this.engine.choose(optionId),
+      onChoose: (optionId) => !this.paused && this.engine.choose(optionId),
       onExit,
       title,
       resolveCharacter,
@@ -95,6 +98,7 @@ export class App {
   }
 
   advance() {
+    if (this.paused) return;
     if (this.view.isTyping()) {
       this.view.skipTyping();
       return;
@@ -117,10 +121,10 @@ export class App {
     this.bus.on("ending", (payload) => this.view.showEnding(payload));
     this.bus.on("chat", (payload) => this.view.showChat(payload));
     this.bus.on("interstitial", (payload) =>
-      this.view.showInterstitial(payload, () => this.engine.advance()),
+      this.view.showInterstitial(payload, () => !this.paused && this.engine.advance()),
     );
     this.bus.on("minigame", (payload) =>
-      this.view.showMinigame(payload, (selected) => this.engine.completeActivity(selected)),
+      this.view.showMinigame(payload, (selected) => !this.paused && this.engine.completeActivity(selected)),
     );
     this.bus.on("quiz", (payload) =>
       this.view.showQuiz(payload, (answers) => this.engine.completeQuiz(answers)),

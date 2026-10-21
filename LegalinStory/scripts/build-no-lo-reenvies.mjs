@@ -15,15 +15,32 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const storyDir = path.resolve(here, "../public/content/stories/no-lo-reenvies");
 
 const nodes = {};
+const portraits = {
+  Sara: "sara",
+  Julia: "julia",
+  Sergio: "sergio",
+  Hugo: "hugo",
+  Marina: "marina",
+};
 
 const say = (id, speaker, text, next, extra = {}) => {
-  nodes[id] = { type: "dialogue", speaker, text, next, ...extra };
+  const portrait = portraits[speaker];
+  nodes[id] = {
+    type: "dialogue",
+    speaker,
+    text,
+    next,
+    ...(portrait ? { cast: { [portrait]: "neutral" } } : {}),
+    // A null cast clears the portrait when the speaking character has no sprite.
+    ...(speaker && !portrait ? { cast: { sara: null } } : {}),
+    ...extra,
+  };
 };
 
 const narrate = (id, text, next, extra = {}) => say(id, null, text, next, extra);
 
 const thought = (id, text, next, extra = {}) =>
-  say(id, null, text, next, { tone: "thought", ...extra });
+  say(id, extra.speaker ?? null, text, next, { tone: "thought", ...extra });
 
 const chat = (id, chatTitle, self, messages, next, extra = {}) => {
   nodes[id] = { type: "chat", chatTitle, self, messages, next, ...extra };
@@ -113,7 +130,7 @@ choice("decision-1", "Sara ve lo que está pasando. ¿Qué hace?", [
     "d1-avoid",
     { flags: { avoidedSergio: true } },
   ),
-]);
+], { cast: { sara: "neutral" } });
 
 say(
   "d1-intervene",
@@ -151,6 +168,7 @@ thought(
   "d1-avoid-2",
   "«Quizá debería haber dicho algo...»",
   "prologo-end",
+  { speaker: "Sara" },
 );
 
 narrate(
@@ -224,6 +242,7 @@ thought(
   "ch1-3",
   "«¿Y si mañana todo el mundo me ha visto?»",
   "decision-2",
+  { speaker: "Sara" },
 );
 
 choice("decision-2", "¿Qué hace Sara?", [
@@ -245,7 +264,7 @@ choice("decision-2", "¿Qué hace Sara?", [
     "d2-avoid",
     { flags: { avoidedPhone: true } },
   ),
-]);
+], { cast: { sara: "neutral" } });
 
 say(
   "d2-investigate",
@@ -265,15 +284,15 @@ chat(
   "Hugo",
   "Sara",
   [
-    msg("Sara", "Hugo, ¿qué es esa foto?", "19:02"),
-    msg("Hugo", "qué foto", "19:02"),
-    msg("Sara", "la que estáis pasando", "19:03"),
-    msg("Hugo", "yo no he pasado nada", "19:03"),
-    msg("Hugo", "pregúntale a los de 4ºB", "19:04"),
+    msg("Sara", "Hugo, ¿qué es esa foto?", "18:50"),
+    msg("Hugo", "qué foto", "18:50"),
+    msg("Sara", "la que estáis pasando", "18:51"),
+    msg("Hugo", "yo no he pasado nada", "18:51"),
+    msg("Hugo", "pregúntale a los de 4ºB", "18:52"),
   ],
   "d2-hugo-2",
 );
-thought(
+narrate(
   "d2-hugo-2",
   "La conversación no le ha dado respuestas. Sara siente que ha empeorado.",
   "ch1-end",
@@ -284,7 +303,7 @@ narrate(
   "Sara apaga el teléfono y lo deja a un lado. Pero la preocupación no desaparece.",
   "d2-avoid-2",
 );
-thought("d2-avoid-2", "«Mañana tendré que ir al instituto.»", "ch1-end");
+thought("d2-avoid-2", "«Mañana tendré que ir al instituto.»", "ch1-end", { speaker: "Sara" });
 
 narrate(
   "ch1-end",
@@ -298,13 +317,13 @@ card(
   "chapter2-card",
   null,
   "Capítulo 2",
-  "Hasta ahora has decidido qué hacer cuando algo te ocurre a ti.\nAhora eres la persona que recibe el contenido.",
+  "Martes, 19:03. Mientras Sara intenta entender qué ocurre, a Julia le llega un mensaje.",
   "ch2-1",
 );
 
 narrate(
   "ch2-1",
-  "La pantalla se oscurece. El nombre del personaje cambia. Ahora el jugador controla a Julia.",
+  "Julia abre la conversación. Hugo le ha enviado la imagen que circula sobre Sara.",
   "ch2-chat-1",
   { scene: "bedroom-evening", cast: { julia: "neutral" } },
 );
@@ -327,6 +346,7 @@ thought(
   "ch2-2",
   "«No sé si esto es real. Tampoco sé quién lo ha hecho. Pero Sara me ha pedido que no se lo diga a nadie.»",
   "decision-3",
+  { speaker: "Julia" },
 );
 
 choice("decision-3", "¿Qué hace Julia?", [
@@ -348,7 +368,7 @@ choice("decision-3", "¿Qué hace Julia?", [
     "d3-exit",
     { flags: { juliaDisengaged: true } },
   ),
-]);
+], { cast: { julia: "neutral" } });
 
 narrate(
   "d3-forward",
@@ -357,12 +377,12 @@ narrate(
 );
 narrate(
   "d3-forward-2",
-  "«Has generado otra difusión. Aunque tu intención fuera comprobar qué ocurrió, compartir contenido íntimo ajeno sin consentimiento puede aumentar el daño.»",
+  "El reenvío ha creado otra copia de la imagen. Aunque Julia quería comprobar de dónde venía, ahora otra persona la tiene.",
   "d3-forward-3",
 );
-thought(
+narrate(
   "d3-forward-3",
-  "Julia se da cuenta de lo que ha hecho. Decide dejar de reenviarlo y buscar ayuda.",
+  "Julia se queda mirando el chat. Ya no puede retirar lo que la otra persona ha recibido.",
   "ch2-end",
 );
 
@@ -394,7 +414,7 @@ chat(
 
 narrate(
   "d3-help-end",
-  "«Una persona que presencia una situación también puede ayudar a detenerla.»",
+  "Julia ha decidido no ampliar la difusión y acompañar a Sara.",
   "ch2-end",
 );
 
@@ -405,11 +425,11 @@ narrate(
 );
 narrate(
   "d3-exit-2",
-  "«No reenviar evita que contribuyas a difundirlo, pero todavía puedes ayudar a quien lo está viviendo.»",
+  "Julia no ha reenviado la imagen, aunque Sara todavía necesita apoyo.",
   "ch2-end",
 );
 
-narrate("ch2-end", "La historia continúa.", "chapter3-card");
+narrate("ch2-end", "Al día siguiente, Sara vuelve al instituto.", "chapter3-card");
 
 /* ----------------------------------------------------------------- chapter 3 */
 
@@ -427,6 +447,7 @@ thought(
   "ch3-4",
   "«Antes me preocupaba suspender Matemáticas. Ahora solo quiero que nadie me mire.»",
   "ch3-5",
+  { speaker: "Sara" },
 );
 narrate(
   "ch3-5",
@@ -470,9 +491,9 @@ chat(
   "ch3-6",
 );
 
-thought(
+narrate(
   "ch3-6",
-  "«Sergio lleva meses esperando que alguien haga algo. Sara lleva menos de un día sintiendo el mismo miedo.»",
+  "Sergio lleva meses esperando que alguien haga algo. Sara empieza a comprender ese miedo.",
   "decision-4",
 );
 
@@ -492,7 +513,7 @@ choice("decision-4", "¿A quién acude Sara?", [
     "d4-not-ready",
     { flags: { notReady: true } },
   ),
-]);
+], { cast: { sara: "neutral" } });
 
 say("d4-together", "Sergio", "¿Vamos juntos?", "d4-together-2");
 narrate(
@@ -546,7 +567,7 @@ choice("late-choice", "¿Quieres ayudar a Sara a dar el primer paso?", [
   option("keep", "No enviarlo todavía.", "late-not-send", {
     flags: { neverAsked: true },
   }),
-]);
+], { cast: { sara: "sad" } });
 
 narrate(
   "late-send",
@@ -556,9 +577,10 @@ narrate(
 say(
   "late-send-2",
   "Marina",
-  "Podemos hablar mañana. No tienes que enfrentarte sola.",
-  "chapter4-card",
+  "El lunes, cuando llegues al instituto, podemos hablar. No tienes que enfrentarte sola.",
+  "late-send-3",
 );
+narrate("late-send-3", "El lunes, Sara acude al Departamento de Orientación.", "chapter4-card");
 
 narrate(
   "late-not-send",
@@ -665,8 +687,8 @@ say(
 card(
   "needs-menu",
   "Apoyos",
-  "¿Qué necesita Sara para hablar?",
-  "Puede ir acompañada por una persona de confianza, pedir explicaciones con palabras sencillas, hacer una pausa si se pone nerviosa y preguntar qué medidas de protección puede ofrecer el instituto.",
+  "Hablar con apoyo",
+  "Sara puede pedir compañía, explicaciones sencillas o una pausa. También puede preguntar qué medidas de protección ofrece el instituto.",
   "needs-response",
 );
 
@@ -703,7 +725,7 @@ say(
 card(
   "ch5-minigame",
   "Información útil",
-  "Organiza la información",
+  "Qué información conviene guardar",
   "Guarda conversaciones con comentarios ofensivos, fechas y nombres de usuario; el nombre del grupo o enlace donde se publicó; e información de quienes lo vieron. No hace falta descargar ni reenviar contenido íntimo para pedir ayuda.",
   "ch5-2",
 );
@@ -729,14 +751,16 @@ say(
   "ch5-7",
 );
 say("ch5-7", "Sara", "¿Y qué es la Fiscalía de Menores?", "ch5-8");
-narrate(
+say(
   "ch5-8",
-  "«La Fiscalía de Menores interviene, entre otras funciones, en la investigación de posibles delitos cometidos por personas de entre 14 y 17 años y vela por la protección de los derechos de los menores.»",
+  "Marina",
+  "Investiga los posibles delitos cometidos por adolescentes de 14 a 17 años y también vela por los derechos de los menores.",
   "ch5-9",
 );
-narrate(
+say(
   "ch5-9",
-  "No todos los casos siguen el mismo procedimiento ni terminan en un juicio. Marina se lo explica con tarjetas y ejemplos sencillos.",
+  "Marina",
+  "No todos los casos siguen el mismo procedimiento ni terminan en un juicio. Te explicaré las opciones que correspondan a tu situación.",
   "chapter6-card",
 );
 
@@ -752,14 +776,14 @@ card(
 
 narrate(
   "ch6-1",
-  "Sara entra en una sala con dos sillas, una mesa y una ventana. La persona que la recibe se presenta y le explica el propósito de la conversación.",
+  "Días después, Sara se reúne con una profesional de apoyo. Ella le explica para qué es la conversación y que puede pedir una pausa.",
   "ch6-2",
   { scene: "quiet-room", cast: { sara: "neutral" } },
 );
 say(
   "ch6-2",
   "Profesional",
-  "Hola, Sara. Vamos a hablar de lo que ha ocurrido. Si hay algo que no entiendes, puedes preguntármelo.",
+  "Hola, Sara. ¿Recuerdas cuándo te enteraste de que compartían esa imagen? Si algo no está claro, puedes preguntármelo.",
   "ch6-3",
 );
 say("ch6-3", "Sara", "Vale.", "decision-6");
@@ -780,7 +804,7 @@ choice("decision-6", "¿Cómo responde Sara?", [
     "d6-repeat",
     { flags: { askedRepeat: true } },
   ),
-]);
+], { cast: { sara: "neutral" } });
 
 say(
   "d6-precise",
@@ -965,7 +989,7 @@ say(
   "Vamos a revisar lo ocurrido y las opciones disponibles.",
   "final2-d7",
 );
-narrate("final2-d7", "Sara se sienta.", "final2");
+narrate("final2-d7", "Sara escucha. Ya no tiene que resolverlo todo a la vez.", "final2");
 ending(
   "final2",
   "Final 2",
@@ -997,7 +1021,7 @@ say(
 say(
   "final3-d6",
   "Sara",
-  "Pero me dijiste que no la habías pasado.",
+  "Te pedí que no se la enseñaras a nadie.",
   "final3-d7",
 );
 say("final3-d7", "Julia", "Ya. Lo siento. Hice mal.", "final3-d8");
@@ -1027,7 +1051,7 @@ ending(
   "final4",
   "Final 4",
   "El mensaje sin enviar",
-  "A veces, pedir ayuda empieza con un mensaje que cuesta mucho escribir. Siempre puedes volver a pedir ayuda. No tienes que enfrentarte a una situación de violencia sin apoyo.",
+  "A veces, pedir ayuda empieza con un mensaje que cuesta mucho escribir. También puedes hablar con una persona de confianza para dar el primer paso. No tienes que afrontar esta situación sin apoyo.",
 );
 
 /* --------------------------------------------------------------------- scenes */
@@ -1134,7 +1158,7 @@ const rights = {
     },
     {
       name: "Canal Prioritario de la AEPD",
-      text: "Recurso para solicitar la retirada urgente de contenido sexual o violento difundido sin permiso cuando existe un riesgo grave. No equivale a presentar una denuncia penal.",
+      text: "Si el contenido sexual o violento se ha publicado en Internet y existe un riesgo grave, permite solicitar su retirada urgente. No equivale a presentar una denuncia penal.",
       url: "https://www.aepd.es/canalprioritario",
     },
     {

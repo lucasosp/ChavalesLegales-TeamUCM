@@ -2,6 +2,13 @@
   "version": 1,
   "stories": [
     {
+      "id": "sara",
+      "title": "Sara · Mi historia sigue",
+      "subtitle": "Seis capítulos para acompañar, comprender y seguir adelante.",
+      "manifest": "stories/sara/novel.json",
+      "cover": "assets/backgrounds/patio-day.svg"
+    },
+    {
       "id": "dos-voces",
       "title": "Dos voces",
       "subtitle": "Una historia sobre violencia en casa, apoyo entre iguales y justicia amigable.",

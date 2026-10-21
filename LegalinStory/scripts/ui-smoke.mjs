@@ -65,7 +65,7 @@ if (character.className !== "character is-visible expression-neutral") {
   fail(`character not rendered: ${character.className}`);
 }
 if (!background?.className.includes("bg-classroom-dusk")) fail("background not applied");
-if (!speaker.hidden) fail("narration should hide the nameplate");
+if (speaker.hidden || speaker.textContent !== "Narración") fail("narration should identify its voice");
 
 let sawChoice = false;
 let guard = 0;

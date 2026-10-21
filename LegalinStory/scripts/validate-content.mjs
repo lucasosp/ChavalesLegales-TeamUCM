@@ -43,6 +43,9 @@ const COMMON_NODE_KEYS = [
   "perspective",
   "mood",
   "remote",
+  "chapter",
+  "learn",
+  "a11y",
 ];
 const NODE_KEYS = {
   dialogue: [...COMMON_NODE_KEYS, "speaker", "text", "next"],
@@ -845,7 +848,7 @@ function validateStory(storyDoc, tag, catalog, sceneIndex, ctx) {
     return;
   }
 
-  rejectUnknownKeys(storyDoc, ["version", "start", "nodes"], where, ctx);
+  rejectUnknownKeys(storyDoc, ["version", "start", "initialFlags", "nodes"], where, ctx);
   if (typeof storyDoc.version !== "number") {
     ctx.errors.push(`${where}.version must be a number`);
   }
@@ -864,6 +867,7 @@ function validateStory(storyDoc, tag, catalog, sceneIndex, ctx) {
 
   const readFlags = new Set();
   const setFlags = new Set();
+  validateFlags(storyDoc.initialFlags, `${where}.initialFlags`, ctx, setFlags);
   const edges = new Map();
 
   for (const [id, node] of Object.entries(nodes)) {
@@ -1284,6 +1288,19 @@ function validateCommonNode(node, where, catalog, sceneIndex, ctx, setFlags) {
 
   if (node.tone !== undefined) {
     requireString(node.tone, `${where}.tone`, ctx);
+  }
+
+  if (node.chapter !== undefined && (!Number.isInteger(node.chapter) || node.chapter < 1)) {
+    ctx.errors.push(`${where}.chapter must be a positive integer`);
+  }
+  if (node.learn !== undefined && !(
+    (typeof node.learn === "string" && node.learn.trim().length > 0)
+    || (Array.isArray(node.learn) && node.learn.length > 0 && node.learn.every((item) => typeof item === "string" && item.trim().length > 0))
+  )) {
+    ctx.errors.push(`${where}.learn must be a non-empty string or an array of them`);
+  }
+  if (node.a11y !== undefined && !isObject(node.a11y)) {
+    ctx.errors.push(`${where}.a11y must be an object`);
   }
 }
 

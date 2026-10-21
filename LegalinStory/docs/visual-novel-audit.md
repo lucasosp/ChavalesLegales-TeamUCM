@@ -78,7 +78,7 @@ novela se han conservado.
 
 - `npm test`: validador, asset ausente deliberado, UI, carga HTTP del catálogo,
   recorrido de la historia y regresiones del motor.
-- El recorrido exhaustivo explora **270 rutas completas**, visita **169 nodos**
+- El recorrido exhaustivo explora **270 rutas completas**, visita **170 nodos**
   y alcanza **los cuatro finales** con condiciones reales, desde el inicio.
 - Reinicio durante chat/actividad, cancelación de escritura, conservación de
   flags y recuperación de un guardado del antiguo menú comprobados.
@@ -95,6 +95,24 @@ novela se han conservado.
   `http://localhost:3000/novela` y Vite en `http://localhost:5173/`.
 - No existen scripts específicos de lint/typecheck en la novela. Next.js
   ejecuta su comprobación integrada durante el build.
+
+## Revisión editorial posterior
+
+- La bienvenida conserva instrucciones breves sin adelantar los personajes.
+  Las tarjetas y escenas muestran el cambio de perspectiva cuando ocurre.
+- Todos los pensamientos de las dos historias identifican a su personaje.
+  La interfaz etiqueta diálogos, narración y decisiones; los chats muestran
+  también quién usa el móvil y quién envía cada mensaje. En «No lo reenvíes»,
+  el retrato sigue a quien habla y desaparece cuando habla alguien sin dibujo.
+- «No lo reenvíes» ajusta las horas del chat, el salto de viernes a lunes, la
+  pregunta previa a la elección de Sara y la conversación del final del reenvío.
+- «No soy yo» permite decidir si Sergio acude a Orientación. La escena con
+  Marina y los finales respetan esa decisión; el segundo caso se presenta como
+  una historia independiente.
+- Las fichas de apoyos y pruebas son ahora informativas. El motor mantiene la
+  capacidad de actividades interactivas para futuros contenidos.
+- Los recursos distinguen la difusión de contenido sexual o violento publicado
+  en Internet de la suplantación mediante un perfil falso.
 
 ## Límites y siguientes pasos, por impacto
 

@@ -54,6 +54,7 @@ export class VisualNovelEngine {
     bus = new EventBus(),
     saveStore = null,
     nodeTypes = {},
+    initialFlags = {},
   }) {
     if (!story || typeof story !== "object") {
       throw new TypeError("VisualNovelEngine requires a story object");
@@ -63,6 +64,8 @@ export class VisualNovelEngine {
     this.startId = startId;
     this.bus = bus;
     this.saveStore = saveStore;
+    this.initialFlags = { ...initialFlags };
+    this.history = [];
 
     this.nodeId = startId;
     this.flags = {};
@@ -148,6 +151,12 @@ export class VisualNovelEngine {
       this.nodeId = saved.nodeId;
       this.flags = { ...savedFlags };
       this.seen = new Set(Array.isArray(saved.seen) ? saved.seen : []);
+      this.history = Array.isArray(saved.history)
+        ? saved.history.filter((item) => item && this.story[item.nodeId]
+          && item.flags && typeof item.flags === "object" && !Array.isArray(item.flags)
+          && item.stage && typeof item.stage === "object" && !Array.isArray(item.stage)
+          && Array.isArray(item.seen)).slice(-150)
+        : [];
       this.rewinds = Number.isFinite(saved.rewinds) ? saved.rewinds : 0;
       this.checkpoint = normalizeCheckpoint(saved.checkpoint, this.story);
       this.stage = {
@@ -178,6 +187,25 @@ export class VisualNovelEngine {
     this.isFinished = false;
     this.#presentCurrentNode();
     return this;
+  }
+
+  back() {
+    if (!this.isRunning) return false;
+    const previous = this.history.pop();
+    if (!previous) return false;
+    this.nodeId = previous.nodeId;
+    this.flags = { ...previous.flags };
+    this.stage = structuredClone(previous.stage);
+    this.seen = new Set(previous.seen);
+    this.isRunning = true;
+    this.isFinished = false;
+    this.#presentCurrentNode();
+    return true;
+  }
+
+  #remember() {
+    this.history.push({ nodeId: this.nodeId, flags: { ...this.flags }, stage: this.#stageSnapshot(), seen: [...this.seen] });
+    if (this.history.length > 150) this.history.shift();
   }
 
   /**
@@ -216,6 +244,7 @@ export class VisualNovelEngine {
     const option = node.options.find((candidate) => candidate.id === optionId);
     if (!option || !this.#matches(option.when)) return false;
 
+    this.#remember();
     if (isRewindOption(option)) {
       this.rewinds += 1;
       this.flags = {
@@ -230,7 +259,7 @@ export class VisualNovelEngine {
       this.#applyEffects(option.effects);
       if (option.next) {
         this.checkpoint = null;
-        this.#goTo(option.next);
+        this.#goTo(option.next, false);
         return true;
       }
 
@@ -253,7 +282,7 @@ export class VisualNovelEngine {
 
     this.flags = { ...this.flags, ...(option.flags ?? {}) };
     this.#applyEffects(option.effects);
-    this.#goTo(option.next);
+    this.#goTo(option.next, false);
     return true;
   }
 
@@ -307,18 +336,20 @@ export class VisualNovelEngine {
     const selected = new Set(selectedIds);
     if (!selected.size || [...selected].some((id) => !node.cards.some((card) => card.id === id))) return false;
     if (node.mode !== "support" && !node.cards.every((card) => Boolean(card.correct) === selected.has(card.id))) return false;
+    this.#remember();
     for (const card of node.cards) {
       if (card.flag) this.flags[card.flag] = selected.has(card.id);
     }
-    this.#goTo(node.next);
+    this.#goTo(node.next, false);
     return true;
   }
 
   /** @param {string} nextId */
-  #goTo(nextId) {
+  #goTo(nextId, remember = true) {
     if (!this.story[nextId]) {
       throw new Error(`Story node "${nextId}" does not exist`);
     }
+    if (remember) this.#remember();
     this.nodeId = nextId;
     this.#presentCurrentNode();
   }
@@ -368,6 +399,7 @@ export class VisualNovelEngine {
 
       if (node.type !== "ending") this.#persist();
       handler.present(node);
+      this.bus.emit("state", { nodeId: this.nodeId, finished: this.isFinished });
       return;
     }
 
@@ -395,6 +427,7 @@ export class VisualNovelEngine {
     this.bus.emit("choice", {
       id: node.id,
       speaker: node.speaker ?? null,
+      remote: node.remote === true,
       prompt: node.prompt,
       tone: node.tone ?? "narration",
       options: options.map(({ id, label }) => ({ id, label })),
@@ -492,6 +525,7 @@ export class VisualNovelEngine {
       seen: [...this.seen],
       rewinds: this.rewinds,
       checkpoint: this.checkpoint,
+      history: this.history,
     });
   }
 
@@ -506,7 +540,8 @@ export class VisualNovelEngine {
 
   #resetState() {
     this.nodeId = this.startId;
-    this.flags = {};
+    this.flags = { ...this.initialFlags };
+    this.history = [];
     this.seen = new Set();
     this.stage = { background: null, character: null, perspective: null, mood: null };
     this.rewinds = 0;

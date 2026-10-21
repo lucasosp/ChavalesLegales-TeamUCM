@@ -1,14 +1,17 @@
 # LegalinStory
 
 Novela visual de Chavales Legales construida con JavaScript y Vite. La
-experiencia principal es **Dos voces**, una historia con perspectiva dual sobre
-violencia intrafamiliar, apoyo entre iguales y justicia amigable. El contenido
+experiencia principal es **Sara · Mi historia sigue**, una historia sobre
+protección, apoyo socioeducativo y acceso a la justicia. El contenido
 vive en JSON y las ilustraciones en `public/assets`. Las historias anteriores se
 conservan como fixtures de regresión y siguen disponibles mediante
 `?story=<id>`.
 
 Contenido conservado en el repositorio:
 
+- **Sara · Mi historia sigue** — seis capítulos con decisiones que reconvergen,
+  mapa del proceso, cuaderno de conceptos, perfiles profesionales y guardado
+  local opcional. El guion se genera con `npm run story:sara`.
 - **Dos voces** — la experiencia principal. Cinco capítulos, 19 decisiones (13 de
   Maya y 6 de Sofi) y un cierre de dos preguntas. Dos modos de edad, mecánica de
   error–aviso–continuación, dos escenas de mensajes del padre, cambios de

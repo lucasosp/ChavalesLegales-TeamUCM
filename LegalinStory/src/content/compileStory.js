@@ -37,7 +37,7 @@ export function compileStory({
     }
   }
 
-  return { startId, nodes };
+  return { startId, nodes, initialFlags: { ...(storyDoc.initialFlags ?? {}) } };
 }
 
 function compileNode(id, node, context) {
@@ -46,6 +46,9 @@ function compileNode(id, node, context) {
   }
 
   const compiled = { id, type: node.type };
+  for (const key of ["chapter", "learn", "a11y"]) {
+    if (node[key] !== undefined) compiled[key] = structuredClone(node[key]);
+  }
 
   if (node.scene) {
     compiled.background = node.scene;

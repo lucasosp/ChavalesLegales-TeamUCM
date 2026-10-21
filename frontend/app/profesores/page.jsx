@@ -120,9 +120,9 @@ export default function ApartadoProfesores({ initialPin = null }) {
           className="btn-sala-iniciar"
           style={{ background: '#3B82F6', color: '#FFFFFF' }}
           onClick={() => handleLaunchGame('/novela', 'novela')}
-          title="Lanzar la novela interactiva «No lo reenvíes» a todos los alumnos conectados"
+          title="Lanzar la aventura interactiva de Sara a los alumnos conectados"
         >
-          Lanzar «No lo reenvíes» {playersCount > 0 ? `(${playersCount})` : ''}
+          Lanzar «Sara» {playersCount > 0 ? `(${playersCount})` : ''}
         </button>
         <button
           type="button"
@@ -349,9 +349,9 @@ export default function ApartadoProfesores({ initialPin = null }) {
                 </div>
                 <div className="game-btn-text-group">
                   <span className="game-btn-badge">Narrativa & Toma de decisiones</span>
-                  <span className="game-btn-title">No lo reenvíes / Modo Historieta</span>
+                  <span className="game-btn-title">Sara · Mi historia sigue</span>
                   <span className="game-btn-desc">
-                    Una novela visual sobre intimidad digital, acoso y cómo pedir ayuda. Tus decisiones cambian la historia.
+                    Acompaña a Sara en una historia sobre protección, apoyo y acceso a la justicia.
                   </span>
                 </div>
               </div>
@@ -377,7 +377,7 @@ export default function ApartadoProfesores({ initialPin = null }) {
                 <Link
                   href="/novela"
                   className="game-btn-action"
-                  aria-label="Abrir No lo reenvíes"
+                  aria-label="Abrir la aventura de Sara"
                 >
                   <span>Proyectar</span>
                   <span>→</span>

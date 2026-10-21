@@ -110,6 +110,7 @@ export class VisualNovelView {
       choices: root.querySelector("[data-choices]"),
       chat: root.querySelector("[data-chat]"),
       chatTitle: root.querySelector("[data-chat-title]"),
+      chatSelf: root.querySelector("[data-chat-self]"),
       chatLog: root.querySelector("[data-chat-log]"),
       chatHint: root.querySelector("[data-chat-hint]"),
       chatSkip: root.querySelector("[data-chat-skip]"),
@@ -198,8 +199,11 @@ export class VisualNovelView {
     this.#awaitingChoice = false;
     this.#clearChoices();
     this.#applyStage(stage);
-    this.#setSpeaker(speaker, remote);
-    this.refs.announcement.textContent = `${speaker ? `${speaker}: ` : ""}${text}`;
+    const voice = tone === "thought"
+      ? (speaker ? `Pensamiento de ${speaker}` : "Pensamiento")
+      : speaker ?? (tone === "narration" ? "Narración" : null);
+    this.#setSpeaker(voice, remote);
+    this.refs.announcement.textContent = `${voice ? `${voice}: ` : ""}${text}`;
 
     this.refs.panel.classList.toggle("is-narration", tone === "narration");
     this.refs.panel.classList.toggle("is-thought", tone === "thought");
@@ -217,8 +221,9 @@ export class VisualNovelView {
     this.#leaveEnding();
     this.#awaitingChoice = false;
     this.#applyStage(stage);
-    this.#setSpeaker(speaker, remote);
-    this.refs.announcement.textContent = `${speaker ? `${speaker}: ` : ""}${prompt}`;
+    const voice = speaker ?? "Decisión";
+    this.#setSpeaker(voice, remote);
+    this.refs.announcement.textContent = `${voice}: ${prompt}`;
     this.#clearChoices();
 
     this.refs.panel.classList.toggle("is-narration", tone === "narration");
@@ -274,6 +279,7 @@ export class VisualNovelView {
     this.refs.panel.hidden = true;
     this.refs.chat.hidden = false;
     this.refs.chatTitle.textContent = chatTitle ?? "Mensajes";
+    this.refs.chatSelf.textContent = self ? `Desde el móvil de ${self}` : "";
     this.refs.chatLog.replaceChildren();
     this.refs.chatHint.hidden = true;
     this.refs.chatSkip.hidden = false;
@@ -376,7 +382,7 @@ export class VisualNovelView {
     if (message.deleted) bubble.classList.add("is-deleted");
     if (message.hidden) bubble.classList.add("is-hidden-content");
 
-    if (message.from && side !== "out") {
+    if (message.from) {
       const author = document.createElement("span");
       author.className = "chat-author";
       author.textContent = message.from;

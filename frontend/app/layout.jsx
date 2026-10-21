@@ -1,8 +1,8 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'Chavales Legales · Tu escudo digital',
-  description: 'Aprende ciberseguridad, prevención de ciberacoso y detección de trampas digitales jugando.',
+  title: 'Chavales Legales · Historias que acompañan',
+  description: 'Aventuras interactivas para comprender tus derechos, la protección y las personas que pueden ayudarte.',
   icons: {
     icon: [
       { url: '/favicon.ico' },

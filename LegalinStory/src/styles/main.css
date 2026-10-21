@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+/* System fallbacks keep the educational experience free of third-party requests. */
 
 :root {
   color-scheme: light;
@@ -900,6 +900,9 @@ a { color: inherit; }
   box-shadow: 0 0 12px rgb(125 219 165 / 80%);
 }
 
+.chat-heading { display: flex; flex-direction: column; gap: 2px; }
+.chat-self { font-size: .72rem; font-weight: 500; letter-spacing: 0; text-transform: none; opacity: .9; }
+
 .chat-log {
   min-height: 0;
   display: flex;
@@ -1662,6 +1665,7 @@ button:disabled { opacity: .45; cursor: default; }
 }
 .dialogue::before { width: 9px; background: var(--brand-green); opacity: 1; }
 .nameplate { margin-bottom: .45rem; color: var(--brand-orange); font-family: var(--brand-font); font-size: .95rem; font-weight: 800; letter-spacing: .04em; text-shadow: none; }
+.nameplate[data-speaker="narración"], .nameplate[data-speaker="decisión"] { color: var(--brand-emerald-dark); }
 .nameplate[data-speaker="you"] { color: #9a3412; }
 .dialogue-text { color: var(--brand-outline); font-family: var(--brand-font); font-size: clamp(1.3rem, 1.8vw, 1.55rem); font-weight: 500; line-height: 1.55; text-shadow: none; }
 .dialogue.is-narration .dialogue-text, .dialogue.is-thought .dialogue-text, .dialogue.is-poem .dialogue-text { color: #3f3f46; }

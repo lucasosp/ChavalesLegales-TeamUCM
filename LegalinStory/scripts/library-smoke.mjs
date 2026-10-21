@@ -17,9 +17,9 @@ try {
   const { loadStoryIndex, loadStory } = await import("../src/content/contentLoader.js");
   const { App } = await import("../src/app/App.js");
   const index = await loadStoryIndex();
-  assert.equal(index.stories[0]?.id, "dos-voces", "the primary experience must be first");
+  assert.equal(index.stories[0]?.id, "sara", "Sara is the primary experience");
   assert.ok(index.stories.length >= 2, "the registry must contain the primary experience");
-  const content = await loadStory(index.stories[0]);
+  const content = await loadStory(index.stories.find((story) => story.id === "dos-voces"));
   assert.ok(content.rights);
   const root = document.querySelector("#app");
   const app = new App({ root, ...content });

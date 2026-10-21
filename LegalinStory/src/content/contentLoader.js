@@ -40,6 +40,7 @@ export async function loadStory(entry) {
   return {
     story: compiled.nodes,
     startId: compiled.startId,
+    initialFlags: compiled.initialFlags,
     title: manifest.title ?? entry.title,
     manifest,
     scenes,

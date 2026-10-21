@@ -438,7 +438,7 @@ export default function Home() {
                     Narrativa & Novela Visual
                   </span>
                   <strong style={{ fontSize: 15, fontWeight: 900, color: '#18181B' }}>
-                    No lo reenvíes
+                    Sara · Mi historia sigue
                   </strong>
                 </div>
                 <span

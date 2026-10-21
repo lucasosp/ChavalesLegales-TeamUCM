@@ -16,7 +16,7 @@ export default function Novela() {
 
   return (
     <main style={{ position: 'fixed', inset: 0, zIndex: 100, background: '#461020' }}>
-      <iframe id="novela-frame" title="No lo reenvíes · Novela visual interactiva" src="/novela/index.html" style={{ display: 'block', width: '100%', height: '100%', border: 0 }} />
+      <iframe id="novela-frame" title="Sara · Mi historia sigue · Aventura interactiva" src="/novela/index.html" style={{ display: 'block', width: '100%', height: '100%', border: 0 }} />
     </main>
   )
 }

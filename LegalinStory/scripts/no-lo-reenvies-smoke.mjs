@@ -169,13 +169,13 @@ try {
   handleInterstitial("Capítulo 4");
 
   assert.equal(pump(), "interstitial");
-  handleInterstitial("¿Qué necesita Sara para hablar?");
+  handleInterstitial("Hablar con apoyo");
 
   assert.equal(pump(), "interstitial");
   handleInterstitial("Capítulo 5");
 
   assert.equal(pump(), "interstitial");
-  handleInterstitial("Organiza la información");
+  handleInterstitial("Qué información conviene guardar");
 
   assert.equal(pump(), "interstitial");
   handleInterstitial("Capítulo 6");

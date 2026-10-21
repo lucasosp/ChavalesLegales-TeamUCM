@@ -133,8 +133,10 @@ try {
 
   assert.equal(pump({ stopAtChat: true }), "chat");
   assert.equal(el("[data-chat-title]").textContent, "4.º ESO | Los de siempre");
+  assert.equal(el("[data-chat-self]").textContent, "Desde el móvil de Sergio");
   app.view.skipTyping();
   assert.match(el("[data-chat-log]").textContent, /una que se ha hecho con tu nombre/);
+  assert.ok([...root.querySelectorAll(".chat-row.is-out .chat-author")].some((author) => author.textContent === "Sergio"));
   assert.equal(el(".censored-preview").getAttribute("role"), "img");
   assert.match(el(".censored-preview-art").src, /censored-preview\.svg/);
   app.advance();
@@ -168,6 +170,9 @@ try {
   assert.equal(pump(), "interstitial");
   handleInterstitial("Capítulo 3");
 
+  assert.equal(pump(), "choice");
+  choose("Ir con Julia");
+
   assert.equal(pump(), "interstitial");
   handleInterstitial("Qué hago con las pruebas");
 
@@ -191,6 +196,36 @@ try {
   assert.equal(app.engine.flags.reportedPlatform, true);
   assert.equal(app.engine.flags.hugoSupport, true);
   assert.equal(saveStore.load(), null, "ending should clear the save");
+
+  app.restart();
+  handleInterstitial("No soy yo");
+  assert.equal(pump({ stopAtChat: true }), "chat");
+  finishChat("4.º ESO | Los de siempre");
+  assert.equal(pump({ stopAtChat: true }), "chat");
+  finishChat("Julia");
+  assert.equal(pump(), "choice");
+  choose("Guardar capturas");
+  assert.equal(pump(), "interstitial");
+  handleInterstitial("Capítulo 1");
+  assert.equal(pump(), "choice");
+  choose("Investigar por su cuenta");
+  assert.equal(pump(), "interstitial");
+  handleInterstitial("Capítulo 2");
+  assert.equal(pump({ stopAtChat: true }), "chat");
+  finishChat("Dani");
+  assert.equal(pump(), "choice");
+  choose("No reenviarlo y escribir");
+  assert.equal(pump({ stopAtChat: true }), "chat");
+  finishChat("Sergio");
+  assert.equal(pump(), "interstitial");
+  handleInterstitial("Capítulo 3");
+  assert.equal(pump(), "choice");
+  choose("Todavía no se siente");
+  assert.equal(pump(), "interstitial");
+  handleInterstitial("Capítulo 4");
+  assert.equal(pump(), "ending");
+  assert.equal(el("[data-ending-title]").textContent, "El primer paso");
+  assert.equal(app.engine.seen.has("ch3-1"), false, "Sergio should not visit Marina in this route");
 
   console.log("No soy yo smoke test passed");
   console.log("ending:", el("[data-ending-title]").textContent);

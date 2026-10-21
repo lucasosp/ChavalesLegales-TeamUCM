@@ -1,4 +1,5 @@
 import { App } from "./app/App.js";
+import { SaraExperience } from "./app/SaraExperience.js";
 import {
   loadStory,
   loadStoryIndex,
@@ -6,6 +7,7 @@ import {
 } from "./content/contentLoader.js";
 import { LocalStorageSaveStore } from "./services/saveStores.js";
 import "./styles/main.css";
+import "./styles/sara.css";
 
 const root = document.querySelector("#app");
 
@@ -14,7 +16,7 @@ let app = null;
 let session = 0;
 
 async function init() {
-  showLoading("Dos voces");
+  showLoading("Sara · Mi historia sigue");
 
   try {
     index = await loadStoryIndex();
@@ -66,6 +68,17 @@ async function startStory(entry) {
 
     document.title = `${content.title} — LegalinStory`;
     preloadCharacterArt(content.assets);
+
+    if (entry.id === "sara") {
+      const [guide, legal] = await Promise.all(["guide", "legal"].map(async (name) => {
+        const response = await fetch(new URL(`content/stories/sara/${name}.json`, document.baseURI));
+        if (!response.ok) throw new Error(`No se pudo cargar la información de Sara (${name})`);
+        return response.json();
+      }));
+      if (token !== session) return;
+      app = new SaraExperience({ root, content, guide, legal, onExit: showLibrary });
+      return;
+    }
 
     const saveStore = new LocalStorageSaveStore(`${entry.id}.save`);
     // The platform launches the novel in a fresh iframe each time. Start a

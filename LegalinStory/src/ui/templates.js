@@ -27,17 +27,11 @@ export function appTemplate() {
           <div class="welcome-card" role="dialog" aria-modal="true">
             <p class="welcome-kicker">Chavales Legales · Novela visual</p>
             <h1 class="welcome-title" id="welcome-title">Antes de empezar...</h1>
-            <div class="welcome-copy">
-              <p>En esta historia, tus decisiones importan.</p>
-              <p>Vivirás situaciones relacionadas con la seguridad en casa, tus derechos y las consecuencias de lo que decides hacer.</p>
-              <p>A lo largo de la aventura tendrás que elegir cómo actuar. Algunas decisiones serán fáciles; otras te harán pensar.</p>
-              <p>No se trata solo de llegar al final, sino de aprender a reconocer los riesgos, protegerte y saber cuándo pedir ayuda.</p>
-            </div>
             <ul class="welcome-instructions">
-              <li>Lee los diálogos y avanza por la historia.</li>
-              <li>Elige cómo actuar cuando aparezcan decisiones.</li>
+              <li>Sigue la historia y fíjate en quién habla.</li>
+              <li>Cuando llegue tu turno, elige cómo actuar.</li>
               <li>Descubre las consecuencias de tus elecciones.</li>
-              <li>Aprende a protegerte y a ayudar a los demás.</li>
+              <li>Aprende a protegerte y a pedir ayuda.</li>
             </ul>
             <button class="welcome-button" type="button" data-welcome-start>Comenzar historia</button>
           </div>
@@ -70,7 +64,7 @@ export function appTemplate() {
         <section class="chat" data-chat hidden aria-label="Conversación de mensajería">
           <header class="chat-head">
             <span class="chat-dot" aria-hidden="true"></span>
-            <span data-chat-title></span>
+            <span class="chat-heading"><span data-chat-title></span><span class="chat-self" data-chat-self></span></span>
           </header>
           <div class="chat-log" data-chat-log role="log" aria-label="Mensajes"></div>
           <button class="chat-hint" type="button" data-chat-skip>Mostrar toda la conversación</button>
