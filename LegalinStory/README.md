@@ -4,7 +4,7 @@ A small visual novel library built with vanilla JavaScript and Vite. Stories are
 plain JSON, sprites and backgrounds live in `public/assets`, and the app opens
 on a library screen where you choose what to read.
 
-Three stories are included:
+Four stories are included:
 
 - **Between the Lines** — a short chapter about a girl, a poem, and an open door.
 - **The Locker Note** — a side story about a note that was never meant to be read.
@@ -12,6 +12,10 @@ Three stories are included:
   image sharing, protection of minors, and access to justice. It includes
   messaging scenes, a perspective switch, a decision menu, an information
   minigame, four endings, and a rights/resources screen.
+- **No soy yo** — an educational visual novel about cyberbullying, a fake
+  profile, identity, evidence handling, and asking for help. It includes
+  messaging scenes, a bystander perspective switch, a proof-handling minigame,
+  three endings, and a rights/resources screen.
 
 ## Run it
 
@@ -55,11 +59,16 @@ public/
 │       │   ├── novel.json
 │       │   ├── story.json
 │       │   └── scene.json
-│       └── no-lo-reenvies/
+│       ├── no-lo-reenvies/
+│       │   ├── novel.json
+│       │   ├── story.json
+│       │   ├── scene.json
+│       │   └── rights.json            # shared rights/resources screen
+│       └── no-soy-yo/
 │           ├── novel.json
 │           ├── story.json
 │           ├── scene.json
-│           └── rights.json            # shared rights/resources screen
+│           └── rights.json            # cyberbullying rights/resources screen
 └── assets/
     ├── backgrounds/
     │   ├── classroom-dusk.svg
@@ -132,7 +141,8 @@ Besides `dialogue`, `choice`, `branch`, and `ending`, the runtime understands:
 - `interstitial` — a full-screen chapter or perspective card.
 - `minigame` — a multi-select card activity with feedback. **No lo reenvíes**
   uses it to practise identifying useful information without redistributing
-  intimate content.
+  intimate content; **No soy yo** uses it to decide what evidence is useful
+  without further spreading humiliating content.
 
 An ending can point at a story-wide `rights.json` through
 `novel.json.content.rights`; the ending screen then exposes a **Conoce tus
@@ -218,7 +228,8 @@ scripts/
 ├── validation-smoke.mjs          # proves missing assets fail validation
 ├── ui-smoke.mjs                  # engine/view smoke test
 ├── library-smoke.mjs             # loader + library + asset resolution test
-└── no-lo-reenvies-smoke.mjs      # chat, minigame, ending, rights coverage
+├── no-lo-reenvies-smoke.mjs      # chat, minigame, ending, rights coverage
+└── no-soy-yo-smoke.mjs           # cyberbullying story, bystander, rights coverage
 ```
 
 ### Design notes
@@ -240,10 +251,12 @@ pnpm test
 ```
 
 Runs the validator, a missing-asset validation test, the engine/view smoke test,
-an end-to-end library test that starts Vite and loads all three stories, and a
+an end-to-end library test that starts Vite and loads all four stories, a
 full playthrough of **No lo reenvíes** covering messaging scenes, the perspective
 switch, the multi-select needs menu, the minigame, the ending router, and the
-rights panel.
+rights panel, and a playthrough of **No soy yo** covering the fake-profile
+story, the bystander perspective, evidence handling, the minigame, the ending
+router, and the cyberbullying rights panel.
 
 ### Regenerating art and content
 
@@ -264,3 +277,7 @@ pnpm story:build
 Edit `scripts/build-no-lo-reenvies.mjs` (or the generated JSON directly) and run
 the command. The validator will catch dangling links or missing assets after any
 change.
+
+**No soy yo** is authored directly as JSON in
+`public/content/stories/no-soy-yo/`. Edit those files and run `pnpm validate`;
+the same graph and asset checks apply.

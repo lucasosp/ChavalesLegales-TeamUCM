@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "assets:build": "node scripts/build-hana-svgs.mjs && node scripts/build-character-svgs.mjs",
     "validate": "node scripts/validate-content.mjs",
-    "test": "node scripts/validate-content.mjs && node scripts/validation-smoke.mjs && node scripts/ui-smoke.mjs && node scripts/library-smoke.mjs && node scripts/no-lo-reenvies-smoke.mjs",
+    "test": "node scripts/validate-content.mjs && node scripts/validation-smoke.mjs && node scripts/ui-smoke.mjs && node scripts/library-smoke.mjs && node scripts/no-lo-reenvies-smoke.mjs && node scripts/no-soy-yo-smoke.mjs",
     "story:build": "node scripts/build-no-lo-reenvies.mjs"
   },
   "devDependencies": {

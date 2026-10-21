@@ -2,7 +2,7 @@
  * End-to-end test for the JSON content pipeline and the library screen.
  *
  * Starts Vite (which also runs the content validator), loads the registry and
- * both stories through the same fetch-based loader the browser uses, runs one
+ * all stories through the same fetch-based loader the browser uses, runs one
  * story, then clicks a card in the story selector.
  */
 import { createServer } from "vite";
@@ -43,8 +43,8 @@ const fail = (message) => {
 
 try {
   const index = await loadStoryIndex();
-  if (index.stories.length !== 3) {
-    fail(`expected 3 stories in the registry, found ${index.stories.length}`);
+  if (index.stories.length !== 4) {
+    fail(`expected 4 stories in the registry, found ${index.stories.length}`);
   }
 
   const featured = await loadStory(index.stories[2]);
@@ -52,6 +52,12 @@ try {
     fail(`unexpected third story: ${featured.title}`);
   }
   if (!featured.rights) fail("rights content was not loaded for No lo reenvíes");
+
+  const cyberbullyingStory = await loadStory(index.stories[3]);
+  if (cyberbullyingStory.title !== "No soy yo") {
+    fail(`unexpected fourth story: ${cyberbullyingStory.title}`);
+  }
+  if (!cyberbullyingStory.rights) fail("rights content was not loaded for No soy yo");
 
   const content = await loadStory(index.stories[0]);
   const saveStore = new MemorySaveStore();
@@ -126,7 +132,7 @@ try {
   });
 
   const cards = libraryRoot.querySelectorAll(".story-card");
-  if (cards.length !== 3) fail(`expected 3 story cards, found ${cards.length}`);
+  if (cards.length !== 4) fail(`expected 4 story cards, found ${cards.length}`);
   if (!cards[0].querySelector(".story-cover").src.includes("classroom-dusk.svg")) {
     fail("story cover was not resolved");
   }
