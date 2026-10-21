@@ -83,6 +83,7 @@ export default function Home() {
           PARTE SUPERIOR: BOTÓN ACCESO A PROFESIONALES (MINIMAL GLASS)
           ==================================================================== */}
       <header className="kahoot-topbar">
+        <Link href="/necesito-ayuda" className="btn-help-access">Necesito ayuda <span aria-hidden="true">→</span></Link>
         <Link
           href="/profesores"
           className="btn-pro-opt1"
@@ -157,7 +158,7 @@ export default function Home() {
             <h2 className="solo-title">¿No tienes PIN de clase?</h2>
 
             <Link
-              href="/historia"
+              href="/novela"
               className="btn-solo-action"
             >
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

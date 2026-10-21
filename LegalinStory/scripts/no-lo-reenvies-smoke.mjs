@@ -123,6 +123,11 @@ function choose(labelPart) {
 function handleMinigame() {
   assert.equal(shown("[data-minigame]"), true, "minigame should be visible");
   assert.equal(el("[data-minigame-title]").textContent, "Organiza la información");
+  el('[data-card-id="download"]').click();
+  el("[data-minigame-check]").click();
+  assert.equal(shown("[data-minigame-continue]"), false, "unsafe selection cannot complete");
+  el('[data-card-id="download"]').click();
+  assert.equal(shown("[data-minigame-feedback]"), false, "changing selection invalidates feedback");
 
   for (const id of ["messages", "link", "witnesses"]) {
     const card = el(`[data-card-id="${id}"]`);
@@ -147,61 +152,60 @@ try {
   choose("Intervenir");
 
   assert.equal(pump(), "interstitial");
-  handleInterstitial("27 mensajes nuevos");
+  handleInterstitial("El grupo está hablando de ti");
 
   assert.equal(pump({ stopAtChat: true }), "chat");
   assert.equal(el("[data-chat-title]").textContent, "4.º ESO | Los de siempre");
   app.view.skipTyping();
   assert.match(el("[data-chat-log]").textContent, /alguien ha visto lo de Sara/);
-  assert.match(el("[data-chat-log]").textContent, /Contenido no mostrado/);
+  assert.match(el("[data-chat-log]").textContent, /Imagen oculta/);
+  assert.equal(el(".is-hidden-content").parentElement.classList.contains("is-in"), true);
   app.advance();
 
   assert.equal(pump(), "choice");
   choose("Pedir a Julia");
 
   assert.equal(pump(), "interstitial");
-  handleInterstitial("Ahora te toca a ti");
+  handleInterstitial("En tus manos");
 
   assert.equal(pump({ stopAtChat: true }), "chat");
   assert.equal(el("[data-character]").dataset.character, "julia");
   app.view.skipTyping();
-  assert.match(el("[data-chat-log]").textContent, /Archivo de contenido sensible oculto/);
+  assert.match(el("[data-chat-log]").textContent, /Imagen oculta/);
   app.advance();
 
   assert.equal(pump(), "choice");
   choose("Negarse a reenviarlo");
 
   assert.equal(pump(), "interstitial");
-  handleInterstitial("El sitio vacío");
+  handleInterstitial("Alguien que te entiende");
 
   assert.equal(pump(), "choice");
   choose("Ir con Sergio");
 
   assert.equal(pump(), "interstitial");
-  handleInterstitial("No sé por dónde empezar");
+  handleInterstitial("Romper el silencio");
 
-  assert.equal(pump(), "choice");
-  assert.match(el("[data-text]").textContent, /Qué necesita Sara/);
-  choose("persona de confianza");
-  assert.equal(pump(), "choice");
-  choose("palabras sencillas");
-  assert.equal(pump(), "choice");
-
-  const remaining = [...el("[data-choices]").querySelectorAll(".choice")].map((button) =>
-    button.textContent.trim(),
-  );
-  assert.equal(remaining.some((label) => label.includes("persona de confianza")), false);
-  assert.equal(remaining.some((label) => label.includes("palabras sencillas")), false);
-  choose("Continuar");
+  assert.equal(pump(), "minigame");
+  assert.equal(el("[data-minigame-check]").disabled, true);
+  el('[data-card-id="needCompanion"]').click();
+  el('[data-card-id="needClearLanguage"]').click();
+  el('[data-card-id="needPause"]').click();
+  el('[data-card-id="needPause"]').click();
+  assert.equal(app.engine.nodeId, "needs-menu", "toggling must not reload the beat");
+  el("[data-minigame-check]").click();
+  assert.match(el("[data-minigame-feedback]").textContent, /No hay una respuesta única/);
+  el("[data-minigame-continue]").click();
+  assert.equal(app.engine.flags.needPause, false);
 
   assert.equal(pump(), "interstitial");
-  handleInterstitial("¿Qué pasa si denuncio?");
+  handleInterstitial("Guardar pruebas sin hacer daño");
 
   assert.equal(pump(), "minigame");
   handleMinigame();
 
   assert.equal(pump(), "interstitial");
-  handleInterstitial("No es un examen");
+  handleInterstitial("Contarlo a tu ritmo");
 
   assert.equal(pump(), "choice");
   choose("No recuerdo la hora exacta");

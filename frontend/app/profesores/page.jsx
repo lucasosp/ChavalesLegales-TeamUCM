@@ -75,9 +75,9 @@ export default function ApartadoProfesores() {
           <div className="teacher-buttons-stack">
             {/* BOTÓN SUPERIOR: MODO HISTORIETA */}
             <Link
-              href="/historia"
+              href="/novela"
               className="teacher-game-btn teacher-game-btn--historia"
-              aria-label="Abrir Modo historieta"
+              aria-label="Abrir No lo reenvíes"
             >
               <div className="game-btn-left">
                 <div className="game-btn-icon-wrapper" aria-hidden="true">
@@ -85,9 +85,9 @@ export default function ApartadoProfesores() {
                 </div>
                 <div className="game-btn-text-group">
                   <span className="game-btn-badge">Narrativa & Toma de decisiones</span>
-                  <span className="game-btn-title">Modo historieta</span>
+                  <span className="game-btn-title">No lo reenvíes</span>
                   <span className="game-btn-desc">
-                    Aventura interactiva donde la clase debate y toma decisiones frente a trampas digitales, suplantación y estafas.
+                    Una novela visual sobre intimidad digital, acoso y cómo pedir ayuda. Tus decisiones cambian la historia.
                   </span>
                 </div>
               </div>

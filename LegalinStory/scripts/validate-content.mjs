@@ -35,7 +35,7 @@ const NODE_KEYS = {
   ending: [...COMMON_NODE_KEYS, "kicker", "title", "text"],
   chat: [...COMMON_NODE_KEYS, "chatTitle", "self", "messages", "next"],
   interstitial: [...COMMON_NODE_KEYS, "kicker", "title", "text", "next"],
-  minigame: [...COMMON_NODE_KEYS, "title", "prompt", "cards", "next"],
+  minigame: [...COMMON_NODE_KEYS, "title", "prompt", "cards", "next", "mode"],
 };
 
 export async function validateContent({ root = process.cwd() } = {}) {
@@ -326,7 +326,10 @@ function validateRights(rights, tag, ctx) {
           ctx.errors.push(`${at} must be an object`);
           return;
         }
-        rejectUnknownKeys(resource, ["name", "text"], at, ctx);
+        rejectUnknownKeys(resource, ["name", "text", "url"], at, ctx);
+        if (resource.url !== undefined && (typeof resource.url !== "string" || !/^https:\/\//.test(resource.url))) {
+          ctx.errors.push(`${at}.url must be an HTTPS link`);
+        }
         requireString(resource.name, `${at}.name`, ctx);
         requireString(resource.text, `${at}.text`, ctx);
       });
@@ -971,6 +974,9 @@ function validateStory(storyDoc, tag, catalog, sceneIndex, ctx) {
     }
 
     if (node.type === "minigame") {
+      if (node.mode !== undefined && !["support", "information"].includes(node.mode)) {
+        ctx.errors.push(`${at}.mode must be support or information`);
+      }
       requireText(node.title, `${at}.title`, ctx);
       requireText(node.prompt, `${at}.prompt`, ctx);
 
@@ -985,10 +991,14 @@ function validateStory(storyDoc, tag, catalog, sceneIndex, ctx) {
             return;
           }
 
-          rejectUnknownKeys(card, ["id", "text", "correct", "feedback"], cardAt, ctx);
+          rejectUnknownKeys(card, ["id", "text", "correct", "feedback", "flag"], cardAt, ctx);
+          if (card.flag !== undefined) {
+            requireString(card.flag, `${cardAt}.flag`, ctx);
+            setFlags.add(card.flag);
+          }
           requireString(card.id, `${cardAt}.id`, ctx);
           requireString(card.text, `${cardAt}.text`, ctx);
-          if (typeof card.correct !== "boolean") {
+          if (node.mode !== "support" && typeof card.correct !== "boolean") {
             ctx.errors.push(`${cardAt}.correct must be a boolean`);
           }
           if (card.feedback !== undefined) {
@@ -1039,6 +1049,20 @@ function validateStory(storyDoc, tag, catalog, sceneIndex, ctx) {
     }
 
     const endings = [...reachable].filter((id) => nodes[id]?.type === "ending");
+    const canFinish = new Set(endings);
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const id of reachable) {
+        if (!canFinish.has(id) && (edges.get(id) ?? []).some((next) => canFinish.has(next))) {
+          canFinish.add(id);
+          changed = true;
+        }
+      }
+    }
+    for (const id of reachable) {
+      if (!canFinish.has(id)) ctx.errors.push(`${where}: node "${id}" has no path to an ending`);
+    }
     if (endings.length === 0) {
       ctx.warnings.push(`${where}: no ending is reachable from "${storyDoc.start}"`);
     }
