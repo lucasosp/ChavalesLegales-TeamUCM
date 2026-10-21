@@ -48,6 +48,14 @@
           "fit": "cover"
         },
         {
+          "id": "maya",
+          "type": "character",
+          "asset": "characters/maya",
+          "expression": "neutral",
+          "at": "center",
+          "z": 20
+        },
+        {
           "id": "vignette",
           "type": "effect",
           "effect": "vignette",
@@ -64,6 +72,14 @@
           "type": "image",
           "asset": "backgrounds/home-kitchen-cold",
           "fit": "cover"
+        },
+        {
+          "id": "maya",
+          "type": "character",
+          "asset": "characters/maya",
+          "expression": "neutral",
+          "at": "center",
+          "z": 20
         },
         {
           "id": "vignette",
@@ -84,6 +100,14 @@
           "fit": "cover"
         },
         {
+          "id": "maya",
+          "type": "character",
+          "asset": "characters/maya",
+          "expression": "neutral",
+          "at": "center",
+          "z": 20
+        },
+        {
           "id": "vignette",
           "type": "effect",
           "effect": "vignette",
@@ -100,6 +124,14 @@
           "type": "image",
           "asset": "backgrounds/patio-day",
           "fit": "cover"
+        },
+        {
+          "id": "maya",
+          "type": "character",
+          "asset": "characters/maya",
+          "expression": "neutral",
+          "at": "center",
+          "z": 20
         },
         {
           "id": "vignette",
@@ -120,6 +152,14 @@
           "fit": "cover"
         },
         {
+          "id": "maya",
+          "type": "character",
+          "asset": "characters/maya",
+          "expression": "neutral",
+          "at": "center",
+          "z": 20
+        },
+        {
           "id": "vignette",
           "type": "effect",
           "effect": "vignette",
@@ -136,6 +176,14 @@
           "type": "image",
           "asset": "backgrounds/orientation-office",
           "fit": "cover"
+        },
+        {
+          "id": "maya",
+          "type": "character",
+          "asset": "characters/maya",
+          "expression": "neutral",
+          "at": "center",
+          "z": 20
         },
         {
           "id": "vignette",
@@ -156,6 +204,14 @@
           "fit": "cover"
         },
         {
+          "id": "maya",
+          "type": "character",
+          "asset": "characters/maya",
+          "expression": "neutral",
+          "at": "center",
+          "z": 20
+        },
+        {
           "id": "vignette",
           "type": "effect",
           "effect": "vignette",
@@ -174,6 +230,14 @@
           "fit": "cover"
         },
         {
+          "id": "maya",
+          "type": "character",
+          "asset": "characters/maya",
+          "expression": "neutral",
+          "at": "center",
+          "z": 20
+        },
+        {
           "id": "vignette",
           "type": "effect",
           "effect": "vignette",
@@ -190,6 +254,14 @@
           "type": "image",
           "asset": "backgrounds/bedroom-evening",
           "fit": "cover"
+        },
+        {
+          "id": "sofi",
+          "type": "character",
+          "asset": "characters/sofi",
+          "expression": "neutral",
+          "at": "center",
+          "z": 20
         },
         {
           "id": "vignette",

@@ -176,6 +176,7 @@ try {
   assert.equal(el("[data-perspective-badge]").textContent, "Maya · en casa");
   assert.equal(el("[data-location-chip]").textContent, "Casa · Salón");
   assert.equal(el("[data-location-banner]").hidden, false, "location banner should announce the room");
+  assert.equal(el("[data-character]").dataset.position, "center", "sprites should use the same centered position as No lo reenvíes");
   assert.match(
     el(".scene-bg.is-active").style.backgroundImage,
     /home-living-cold\.svg/,
