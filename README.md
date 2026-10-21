@@ -87,4 +87,6 @@ npm install --prefix frontend && npm run dev              # Web en :3000 (/api �
 ```
 
 - `backend/main.py` + `backend/contenido.py`: FastAPI, `GET /api/juegos/{historia|preguntas|cooperativo}`.
-- `frontend/`: Next.js (App Router). `app/page.jsx` (portada), `app/historia`, `app/preguntas`, `app/cooperativo`; componentes en `components/` (Header, Footer, Juez = mascota).
+- `backend/juzgado/`: lógica del juego **El Juzgado de Legalín** (partidas, constantes, textos, schemas).
+- `frontend/`: Next.js (App Router). Rutas: `app/page.jsx` (portada), `historia`, `novela`, `historieta`, `preguntas`, `cooperativo`, `juicio`, `juzgado`, `profesores`, `profesionales`; componentes en `components/` (Header, Footer, Juez = mascota, SalaEsperaAlumnos, AyudaDerivacion).
+- **Juzgado de Legalín** (`frontend/app/juzgado/`): mesa del juez adaptable a la pantalla, libro de leyes 3D, sonidos, partículas, rachas y tutorial inicial.
