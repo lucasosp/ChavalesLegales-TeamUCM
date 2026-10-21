@@ -76,15 +76,11 @@ try {
   assert.equal(root.querySelector("[data-chat]").hidden, true);
   assert.equal(frames.size, 0);
 
-  // Old saves on the former looping menu remain playable after the migration.
+  // Old saves on the former activity recover into the new explanatory card.
   store.save({ nodeId: "needs-menu", flags: { needCompanion: true }, seen: [], stage: { background: "orientation-office", character: null } });
   app.engine.start();
-  assert.equal(root.querySelector('[data-card-id="needCompanion"]').getAttribute("aria-pressed"), "true");
-  assert.equal(app.engine.completeActivity(["missing"]), false);
-  root.querySelector('[data-card-id="needPause"]').click();
-  root.querySelector("[data-minigame-check]").click();
-  root.querySelector("[data-minigame-continue]").click();
-  assert.equal(app.engine.flags.needPause, true);
+  assert.equal(root.querySelector("[data-interstitial]").hidden, false);
+  root.querySelector("[data-interstitial-next]").click();
   assert.equal(store.load().nodeId, "needs-response");
   app.restart();
   assert.deepEqual(app.engine.flags, {});

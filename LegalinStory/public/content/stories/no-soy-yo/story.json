@@ -51,10 +51,10 @@
           "time": "21:13"
         },
         {
-          "from": "Sistema",
-          "text": "Publicación con contenido editado no mostrada.",
+          "from": "Hugo",
+          "text": "Imagen censurada",
           "time": "21:13",
-          "system": true
+          "hidden": true
         },
         {
           "from": "Dani",
@@ -237,8 +237,7 @@
     },
     "chapter1-card": {
       "type": "interstitial",
-      "kicker": "Capítulo 1",
-      "title": "La bola de nieve",
+      "title": "Capítulo 1",
       "text": "Miércoles, 08:10.",
       "next": "ch1-1"
     },
@@ -405,8 +404,7 @@
     },
     "chapter2-card": {
       "type": "interstitial",
-      "kicker": "Capítulo 2",
-      "title": "Ahora eres Hugo",
+      "title": "Capítulo 2",
       "text": "No todo el mundo que ve el acoso participa. Pero quedarse mirando también tiene consecuencias.",
       "next": "ch2-1"
     },
@@ -451,10 +449,10 @@
           "time": "11:21"
         },
         {
-          "from": "Sistema",
-          "text": "Archivo con contenido editado oculto.",
+          "from": "Dani",
+          "text": "Imagen censurada",
           "time": "11:22",
-          "system": true
+          "hidden": true
         },
         {
           "from": "Hugo",
@@ -580,8 +578,7 @@
     },
     "chapter3-card": {
       "type": "interstitial",
-      "kicker": "Capítulo 3",
-      "title": "Las pruebas no se reenvían",
+      "title": "Capítulo 3",
       "text": "Jueves, 17:30. Orientación.",
       "next": "ch3-1"
     },
@@ -623,41 +620,10 @@
       "next": "ch3-minigame"
     },
     "ch3-minigame": {
-      "type": "minigame",
+      "type": "interstitial",
+      "kicker": "Información útil",
       "title": "Qué hago con las pruebas",
-      "prompt": "Selecciona lo que puede ayudar sin difundir el contenido humillante.",
-      "cards": [
-        {
-          "id": "capturas",
-          "text": "Capturas de la cuenta, publicaciones, fechas y nombres de usuario.",
-          "correct": true,
-          "feedback": "Útil. Documenta lo ocurrido sin reenviar el contenido."
-        },
-        {
-          "id": "url",
-          "text": "Enlace o nombre de la cuenta falsa y grupos donde se ha compartido.",
-          "correct": true,
-          "feedback": "Útil. Ayuda a identificar el alcance y a pedir su retirada."
-        },
-        {
-          "id": "testigos",
-          "text": "Nombres de compañeros que pueden haber visto los mensajes.",
-          "correct": true,
-          "feedback": "Útil. Puede ayudar a reconstruir lo ocurrido."
-        },
-        {
-          "id": "reenviar",
-          "text": "Reenviar las publicaciones a todo el grupo para demostrar que existen.",
-          "correct": false,
-          "feedback": "No. No necesitas difundir el contenido para demostrar lo que ha pasado."
-        },
-        {
-          "id": "hackear",
-          "text": "Intentar entrar en la cuenta falsa para borrarla por tu cuenta.",
-          "correct": false,
-          "feedback": "No. Es peligroso y puede complicar la situación. Mejor pedir ayuda y reportar la cuenta."
-        }
-      ],
+      "text": "Puede ser útil guardar capturas de la cuenta, publicaciones, fechas, nombres de usuario, enlaces y quién vio los mensajes. No hace falta reenviar las publicaciones ni intentar entrar en la cuenta: pide ayuda y repórtala.",
       "next": "ch3-5"
     },
     "ch3-5": {
@@ -704,8 +670,7 @@
     },
     "chapter4-card": {
       "type": "interstitial",
-      "kicker": "Capítulo 4",
-      "title": "No estás solo",
+      "title": "Capítulo 4",
       "text": "Viernes. Patio del instituto.",
       "next": "ch4-1"
     },
