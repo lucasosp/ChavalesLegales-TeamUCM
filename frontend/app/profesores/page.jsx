@@ -153,6 +153,14 @@ export default function ApartadoProfesores({ initialPin = null }) {
         isHost={true}
         customActions={launcherActions}
         onVolver={handleCerrarSala}
+        capacidad={roomState.capacidad_aula}
+        modoInfinito={roomState.modo_infinito}
+        onCapacidadChange={(nuevaCapacidad, nuevoModoInfinito) => {
+          socketRef.current?.send('UPDATE_CAPACITY', {
+            capacidad: nuevaCapacidad,
+            modo_infinito: nuevoModoInfinito,
+          })
+        }}
       />
     )
   }

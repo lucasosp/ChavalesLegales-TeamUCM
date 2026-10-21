@@ -169,6 +169,8 @@ export default function Home() {
             tieneGorro: nuevoAvatar.tieneGorro,
           })
         }}
+        capacidad={gameState?.capacidad_aula}
+        modoInfinito={gameState?.modo_infinito}
       />
     )
   }

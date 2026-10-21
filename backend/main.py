@@ -141,6 +141,10 @@ async def ws_host(websocket: WebSocket, pin: str, token: str = Query(...)):
             elif action == "START_GAME":
                 modo = data.get("modo")
                 await room_manager.start_game(room, modo=modo)
+            elif action == "UPDATE_CAPACITY":
+                capacidad = data.get("capacidad") or data.get("capacidad_aula")
+                modo_infinito = data.get("modo_infinito")
+                await room_manager.update_room_capacity(room, capacidad=capacidad, modo_infinito=modo_infinito)
             elif action == "RETURN_TO_LOBBY":
                 room.active_game = None
                 await room_manager.return_to_lobby(room)

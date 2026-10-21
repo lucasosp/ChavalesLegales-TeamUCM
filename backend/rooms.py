@@ -27,6 +27,8 @@ class Room:
         self.host_ws: Optional[WebSocket] = None
         self.player_ws: Dict[str, WebSocket] = {}
         self.active_game: Optional[Dict[str, str]] = None
+        self.capacidad_aula: int = 12
+        self.modo_infinito: bool = False
 
     @property
     def current_item(self) -> Optional[Dict[str, Any]]:
@@ -131,8 +133,10 @@ class RoomManager:
         async with self.lock:
             player_id = secrets.token_hex(8)
             existing_seats = {p.seat_index for p in room.players.values()}
-            # Buscar el primer pupitre libre entre 0 y TOTAL_SEATS - 1
-            seat_index = next((s for s in range(TOTAL_SEATS) if s not in existing_seats), len(room.players))
+            if room.modo_infinito and len(existing_seats) >= room.capacidad_aula:
+                room.capacidad_aula += 4
+            # Buscar el primer pupitre libre entre 0 y capacidad_aula - 1
+            seat_index = next((s for s in range(room.capacidad_aula) if s not in existing_seats), len(room.players))
             avatar_tipo = len(room.players) % 6
 
             player = Player(
@@ -313,6 +317,23 @@ class RoomManager:
 
         await self.broadcast_room_state(room)
 
+    async def update_room_capacity(
+        self,
+        room: Room,
+        capacidad: Optional[int] = None,
+        modo_infinito: Optional[bool] = None,
+    ):
+        async with self.lock:
+            if capacidad is not None:
+                try:
+                    room.capacidad_aula = max(4, int(capacidad))
+                except (ValueError, TypeError):
+                    pass
+            if modo_infinito is not None:
+                room.modo_infinito = bool(modo_infinito)
+
+        await self.broadcast_room_state(room)
+
     async def reveal_question(self, room: Room):
         if room.state != RoomState.QUESTION:
             return
@@ -368,6 +389,8 @@ class RoomManager:
             "answer_stats": room.get_answer_stats() if room.state != RoomState.LOBBY else {},
             "answered_count": answered_count,
             "total_players": len(room.players),
+            "capacidad_aula": room.capacidad_aula,
+            "modo_infinito": room.modo_infinito,
         }
 
     def _build_player_payload(self, room: Room, player_id: str) -> Dict[str, Any]:
@@ -418,6 +441,8 @@ class RoomManager:
                 "is_correct": is_correct,
             } if player else None,
             "leaderboard_preview": leaderboard[:5],
+            "capacidad_aula": room.capacidad_aula,
+            "modo_infinito": room.modo_infinito,
         }
 
     async def send_host_state(self, room: Room):

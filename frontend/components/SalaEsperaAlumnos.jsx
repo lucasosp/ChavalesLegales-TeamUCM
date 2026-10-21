@@ -113,24 +113,62 @@ export default function SalaEsperaAlumnos({
   currentSeat = null,
   roomUrl = '',
   onUpdateAvatar,
+  capacidad: externalCapacidad = null,
+  modoInfinito: externalModoInfinito = null,
+  onCapacidadChange,
 }) {
   const isLive = Array.isArray(externalStudents)
   const cleanPin = rawCleanPin || (pin ? String(pin).replace(/\s+/g, '') : '')
 
-  // Modal de personalización: cerrado al entrar (se genera uno random automáticamente estilo Kahoot)
-    // Estado para la capacidad del aula y modo infinito
-  const [capacidadAula, setCapacidadAula] = useState(TOTAL_SEATS)
-  const [modoInfinito, setModoInfinito] = useState(false)
+  // Estado para la capacidad del aula y modo infinito (sincronizado con backend)
+  const [localCapacidadAula, setLocalCapacidadAula] = useState(TOTAL_SEATS)
+  const [localModoInfinito, setLocalModoInfinito] = useState(false)
+
+  const capacidadAula = externalCapacidad !== null && externalCapacidad !== undefined
+    ? externalCapacidad
+    : localCapacidadAula
+
+  const modoInfinito = externalModoInfinito !== null && externalModoInfinito !== undefined
+    ? externalModoInfinito
+    : localModoInfinito
+
+  // Mantener sincronizado el estado local si cambian las props externas
+  useEffect(() => {
+    if (externalCapacidad !== null && externalCapacidad !== undefined) {
+      setLocalCapacidadAula(externalCapacidad)
+    }
+  }, [externalCapacidad])
+
+  useEffect(() => {
+    if (externalModoInfinito !== null && externalModoInfinito !== undefined) {
+      setLocalModoInfinito(externalModoInfinito)
+    }
+  }, [externalModoInfinito])
 
   const aumentarCapacidad = () => {
-    setCapacidadAula((prev) => prev + 4)
+    const nueva = capacidadAula + 4
+    setLocalCapacidadAula(nueva)
+    if (onCapacidadChange) {
+      onCapacidadChange(nueva, modoInfinito)
+    }
   }
 
   const disminuirCapacidad = () => {
-    setCapacidadAula((prev) => {
-      const minOcupado = Math.ceil(students.length / 4) * 4 || 4
-      return Math.max(minOcupado, prev - 4)
-    })
+    const count = isLive ? (externalStudents?.length || 0) : (mockStudents?.length || 0)
+    const minOcupado = Math.ceil(count / 4) * 4 || 4
+    const nueva = Math.max(minOcupado, capacidadAula - 4)
+    setLocalCapacidadAula(nueva)
+    if (onCapacidadChange) {
+      onCapacidadChange(nueva, modoInfinito)
+    }
+  }
+
+  const toggleModoInfinito = () => {
+    const nuevo = !modoInfinito
+    setLocalModoInfinito(nuevo)
+    if (onCapacidadChange) {
+      onCapacidadChange(capacidadAula, nuevo)
+    }
   }
 
   const [mostrarPersonalizador, setMostrarPersonalizador] = useState(false)
@@ -299,9 +337,13 @@ export default function SalaEsperaAlumnos({
   // Modo Infinito: añade automáticamente una fila de pupitres vacíos cuando se llena el aforo
   useEffect(() => {
     if (modoInfinito && students.length >= capacidadAula) {
-      setCapacidadAula((prev) => prev + 4)
+      const nueva = capacidadAula + 4
+      setLocalCapacidadAula(nueva)
+      if (isHost && onCapacidadChange) {
+        onCapacidadChange(nueva, modoInfinito)
+      }
     }
-  }, [modoInfinito, students.length, capacidadAula])
+  }, [modoInfinito, students.length, capacidadAula, isHost, onCapacidadChange])
 
   return (
     <div className="sala-page-wrapper">
@@ -570,6 +612,7 @@ export default function SalaEsperaAlumnos({
           max-width: 1100px;
           height: auto;
           display: block;
+          flex-shrink: 0;
         }
 
         .sala-aforo-controls {
@@ -1125,7 +1168,7 @@ export default function SalaEsperaAlumnos({
                 <button
                   type="button"
                   className={`btn-aforo-infinito ${modoInfinito ? 'active' : ''}`}
-                  onClick={() => setModoInfinito((prev) => !prev)}
+                  onClick={toggleModoInfinito}
                   title={modoInfinito ? 'Modo Infinito activo (añade filas automáticamente)' : 'Activar Modo Infinito (∞)'}
                 >
                   ∞ Modo Infinito
@@ -1240,6 +1283,7 @@ export default function SalaEsperaAlumnos({
           <svg
             className="classroom-svg"
             viewBox={`0 0 960 ${svgHeight}`}
+            style={{ minHeight: svgHeight, width: '100%', maxWidth: 1100 }}
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
