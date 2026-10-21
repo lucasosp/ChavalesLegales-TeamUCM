@@ -82,11 +82,9 @@ export default function SalaEsperaAlumnos({
   customActions,
   isHost = false,
   currentSeat = null,
-  roomUrl = '',
 }) {
   const isLive = Array.isArray(externalStudents)
   const cleanPin = rawCleanPin || (pin ? String(pin).replace(/\s+/g, '') : '')
-  const displayUrl = roomUrl || (cleanPin ? `http://localhost:3001/profesores/sala/${cleanPin}` : '')
 
   // Modal de personalización: cerrado al entrar (se genera uno random automáticamente estilo Kahoot)
   const [mostrarPersonalizador, setMostrarPersonalizador] = useState(false)
@@ -780,7 +778,7 @@ export default function SalaEsperaAlumnos({
           <div className="avatar-modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <div>
-                <h2 className="modal-title">🎨 Personaliza tu Personaje</h2>
+                <h2 className="modal-title">Personaliza tu Personaje</h2>
                 <p className="modal-subtitle">Modifica tu estilo o genera otro aleatorio</p>
               </div>
               <button
@@ -810,7 +808,7 @@ export default function SalaEsperaAlumnos({
                   onClick={aleatorizarMiAvatar}
                   title="Generar otro avatar al azar estilo Kahoot"
                 >
-                  🎲 Generar aleatorio
+                  Generar aleatorio
                 </button>
               </div>
 
@@ -883,7 +881,7 @@ export default function SalaEsperaAlumnos({
                       className={`btn-toggle-hat ${miAvatar.tieneGorro ? 'active' : ''}`}
                       onClick={() => setMiAvatar((prev) => ({ ...prev, tieneGorro: !prev.tieneGorro }))}
                     >
-                      <span>{miAvatar.tieneGorro ? '🧢 Con gorra hacia atrás' : '✂️ Sin gorra (Pelo moderno)'}</span>
+                      <span>{miAvatar.tieneGorro ? 'Con gorra hacia atrás' : 'Sin gorra (Pelo moderno)'}</span>
                       <span style={{ fontSize: '11px', fontWeight: 'bold' }}>
                         {miAvatar.tieneGorro ? '(Puesto)' : '(Quitado)'}
                       </span>
@@ -923,7 +921,6 @@ export default function SalaEsperaAlumnos({
                 onClick={confirmarMiAvatar}
               >
                 <span>Guardar cambios</span>
-                <span>✨</span>
               </button>
             </div>
           </div>
@@ -945,25 +942,6 @@ export default function SalaEsperaAlumnos({
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            {displayUrl && (
-              <div
-                style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  border: '1.5px solid rgba(255, 255, 255, 0.25)',
-                  borderRadius: 14,
-                  padding: '6px 14px',
-                  textAlign: 'right',
-                }}
-              >
-                <span style={{ display: 'block', fontSize: 10, fontWeight: 800, color: '#FACC15', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                  Enlace de sala
-                </span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#FFFFFF', letterSpacing: '0.02em', fontFamily: 'monospace' }}>
-                  {displayUrl}
-                </span>
-              </div>
-            )}
-
             <div className="sala-pin-pill">
               <span className="sala-pin-label">CÓDIGO PIN</span>
               <span className="sala-pin-value">{pin || cleanPin}</span>
@@ -998,7 +976,7 @@ export default function SalaEsperaAlumnos({
                   gap: 4,
                 }}
               >
-                ⭐ Tu pupitre: #{currentSeat + 1}
+                Tu pupitre: #{currentSeat + 1}
               </span>
             )}
           </div>
@@ -1012,7 +990,7 @@ export default function SalaEsperaAlumnos({
                   onClick={() => setMostrarPersonalizador(true)}
                   title="Personalizar mi personaje"
                 >
-                  🎨 Personalizar mi avatar
+                  Personalizar mi avatar
                 </button>
                 <button
                   type="button"
@@ -1020,7 +998,7 @@ export default function SalaEsperaAlumnos({
                   onClick={reiniciarAula}
                   title="Vaciar las sillas para volver a ver la animación"
                 >
-                  🔄 Reiniciar
+                  Reiniciar
                 </button>
                 <button
                   type="button"
@@ -1028,7 +1006,7 @@ export default function SalaEsperaAlumnos({
                   onClick={llenarAula}
                   title="Llenar todos los pupitres de inmediato"
                 >
-                  ⚡ Llenar aula
+                  Llenar aula
                 </button>
                 {onVolver && (
                   <button
@@ -1047,15 +1025,14 @@ export default function SalaEsperaAlumnos({
                 type="button"
                 className="btn-sala-iniciar"
                 onClick={onIniciar}
-                disabled={students.length === 0}
-                title={students.length === 0 ? 'Esperando alumnos' : 'Iniciar la actividad'}
+                title="Iniciar la actividad"
               >
-                🚀 Iniciar partida ({students.length})
+                Iniciar partida ({students.length})
               </button>
             ) : !isHost ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span style={{ fontSize: 13, color: '#64748B', fontWeight: 600 }}>
-                  ⏳ Esperando a que el profesor inicie la partida...
+                  Esperando a que el profesor lance un juego a la clase...
                 </span>
                 {onVolver && (
                   <button

@@ -130,16 +130,15 @@ async def ws_host(websocket: WebSocket, pin: str, token: str = Query(...)):
 
             if action == "PING":
                 await websocket.send_json({"event": "PONG"})
+            elif action == "LAUNCH_GAME":
+                url = data.get("url", "/novela")
+                game = data.get("game", "novela")
+                await room_manager.launch_game(room, url=url, game=game)
             elif action == "START_GAME":
                 modo = data.get("modo")
                 await room_manager.start_game(room, modo=modo)
-            elif action == "REVEAL":
-                await room_manager.reveal_question(room)
-            elif action == "LEADERBOARD":
-                await room_manager.show_leaderboard(room)
-            elif action == "NEXT_QUESTION":
-                await room_manager.next_question(room)
             elif action == "RETURN_TO_LOBBY":
+                room.active_game = None
                 await room_manager.return_to_lobby(room)
     except WebSocketDisconnect:
         await room_manager.disconnect_host(room)

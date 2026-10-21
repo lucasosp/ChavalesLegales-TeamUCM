@@ -26,6 +26,7 @@ class Room:
         self.players: Dict[str, Player] = {}
         self.host_ws: Optional[WebSocket] = None
         self.player_ws: Dict[str, WebSocket] = {}
+        self.active_game: Optional[Dict[str, str]] = None
 
     @property
     def current_item(self) -> Optional[Dict[str, Any]]:
@@ -150,6 +151,14 @@ class RoomManager:
         if player_id in room.players:
             room.players[player_id].is_connected = True
             room.player_ws[player_id] = ws
+            if room.active_game:
+                try:
+                    await ws.send_json({
+                        "event": "LAUNCH_GAME",
+                        **room.active_game,
+                    })
+                except Exception:
+                    pass
             await self.broadcast_room_state(room)
 
     async def disconnect_player(self, room: Room, player_id: str):
@@ -158,6 +167,24 @@ class RoomManager:
         if player_id in room.player_ws:
             del room.player_ws[player_id]
         await self.broadcast_room_state(room)
+
+    async def launch_game(self, room: Room, url: str, game: str):
+        room.active_game = {"url": url, "game": game}
+        payload = {
+            "event": "LAUNCH_GAME",
+            "url": url,
+            "game": game,
+        }
+        for ws in list(room.player_ws.values()):
+            try:
+                await ws.send_json(payload)
+            except Exception:
+                pass
+        if room.host_ws:
+            try:
+                await room.host_ws.send_json(payload)
+            except Exception:
+                pass
 
     # =========================================================================
     # LÓGICA DE JUEGO (MÁQUINA DE ESTADOS)
@@ -295,6 +322,7 @@ class RoomManager:
             "state": room.state.value,
             "pin": room.pin,
             "modo": room.modo,
+            "active_game": room.active_game,
             "current_index": room.current_index,
             "total_items": len(room.items),
             "question_duration": room.question_duration,
@@ -335,6 +363,7 @@ class RoomManager:
             "state": room.state.value,
             "pin": room.pin,
             "modo": room.modo,
+            "active_game": room.active_game,
             "current_index": room.current_index,
             "total_items": len(room.items),
             "item": base_item,

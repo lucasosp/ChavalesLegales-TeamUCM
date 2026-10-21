@@ -111,8 +111,8 @@ html, body {
   left: -20%;
   width: 75vw;
   height: 130vh;
-  background: radial-gradient(ellipse at center, var(--naranja) 0%, var(--granate) 60%, transparent 80%);
-  opacity: 0.35;
+  background: radial-gradient(ellipse at center, var(--verde-light) 0%, var(--granate) 60%, transparent 80%);
+  opacity: 0.28;
   border-radius: 50%;
   transform: rotate(-25deg);
   filter: blur(2px);
@@ -201,23 +201,6 @@ html, body {
   align-items: center;
   padding: 1.15rem 2.2rem 0.5rem;
 }
-
-.btn-help-access {
-  display: inline-flex;
-  align-items: center;
-  gap: .5rem;
-  min-height: 44px;
-  padding: .55rem 1rem;
-  margin-right: auto;
-  border: 2px solid #fbbf24;
-  border-radius: 999px;
-  background: #fbbf24;
-  color: #17332b;
-  font-weight: 800;
-  text-decoration: none;
-  box-shadow: 0 4px 16px #0005;
-}
-.btn-help-access:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 
 /* --------------------------------------------------------------------------
    BOTÓN ACCESO A PROFESORES (MINIMAL GLASS)
@@ -338,23 +321,23 @@ html, body {
   flex-direction: column;
   align-items: flex-end; /* Alineado a la derecha hacia el sufijo ES */
   justify-content: center;
-  line-height: 0.86;
-  gap: 0.15rem;
+  line-height: 0.82;
+  gap: 0;
 }
 
 .title-word {
   display: block;
   font-family: 'Talina', cursive, system-ui, sans-serif;
   color: var(--title-color-1, var(--amarillo));
-  font-size: clamp(2.1rem, 5.5vw, 3.25rem);
-  line-height: 0.88;
+  font-size: clamp(2.2rem, 5.8vw, 3.35rem);
+  line-height: 0.84;
   letter-spacing: 0.02em;
   text-shadow:
-    -1px 1px 0 var(--title-shadow-1, #df7005),
-    -2px 2px 0 var(--title-shadow-1, #df7005),
-    -3px 3px 0 var(--title-shadow-1, #cc5b00),
-    -4px 4px 0 var(--title-shadow-1, #b34b00),
-    -5px 5px 0 var(--title-shadow-1, #943b00),
+    -1px 1px 0 var(--title-shadow-1, #b45309),
+    -2px 2px 0 var(--title-shadow-1, #b45309),
+    -3px 3px 0 var(--title-shadow-1, #b45309),
+    -4px 4px 0 var(--title-shadow-1, #b45309),
+    -5px 5px 0 var(--title-shadow-1, #92400e),
     -6px 6px 1px rgba(0, 0, 0, 0.4),
     -8px 8px 12px rgba(0, 0, 0, 0.45);
   transition: color 0.35s ease;
@@ -364,19 +347,18 @@ html, body {
   display: block;
   font-family: 'Talina', cursive, system-ui, sans-serif;
   color: var(--title-color-2, var(--verde));
-  font-size: clamp(4.6rem, 12vw, 7.2rem);
-  line-height: 0.82;
-  margin-left: 0.25rem;
+  font-size: clamp(4.9rem, 13vw, 7.5rem);
+  line-height: 0.80;
+  margin-left: 0.2rem;
   letter-spacing: -0.01em;
   text-shadow:
-    -1px 1px 0 var(--title-shadow-2, #2e531e),
-    -2px 2px 0 var(--title-shadow-2, #284c1a),
-    -3px 3px 0 var(--title-shadow-2, #224215),
-    -4px 4px 0 var(--title-shadow-2, #1c3811),
-    -5px 5px 0 var(--title-shadow-2, #17300e),
-    -6px 6px 0 var(--title-shadow-2, #13280b),
-    -7px 7px 0 var(--title-shadow-2, #0f2008),
-    -8px 8px 0 rgba(0, 0, 0, 0.35),
+    -1px 1px 0 var(--title-shadow-2, #059669),
+    -2px 2px 0 var(--title-shadow-2, #059669),
+    -3px 3px 0 var(--title-shadow-2, #059669),
+    -4px 4px 0 var(--title-shadow-2, #047857),
+    -5px 5px 0 var(--title-shadow-2, #065f46),
+    -6px 6px 0 var(--title-shadow-2, #064e3b),
+    -7px 7px 0 rgba(0, 0, 0, 0.35),
     -9px 9px 1px rgba(0, 0, 0, 0.4),
     -11px 11px 16px rgba(0, 0, 0, 0.55);
   transition: color 0.35s ease;
