@@ -1,5 +1,51 @@
 """Contenido de los tres modos de juego (historia, preguntas, cooperativo)."""
 
+# Modo historieta: casos narrativos interactivos para debate y toma de decisiones colectiva en clase
+HISTORIETA = [
+    {
+        "id": "h_1",
+        "titulo": "Historieta 1: El enlace trampa en WhatsApp",
+        "hechos": "Te llega un WhatsApp de un número desconocido: «¡Has ganado un smartphone de última generación! Pulsa en este enlace oficial e introduce tu contraseña y número de teléfono para recibirlo gratis».",
+        "pregunta": "¿Qué decisión toma la clase?",
+        "opciones": [
+            "Pulsar el enlace rápido: ¡no queremos perder el regalo!",
+            "No pulsar nada, bloquear el número y avisar a un adulto responsable",
+            "Reenviarlo al grupo de amigos para comprobar si a ellos les funciona",
+        ],
+        "correcta": 1,
+        "sentencia": "¡Decisión acertada! Se trataba de un ataque de phishing. El engaño con ánimo de lucro para obtener datos personales o dinero constituye un delito de estafa (art. 249 CP).",
+        "articulo": "Art. 249 del Código Penal (Estafa)",
+    },
+    {
+        "id": "h_2",
+        "titulo": "Historieta 2: La foto falsa creada con IA",
+        "hechos": "Un compañero de clase crea y comparte una imagen manipulada con inteligencia artificial para ridiculizar a otro estudiante, y os pide que la difundáis por redes.",
+        "pregunta": "¿Cómo debe actuar el grupo?",
+        "opciones": [
+            "Reenviarla a más grupos porque es solo humor y una broma",
+            "No difundirla, denunciar la publicación y avisar al profesorado",
+            "Guardarla en privado para amenazar con publicarla si no obedece",
+        ],
+        "correcta": 1,
+        "sentencia": "¡Muy bien resuelto! Crear o difundir montajes para humillar a otra persona vulnera la intimidad y la integridad moral (arts. 173 y 197.7 CP). Frenar la difusión evita un daño irreparable.",
+        "articulo": "Arts. 173 y 197.7 del Código Penal",
+    },
+    {
+        "id": "h_3",
+        "titulo": "Historieta 3: El chantaje del desconocido en redes",
+        "hechos": "Una persona que conociste en un videojuego online comienza a exigir que le envíes dinero o fotos íntimas, amenazando con publicar tus datos personales si no lo haces.",
+        "pregunta": "¿Cuál es la respuesta legal y segura?",
+        "opciones": [
+            "Ceder y enviarle lo que pide para que no cumpla sus amenazas",
+            "Cortar comunicación, guardar capturas como prueba y llamar al 017 o a la Policía",
+            "Quedar con él en persona para devolverle las amenazas",
+        ],
+        "correcta": 1,
+        "sentencia": "¡Excelente! Jamás se debe ceder ante el chantaje o sextorsión (arts. 171 y 172 CP). Guardar pruebas y solicitar ayuda inmediata al 017 o a las fuerzas de seguridad es la vía correcta.",
+        "articulo": "Arts. 171 y 172 del Código Penal (Extorsión y Coacciones)",
+    },
+]
+
 # Modo historia: escenas con decisiones. Cada opción lleva a otra escena.
 HISTORIA = {
     "inicio": "mensaje",

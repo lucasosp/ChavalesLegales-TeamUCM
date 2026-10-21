@@ -38,16 +38,30 @@ const SEAT_COORDS = [
   { id: 11, x: 805, y: 465, row: 3 },
 ]
 
-export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
-  // Estado local para los alumnos en la sala de espera
-  const [students, setStudents] = useState([])
+export default function SalaEsperaAlumnos({
+  pin = '734 912',
+  cleanPin: rawCleanPin,
+  students: externalStudents,
+  onVolver,
+  onIniciar,
+  customActions,
+  isHost = false,
+  currentSeat = null,
+  roomUrl = '',
+}) {
+  const isLive = Array.isArray(externalStudents)
+  const cleanPin = rawCleanPin || (pin ? String(pin).replace(/\s+/g, '') : '')
+  const displayUrl = roomUrl || (cleanPin ? `http://localhost:3001/profesores/sala/${cleanPin}` : '')
+  // Estado local para los alumnos en la sala de espera simulada
+  const [mockStudents, setMockStudents] = useState([])
 
-  // Simulación de entrada paulatina de alumnos cada 2-3 segundos
+  // Simulación de entrada paulatina de alumnos solo si NO estamos en modo en vivo
   useEffect(() => {
-    if (students.length >= TOTAL_SEATS) return
+    if (isLive) return
+    if (mockStudents.length >= TOTAL_SEATS) return
 
     const timer = setTimeout(() => {
-      setStudents((prev) => {
+      setMockStudents((prev) => {
         if (prev.length >= TOTAL_SEATS) return prev
         const nextIndex = prev.length
         const nuevo = {
@@ -61,10 +75,10 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
     }, 2400)
 
     return () => clearTimeout(timer)
-  }, [students.length])
+  }, [isLive, mockStudents.length])
 
   // Helpers para testing rápido
-  const reiniciarAula = () => setStudents([])
+  const reiniciarAula = () => setMockStudents([])
   const llenarAula = () => {
     const todos = SEAT_COORDS.map((seat, idx) => ({
       id: `alumno-${idx + 1}`,
@@ -72,10 +86,11 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
       seatIndex: idx,
       avatarTipo: idx % 6,
     }))
-    setStudents(todos)
+    setMockStudents(todos)
   }
 
-  const porcentajeLleno = Math.round((students.length / TOTAL_SEATS) * 100)
+  const students = isLive ? externalStudents : mockStudents
+  const porcentajeLleno = Math.min(100, Math.round((students.length / TOTAL_SEATS) * 100))
 
   return (
     <div className="sala-page-wrapper">
@@ -83,25 +98,26 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
         .sala-page-wrapper {
           min-height: 100vh;
           width: 100%;
-          background: radial-gradient(circle at 50% 25%, #461020 0%, #2a0712 65%, #1d040c 100%);
+          background: #F8F4EC;
           color: #18181B;
           font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
           display: flex;
           flex-direction: column;
-          align-items: center;
-          padding: 24px 16px 40px;
+          align-items: stretch;
+          padding: 0;
           box-sizing: border-box;
           position: relative;
         }
 
         .sala-card-container {
           width: 100%;
-          max-width: 1080px;
-          background: #FFFFFF;
-          border-radius: 28px;
-          box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35), 0 4px 16px rgba(0, 0, 0, 0.2);
+          max-width: 100%;
+          min-height: 100vh;
+          background: #F8F4EC;
+          border-radius: 0;
+          box-shadow: none;
           overflow: hidden;
-          border: 4px solid #18181B;
+          border: none;
           display: flex;
           flex-direction: column;
         }
@@ -109,13 +125,13 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
         .sala-top-banner {
           background: #4A1A1C;
           color: #FFFFFF;
-          padding: 18px 28px;
+          padding: 16px 28px;
           display: flex;
           flex-wrap: wrap;
           align-items: center;
           justify-content: space-between;
           gap: 16px;
-          border-bottom: 4px solid #18181B;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.2);
         }
 
         .sala-badge-live {
@@ -262,11 +278,38 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
           background: #3D4A27;
         }
 
+        .btn-sala-iniciar {
+          background: #22C55E;
+          color: #0F172A;
+          border: 2px solid #18181B;
+          padding: 8px 18px;
+          border-radius: 14px;
+          font-size: 13px;
+          font-weight: 800;
+          cursor: pointer;
+          box-shadow: 0 4px 0 #18181B;
+          transition: transform 0.1s ease, filter 0.15s ease;
+        }
+
+        .btn-sala-iniciar:hover:not(:disabled) {
+          background: #4ADE80;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 0 #18181B;
+        }
+
+        .btn-sala-iniciar:disabled {
+          background: #94A3B8;
+          color: #475569;
+          cursor: not-allowed;
+          box-shadow: none;
+        }
+
         .sala-canvas-stage {
-          background: #FBF9F5;
+          background: #F8F4EC;
           position: relative;
           width: 100%;
-          padding: 10px 10px 20px;
+          flex: 1;
+          padding: 14px 20px 20px;
           box-sizing: border-box;
           display: flex;
           justify-content: center;
@@ -275,15 +318,16 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
 
         .classroom-svg {
           width: 100%;
+          max-width: 1100px;
           height: auto;
           display: block;
-          max-height: 640px;
+          max-height: calc(100vh - 180px);
         }
 
         .sala-footer-legal {
           background: #FFFFFF;
-          border-top: 3px solid #18181B;
-          padding: 14px 24px;
+          border-top: 1px solid #E2D9CC;
+          padding: 12px 28px;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -337,24 +381,46 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
 
       {/* Contenedor blanco principal de la sala */}
       <div className="sala-card-container">
-        {/* Cabecera superior con estado y PIN */}
+        {/* Cabecera superior con estado, URL de acceso y PIN */}
         <div className="sala-top-banner">
           <div>
             <div className="sala-badge-live">
               <span className="sala-dot-pulse" />
-              <span>SALA DE ESPERA ACTIVA</span>
+              <span>{isHost ? 'SALA DE AULA ACTIVA' : 'SALA DE ESPERA'}</span>
             </div>
-            <h1 className="sala-title-main">Aula Virtual de Chavales Legales</h1>
-            <p className="sala-subtitle">Los pupitres se están ocupando. ¡La partida comenzará en breve!</p>
+            <h1 className="sala-title-main" style={{ fontSize: 22, margin: '6px 0 0' }}>
+              Aula Virtual · Chavales Legales
+            </h1>
           </div>
 
-          <div className="sala-pin-pill">
-            <span className="sala-pin-label">PIN DE CLASE</span>
-            <span className="sala-pin-value">{pin || '734 912'}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            {displayUrl && (
+              <div
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: '1.5px solid rgba(255, 255, 255, 0.25)',
+                  borderRadius: 14,
+                  padding: '6px 14px',
+                  textAlign: 'right',
+                }}
+              >
+                <span style={{ display: 'block', fontSize: 10, fontWeight: 800, color: '#FACC15', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                  Enlace de sala
+                </span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#FFFFFF', letterSpacing: '0.02em', fontFamily: 'monospace' }}>
+                  {displayUrl}
+                </span>
+              </div>
+            )}
+
+            <div className="sala-pin-pill">
+              <span className="sala-pin-label">CÓDIGO PIN</span>
+              <span className="sala-pin-value">{pin || cleanPin}</span>
+            </div>
           </div>
         </div>
 
-        {/* Barra de progreso y acciones de simulación */}
+        {/* Barra de progreso y acciones */}
         <div className="sala-subbar">
           <div className="sala-counter-wrap">
             <span className="sala-counter-text">
@@ -366,32 +432,83 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
                 style={{ width: `${porcentajeLleno}%` }}
               />
             </div>
+            {!isHost && currentSeat !== null && (
+              <span
+                style={{
+                  background: '#FEF08A',
+                  color: '#854D0E',
+                  border: '1.5px solid #EAB308',
+                  borderRadius: 999,
+                  padding: '3px 12px',
+                  fontSize: 12,
+                  fontWeight: 800,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                }}
+              >
+                ⭐ Tu pupitre: #{currentSeat + 1}
+              </span>
+            )}
           </div>
 
           <div className="sala-actions">
-            <button
-              type="button"
-              className="btn-sala-pill"
-              onClick={reiniciarAula}
-              title="Vaciar las sillas para volver a ver la animación"
-            >
-              🔄 Reiniciar
-            </button>
-            <button
-              type="button"
-              className="btn-sala-pill"
-              onClick={llenarAula}
-              title="Llenar todos los pupitres de inmediato"
-            >
-              ⚡ Llenar aula
-            </button>
-            {onVolver && (
+            {!isLive ? (
+              <>
+                <button
+                  type="button"
+                  className="btn-sala-pill"
+                  onClick={reiniciarAula}
+                  title="Vaciar las sillas para volver a ver la animación"
+                >
+                  🔄 Reiniciar
+                </button>
+                <button
+                  type="button"
+                  className="btn-sala-pill"
+                  onClick={llenarAula}
+                  title="Llenar todos los pupitres de inmediato"
+                >
+                  ⚡ Llenar aula
+                </button>
+              </>
+            ) : customActions ? (
+              customActions
+            ) : isHost && onIniciar ? (
+              <button
+                type="button"
+                className="btn-sala-iniciar"
+                onClick={onIniciar}
+                disabled={students.length === 0}
+                title={students.length === 0 ? 'Esperando alumnos' : 'Iniciar la actividad'}
+              >
+                🚀 Iniciar partida ({students.length})
+              </button>
+            ) : !isHost ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 13, color: '#64748B', fontWeight: 600 }}>
+                  ⏳ Esperando a que el profesor inicie la partida...
+                </span>
+                {onVolver && (
+                  <button
+                    type="button"
+                    className="btn-sala-volver"
+                    style={{ background: '#EF4444', borderColor: '#DC2626' }}
+                    onClick={onVolver}
+                  >
+                    Salir
+                  </button>
+                )}
+              </div>
+            ) : null}
+
+            {isHost && onVolver && (
               <button
                 type="button"
                 className="btn-sala-volver"
                 onClick={onVolver}
               >
-                Volver
+                Cerrar sala
               </button>
             )}
           </div>
@@ -595,55 +712,46 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
                   )}
 
                   {/* --- CARTEL FLOTANTE CON NOMBRE DEL ALUMNO --- */}
-                  {student && (
-                    <g
-                      className="anim-name-float"
-                      style={{ transformOrigin: `${x}px ${y - 60}px` }}
-                    >
-                      {/* Fondo blanco puro con borde grueso negro */}
-                      <rect
-                        x={x - 48}
-                        y={y - 72}
-                        width="96"
-                        height="22"
-                        rx="11"
-                        fill="#FFFFFF"
-                        stroke="#18181B"
-                        strokeWidth="2.2"
-                        filter="url(#cardShadow)"
-                      />
-                      {/* Punto verde de conexión */}
-                      <circle cx={x - 36} cy={y - 61} r="3.5" fill="#22C55E" />
-                      {/* Nombre del alumno */}
-                      <text
-                        x={x + 6}
-                        y={y - 57}
-                        textAnchor="middle"
-                        fontSize="11"
-                        fontWeight="800"
-                        fill="#18181B"
-                        letterSpacing="0.02em"
+                  {student && (() => {
+                    const isMe = !isHost && (seat.id === currentSeat)
+                    return (
+                      <g
+                        className="anim-name-float"
+                        style={{ transformOrigin: `${x}px ${y - 60}px` }}
                       >
-                        {student.nombre}
-                      </text>
-                    </g>
-                  )}
+                        {/* Fondo blanco puro o dorado si es el alumno actual */}
+                        <rect
+                          x={x - 52}
+                          y={y - 74}
+                          width="104"
+                          height="24"
+                          rx="12"
+                          fill={isMe ? '#FEF08A' : '#FFFFFF'}
+                          stroke={isMe ? '#CA8A04' : '#18181B'}
+                          strokeWidth={isMe ? '2.8' : '2.2'}
+                          filter="url(#cardShadow)"
+                        />
+                        {/* Punto verde de conexión */}
+                        <circle cx={x - 40} cy={y - 62} r="3.5" fill={isMe ? '#CA8A04' : '#22C55E'} />
+                        {/* Nombre del alumno */}
+                        <text
+                          x={x + 4}
+                          y={y - 58}
+                          textAnchor="middle"
+                          fontSize="11"
+                          fontWeight={isMe ? '900' : '800'}
+                          fill="#18181B"
+                          letterSpacing="0.02em"
+                        >
+                          {isMe ? `⭐ ${student.nombre}` : student.nombre}
+                        </text>
+                      </g>
+                    )
+                  })()}
                 </g>
               )
             })}
           </svg>
-        </div>
-
-        {/* Pie informativo de la sala */}
-        <div className="sala-footer-legal">
-          <div className="sala-tip-badge">
-            <span>💡</span>
-            <span><b>Consejo Legalín:</b> Nadie puede obligarte a compartir fotos privadas ni contraseñas. ¡Juega limpio y seguro!</span>
-          </div>
-
-          <div>
-            <span>Ayuda ante dudas o acoso: <b>017</b> (INCIBE · Gratuito)</span>
-          </div>
         </div>
       </div>
     </div>

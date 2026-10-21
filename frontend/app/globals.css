@@ -189,7 +189,7 @@ html, body {
 }
 
 /* ==========================================================================
-   TOP BAR (PARTE SUPERIOR: BOTÓN ACCESO A PROFESIONALES MINIMAL GLASS)
+   TOP BAR (PARTE SUPERIOR: BOTÓN ACCESO A PROFESORES MINIMAL GLASS)
    ========================================================================== */
 
 .kahoot-topbar {
@@ -203,7 +203,7 @@ html, body {
 }
 
 /* --------------------------------------------------------------------------
-   BOTÓN ACCESO A PROFESIONALES (MINIMAL GLASS)
+   BOTÓN ACCESO A PROFESORES (MINIMAL GLASS)
    -------------------------------------------------------------------------- */
 .btn-pro-opt1 {
   display: inline-flex;
