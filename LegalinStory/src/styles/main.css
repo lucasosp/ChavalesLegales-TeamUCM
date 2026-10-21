@@ -1987,20 +1987,20 @@ button:disabled { opacity: .45; cursor: default; }
 }
 
 .scene[data-mood="cold"] .scene-bg.is-active {
-  filter: saturate(0.62) brightness(0.78) contrast(1.08) hue-rotate(-10deg);
+  filter: blur(3px) saturate(0.62) brightness(0.78) contrast(1.08) hue-rotate(-10deg);
 }
 
 .scene[data-mood="tense"] .scene-bg.is-active {
-  filter: saturate(0.78) brightness(0.84) contrast(1.12);
+  filter: blur(3px) saturate(0.78) brightness(0.84) contrast(1.12);
 }
 
 .scene[data-mood="warm"] .scene-bg.is-active {
-  filter: saturate(1.04) brightness(1.04) sepia(0.08);
+  filter: blur(3px) saturate(1.04) brightness(1.04) sepia(0.08);
 }
 
 .scene[data-mood="safe"] .scene-bg.is-active,
 .scene[data-mood="hope"] .scene-bg.is-active {
-  filter: saturate(1.02) brightness(1.08);
+  filter: blur(3px) saturate(1.02) brightness(1.08);
 }
 
 .scene[data-mood="cold"] .scene-vignette {
