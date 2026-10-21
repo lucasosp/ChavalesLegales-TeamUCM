@@ -67,9 +67,10 @@ export default function ApartadoProfesores() {
           </div>
 
           {/* ====================================================================
-              LOS DOS BOTONES GRANDES DE JUEGOS:
+              LOS BOTONES GRANDES DE JUEGOS:
               1. Superior: "Modo historieta"
-              2. Inferior: "Modo juicio"
+              2. Centro: "Modo juicio"
+              3. Inferior: "Juzgado de Legalín"
               ==================================================================== */}
           <div className="teacher-buttons-stack">
             {/* BOTÓN SUPERIOR: MODO HISTORIETA */}
@@ -111,6 +112,30 @@ export default function ApartadoProfesores() {
                   <span className="game-btn-title">Modo juicio</span>
                   <span className="game-btn-desc">
                     Simulación de juicios rápidos. La clase analiza casos reales de menores y tecnología para dictar sentencia con el Código Penal.
+                  </span>
+                </div>
+              </div>
+              <div className="game-btn-action" aria-hidden="true">
+                <span>Jugar</span>
+                <span>→</span>
+              </div>
+            </Link>
+
+            {/* BOTÓN INFERIOR: JUZGADO DE LEGALÍN */}
+            <Link
+              href="/juzgado"
+              className="teacher-game-btn teacher-game-btn--juzgado"
+              aria-label="Abrir Juzgado de Legalín"
+            >
+              <div className="game-btn-left">
+                <div className="game-btn-icon-wrapper" aria-hidden="true">
+                  🐒
+                </div>
+                <div className="game-btn-text-group">
+                  <span className="game-btn-badge">Mesa del juez</span>
+                  <span className="game-btn-title">Juzgado de Legalín</span>
+                  <span className="game-btn-desc">
+                    Revisa el caso, pide lo que falta y sella LEGAL o ILEGAL. Luego elige a quién acudir. De 7 a 16 años.
                   </span>
                 </div>
               </div>

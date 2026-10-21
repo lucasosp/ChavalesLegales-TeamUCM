@@ -1169,3 +1169,38 @@ html, body {
   margin-bottom: 0.5rem;
 }
 
+/* Botón 3: Juzgado de Legalín (variante naranja, mismo patrón que los otros dos) */
+.teacher-game-btn--juzgado {
+  background: linear-gradient(135deg, #ffffff 0%, #fff7ed 100%);
+  color: #1a1a2e;
+  border: 3px solid var(--naranja);
+  box-shadow: 0 10px 0 var(--naranja-dark), 0 20px 35px rgba(0, 0, 0, 0.35);
+}
+
+.teacher-game-btn--juzgado:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 0 var(--naranja-dark), 0 26px 45px rgba(0, 0, 0, 0.45);
+}
+
+.teacher-game-btn--juzgado:active {
+  transform: translateY(4px);
+  box-shadow: 0 6px 0 var(--naranja-dark), 0 12px 20px rgba(0, 0, 0, 0.3);
+}
+
+.teacher-game-btn--juzgado .game-btn-icon-wrapper {
+  background: rgba(249, 115, 22, 0.15);
+  border: 2px solid rgba(249, 115, 22, 0.4);
+}
+
+.teacher-game-btn--juzgado .game-btn-badge {
+  color: var(--naranja-dark);
+}
+
+.teacher-game-btn--juzgado .game-btn-title {
+  font-size: clamp(1.4rem, 2.4vw, 1.75rem);
+}
+
+.teacher-game-btn--juzgado .game-btn-action {
+  background: var(--naranja);
+  color: #ffffff;
+}

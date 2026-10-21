@@ -1,0 +1,245 @@
+/* Juzgado de Legalín · estilos del juego.
+   Todo va bajo .juzgado-app (y las animaciones con prefijo jz-) para no tocar la estética del resto de la web. */
+/* Tokens: estilo Duolingo (colores planos, contorno oscuro grueso, sombra sólida) sobre la paleta esmeralda de la web. */
+.juzgado-app {
+  --d-tinta: #18181B; --d-borde: 3.5px; --d-borde-g: 4px;
+  --d-sombra: 0 4px 0 var(--d-tinta); --d-sombra-g: 0 8px 0 rgba(0, 0, 0, .35);
+  --d-legal: #58CC02; --d-legal-osc: #46A302;
+  --d-ilegal: #FF4B4B; --d-ilegal-osc: #D33131;
+  --d-falta: #FFC800; --d-falta-osc: #FF9600;
+  --d-azul: #DDF4FF; --d-papel: #FFF8E7; --d-nota: #FFF3B0;
+  --d-madera: #C8834B; --d-madera-osc: #A0612F; --d-madera-veta: #B9743F;
+  --d-rapida: 180ms ease-out;
+  font-family: 'Fredoka', system-ui, sans-serif;
+}
+.juzgado-app button, .juzgado-app select { font-family: inherit; }
+.juzgado-app .trazo { stroke: var(--d-tinta); stroke-width: var(--d-borde-g); }
+.juzgado-app .trazo-fino { stroke: var(--d-tinta); stroke-width: 2.5px; }
+
+/* Paneles (preparación, carga y sentencia final): tarjeta blanca como el resto de la web */
+.juzgado-app .jz-panel { position: relative; max-width: 900px; margin: 0 auto; display: grid; gap: 1rem; padding: 2.2rem 2.4rem; color: var(--d-tinta);
+            background: #fff; border: var(--d-borde-g) solid var(--d-tinta); border-radius: 28px; box-shadow: 0 10px 0 var(--d-tinta), 0 24px 48px rgba(0, 0, 0, .35); }
+.juzgado-app .jz-panel h1 { font-size: 2.6rem; font-weight: 700; line-height: 1.1; }
+.juzgado-app .jz-panel h1 em { font-style: normal; color: var(--verde-dark); }
+.juzgado-app .jz-panel h3 { margin-top: .6rem; font-size: 1.15rem; font-weight: 600; color: var(--granate); }
+.juzgado-app .jz-cargando { color: #fff; text-align: center; }
+.juzgado-app .eyebrow { font-size: .8rem; font-weight: 700; letter-spacing: .25em; text-transform: uppercase; color: var(--naranja); }
+.juzgado-app .juez { display: flex; gap: 1.2rem; align-items: center; }
+.juzgado-app .juez img { width: 96px; height: 96px; flex: none; border-radius: 50%; object-fit: cover; object-position: 50% 30%; border: var(--d-borde-g) solid var(--amarillo); }
+.juzgado-app .bocadillo { flex: 1; padding: 1rem 1.3rem; border-radius: 18px; font-size: 1.15rem; background: #f0fdf4; border: var(--d-borde) solid var(--d-tinta); }
+.juzgado-app .btn { justify-self: start; padding: .8rem 1.8rem; border-radius: 16px; cursor: pointer; font-size: 1.1rem; font-weight: 700; color: var(--d-tinta);
+       background: var(--amarillo); border: var(--d-borde) solid var(--d-tinta); box-shadow: 0 5px 0 var(--d-tinta); transition: transform var(--d-rapida); }
+.juzgado-app .btn:hover:not(:disabled) { transform: translateY(-2px); }
+.juzgado-app .btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 var(--d-tinta); }
+.juzgado-app .btn:disabled { opacity: .45; cursor: not-allowed; }
+.juzgado-app .chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+.juzgado-app .chip { padding: .5rem 1rem; border-radius: 999px; cursor: pointer; font-size: 1rem; font-weight: 600; color: var(--d-tinta);
+        background: #fff; border: 3px solid var(--d-tinta); box-shadow: 0 3px 0 var(--d-tinta); transition: transform var(--d-rapida); }
+.juzgado-app .chip:hover:not(:disabled) { transform: translateY(-2px); }
+.juzgado-app .chip.on { background: var(--amarillo); }
+.juzgado-app .chip:disabled { opacity: .35; cursor: not-allowed; }
+.juzgado-app .veredicto-fuente { color: #4b5563; font-size: .95rem; }
+.juzgado-app .veredicto > .veredicto-fuente { margin-bottom: 1rem; color: rgba(255, 255, 255, .8); }
+.juzgado-app .veredicto-ayuda { margin-top: 1rem; padding: .8rem 1rem; border-radius: 14px; font-size: .95rem; color: var(--d-tinta);
+                   background: var(--amarillo-light); border: var(--d-borde) solid var(--d-tinta); }
+.juzgado-app .veredicto { max-width: 1200px; margin: 0 auto; }
+.juzgado-app .veredicto-resumen { list-style: none; display: grid; gap: .5rem; }
+.juzgado-app .veredicto-resumen li { display: flex; gap: 1rem; align-items: center; padding: .7rem 1rem; border-radius: 14px; background: #f0fdf4; border: 2.5px solid var(--d-tinta); }
+.juzgado-app .veredicto-resumen span { font-weight: 700; min-width: 70px; }
+
+/* Mesa vista desde arriba */
+.juzgado-app .mesa { position: relative; overflow: hidden; height: 920px; display: grid; gap: 14px; padding: 22px 22px 0;
+        grid-template-columns: 250px 1fr 250px; grid-template-rows: 140px 1fr 300px;
+        grid-template-areas: "nota falta dni" "ilegal papel legal" "ayuda cabeza libro";
+        border: var(--d-borde-g) solid var(--d-tinta); border-radius: 28px; box-shadow: 0 10px 0 var(--d-tinta), 0 24px 48px rgba(0, 0, 0, .35);
+        background:
+          repeating-linear-gradient(90deg, transparent 0 158px, rgba(0,0,0,.18) 158px 161px),
+          repeating-linear-gradient(90deg, var(--d-madera) 0 40px, var(--d-madera-veta) 40px 44px, var(--d-madera) 44px 90px, var(--d-madera-osc) 90px 92px, var(--d-madera) 92px 161px); }
+.juzgado-app .mesa > div { position: relative; z-index: 2; }
+.juzgado-app .mesa__nota { grid-area: nota; align-self: start; display: grid; gap: .15rem; padding: .7rem .9rem; transform: rotate(-3deg);
+              background: var(--d-nota); color: var(--d-tinta); border: var(--d-borde) solid var(--d-tinta); border-radius: 6px; box-shadow: var(--d-sombra); font-size: .95rem; }
+.juzgado-app .mesa__nota b { font-size: 1.25rem; }
+.juzgado-app .mesa__puntos { font-weight: 700; }
+.juzgado-app .mesa__puntos small { color: var(--d-ilegal-osc); }
+.juzgado-app .mesa__falta { grid-area: falta; display: grid; place-items: center; }
+.juzgado-app .mesa__falta .sello { grid-auto-flow: column; align-items: center; gap: .8rem; }
+.juzgado-app .mesa__falta .sello svg { width: 110px; }
+.juzgado-app .mesa__dni { grid-area: dni; justify-self: end; align-self: start; }
+.juzgado-app .mesa__ilegal { grid-area: ilegal; display: grid; place-items: center; }
+.juzgado-app .mesa__legal { grid-area: legal; display: grid; place-items: center; }
+.juzgado-app .mesa__papel { grid-area: papel; min-height: 0; }
+.juzgado-app .mesa__ayuda { grid-area: ayuda; align-self: end; padding-bottom: 18px; }
+.juzgado-app .mesa__cabeza { grid-area: cabeza; display: grid; justify-items: center; align-items: end; z-index: 1 !important; }
+.juzgado-app .mesa__libro { grid-area: libro; display: grid; justify-items: end; align-items: end; padding-bottom: 22px; }
+
+/* Legalín desde arriba: cabeza, brazos (capa SVG) y mazazo */
+.juzgado-app .legalin-cabeza { width: 320px; margin-bottom: -24px; filter: drop-shadow(0 -6px 0 rgba(0,0,0,.2)); transition: transform 240ms ease-out; }
+.juzgado-app .brazos { position: absolute; inset: 0; z-index: 30; pointer-events: none; overflow: visible; filter: drop-shadow(0 8px 0 rgba(0,0,0,.25)); }
+.juzgado-app .mazo { transform-box: fill-box; transform-origin: 0 50%; animation: jz-mazazo 700ms cubic-bezier(.5, 0, .5, 1.4) both; }
+.juzgado-app .impacto { transform-box: fill-box; transform-origin: center; animation: jz-impacto 500ms ease-out 460ms both; }
+.juzgado-app .papel.golpeado { animation: jz-temblor 260ms ease-out 480ms; }
+
+/* Papel del recurso */
+.juzgado-app .papel { position: relative; height: 100%; overflow-y: auto; display: grid; align-content: start; gap: .8rem; padding: 1.4rem 1.6rem;
+         background: var(--d-papel); color: var(--d-tinta); border: var(--d-borde-g) solid var(--d-tinta); border-radius: 10px;
+         box-shadow: var(--d-sombra-g); transform: rotate(-.6deg); transition: transform var(--d-rapida), box-shadow var(--d-rapida); }
+.juzgado-app .papel.encima { transform: rotate(0) scale(1.01); box-shadow: 0 0 0 6px var(--d-falta), var(--d-sombra-g); }
+.juzgado-app .papel__cab { font-size: .75rem; letter-spacing: .15em; text-transform: uppercase; color: #8A6A55; border-bottom: 2px dashed #D9C3B5; padding-bottom: .5rem; }
+.juzgado-app .papel__resumen { font-size: 1.15rem; line-height: 1.5; }
+.juzgado-app .papel__pregunta { font-size: 1.35rem; font-weight: 600; padding: .6rem .9rem; border-radius: 10px; background: #FFE9B8; border: var(--d-borde) solid var(--d-tinta); }
+.juzgado-app .anexo { padding: .7rem .9rem; border-radius: 10px; background: #fff; border: 2px dashed #B79A82; animation: jz-aparecer .2s ease-out; }
+.juzgado-app .anexo h4 { margin-bottom: .25rem; }
+.juzgado-app .anexo--nuevo { border: var(--d-borde) solid var(--d-falta-osc); background: #FFF4D6; }
+.juzgado-app .anexo--nuevo small { color: var(--d-falta-osc); font-weight: 700; }
+.juzgado-app .papel__pedir { justify-self: start; padding: .5rem 1rem; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer;
+                background: var(--d-azul); color: var(--d-tinta); border: var(--d-borde) solid var(--d-tinta); box-shadow: var(--d-sombra);
+                transition: transform var(--d-rapida); }
+.juzgado-app .papel__pedir:hover:not(:disabled) { transform: scale(1.05); }
+.juzgado-app .papel__pedir:disabled { opacity: .5; cursor: default; }
+.juzgado-app .tinta { position: absolute; top: 38%; left: 50%; padding: .2rem 1.2rem; border: 7px solid; border-radius: 12px; pointer-events: none;
+         font-size: 3rem; font-weight: 700; letter-spacing: .08em; opacity: .85; mix-blend-mode: multiply;
+         transform: translate(-50%, -50%) rotate(-14deg); animation: jz-golpe 320ms cubic-bezier(.3, 1.6, .5, 1); }
+.juzgado-app .tinta--legal { color: var(--d-legal-osc); }
+.juzgado-app .tinta--ilegal { color: var(--d-ilegal-osc); }
+.juzgado-app .tinta--falta_info { color: var(--d-falta-osc); }
+
+/* Sellos */
+.juzgado-app .sello { --s-c: var(--d-falta); --s-osc: var(--d-falta-osc); display: grid; justify-items: center; gap: .3rem; padding: 0;
+         background: none; border: none; cursor: grab; transition: transform var(--d-rapida), opacity var(--d-rapida); }
+.juzgado-app .sello--legal { --s-c: var(--d-legal); --s-osc: var(--d-legal-osc); }
+.juzgado-app .sello--ilegal { --s-c: var(--d-ilegal); --s-osc: var(--d-ilegal-osc); }
+.juzgado-app .sello svg { width: 130px; filter: drop-shadow(0 6px 0 rgba(0,0,0,.3)); }
+.juzgado-app .sello__base { fill: var(--s-c); stroke: var(--d-tinta); stroke-width: var(--d-borde-g); }
+.juzgado-app .sello__brillo { fill: #fff; opacity: .25; }
+.juzgado-app .sello__mango { fill: var(--s-osc); stroke: var(--d-tinta); stroke-width: var(--d-borde-g); }
+.juzgado-app .sello__pomo { fill: var(--s-c); stroke: var(--d-tinta); stroke-width: var(--d-borde); }
+.juzgado-app .sello__icono { font-size: 24px; font-weight: 700; fill: var(--d-tinta); }
+.juzgado-app .sello__texto { padding: .25rem .8rem; border-radius: 999px; background: var(--s-c); color: var(--d-tinta); font-weight: 700; font-size: .9rem;
+                border: var(--d-borde) solid var(--d-tinta); box-shadow: var(--d-sombra); }
+.juzgado-app .sello:hover { transform: scale(1.05); }
+.juzgado-app .sello:active { cursor: grabbing; animation: jz-rebote 200ms ease-out; }
+.juzgado-app .sello.bloqueado { opacity: .55; }
+
+/* Mini fichas (DNI) e inspector */
+.juzgado-app .dnimonton { display: grid; gap: 8px; justify-items: end; }
+.juzgado-app .dnimini { position: relative; display: flex; align-items: center; gap: 10px; width: 190px; padding: 8px 10px; cursor: pointer;
+           background: var(--d-azul); border: var(--d-borde) solid var(--d-tinta); border-radius: 14px; box-shadow: var(--d-sombra);
+           transform: rotate(calc(3deg - var(--i) * 4deg)); transition: transform var(--d-rapida); }
+.juzgado-app .dnimini:hover { transform: rotate(0) scale(1.05); }
+.juzgado-app .dnimini--implicado { background: #FFE3E3; }
+.juzgado-app .dnimini--testigo { background: #E8F8D8; }
+.juzgado-app .dnimini svg { flex: none; border-radius: 10px; border: 2.5px solid var(--d-tinta); }
+.juzgado-app .dnimini__lineas { flex: 1; display: grid; gap: 8px; }
+.juzgado-app .dnimini__lineas i { display: block; height: 9px; border-radius: 5px; background: var(--d-tinta); }
+.juzgado-app .dnimini__lineas i + i { width: 65%; opacity: .7; }
+.juzgado-app .dnimini.nueva { animation: jz-latido 1s ease-in-out 3; box-shadow: 0 0 0 5px var(--d-falta), var(--d-sombra); }
+.juzgado-app .dnimini--vacio { cursor: default; justify-content: center; color: rgba(0,0,0,.5); background: transparent; border-style: dashed; box-shadow: none; font-weight: 600; transform: none; }
+.juzgado-app .dni { position: relative; overflow: hidden; color: var(--d-tinta); background: var(--d-azul); border: var(--d-borde) solid var(--d-tinta); border-radius: 18px; box-shadow: var(--d-sombra); text-align: left; animation: jz-aparecer .2s ease-out; }
+.juzgado-app .dni--implicado { background: #FFE3E3; }
+.juzgado-app .dni--testigo { background: #E8F8D8; }
+.juzgado-app .dni__cab { display: flex; justify-content: space-between; padding: .5rem 1rem; background: var(--d-tinta); color: #fff; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; }
+.juzgado-app .dni__cuerpo { display: flex; gap: 1.2rem; align-items: center; padding: 1rem; }
+.juzgado-app .dni__cuerpo svg { flex: none; border-radius: 16px; border: var(--d-borde) solid var(--d-tinta); }
+.juzgado-app .dni dl { display: grid; grid-template-columns: auto 1fr; gap: .2rem .8rem; font-size: 1.1rem; }
+.juzgado-app .dni dt { font-size: .75rem; text-transform: uppercase; color: #6A6A6A; align-self: center; }
+.juzgado-app .dni dd { font-weight: 600; }
+.juzgado-app .dni__datos { display: flex; flex-wrap: wrap; gap: .4rem; padding: 0 1rem 1rem; font-size: .9rem; }
+.juzgado-app .dni__datos span { padding: .15rem .6rem; border-radius: 999px; background: #fff; border: 2px solid var(--d-tinta); }
+.juzgado-app .dni__nueva { position: absolute; top: 44px; right: 10px; padding: .1rem .6rem; border-radius: 999px; background: var(--d-falta); border: 2px solid var(--d-tinta); font-weight: 700; }
+.juzgado-app .dni__sello { position: absolute; right: 12px; bottom: 10px; transform: rotate(-12deg); border: 2px solid var(--d-ilegal-osc); color: var(--d-ilegal-osc);
+              font-weight: 700; font-size: .7rem; padding: 0 .4rem; border-radius: 6px; opacity: .5; }
+
+/* «¿A quién acudir?»: 3 tarjetas y bandeja de entrega */
+.juzgado-app .acudir { display: grid; gap: .5rem; padding: .8rem; color: var(--d-tinta); background: var(--d-nota); border: var(--d-borde) solid var(--d-tinta);
+          border-radius: 14px; box-shadow: var(--d-sombra); transform: rotate(1deg); }
+.juzgado-app .acudir h4 { display: flex; justify-content: space-between; align-items: center; font-size: 1.05rem; }
+.juzgado-app .acudir__ayuda { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; background: #fff; border: 2.5px solid var(--d-tinta); box-shadow: 0 2px 0 var(--d-tinta); }
+.juzgado-app .acudir__pregunta { font-size: .85rem; font-weight: 500; }
+.juzgado-app .acudir__opciones { display: grid; gap: .35rem; }
+.juzgado-app .tarjeta-recurso { display: flex; align-items: center; gap: .5rem; padding: .35rem .6rem; border-radius: 10px; cursor: grab; text-align: left;
+                   font-weight: 600; font-size: .85rem; color: var(--d-tinta); background: #fff; border: 2.5px solid var(--d-tinta); box-shadow: 0 3px 0 var(--d-tinta);
+                   transition: transform var(--d-rapida), opacity var(--d-rapida); }
+.juzgado-app .tarjeta-recurso span { font-size: 1.1rem; }
+.juzgado-app .tarjeta-recurso:hover { transform: scale(1.05); }
+.juzgado-app .tarjeta-recurso.usada { opacity: .35; }
+.juzgado-app .bandeja { display: grid; place-items: center; min-height: 46px; padding: .3rem; border-radius: 12px; border: 3px dashed var(--d-tinta);
+           background: rgba(255,255,255,.5); font-size: .85rem; font-weight: 600; transition: background var(--d-rapida), transform var(--d-rapida); }
+.juzgado-app .bandeja.encima { background: #E8F8D8; transform: scale(1.04); }
+.juzgado-app .bandeja.llena { border-style: solid; background: #E8F8D8; }
+.juzgado-app .bandeja button { font-size: .85rem; font-weight: 600; cursor: pointer; background: none; border: none; color: var(--d-tinta); }
+.juzgado-app .bandeja small { display: block; font-weight: 400; }
+.juzgado-app .acudir.sacude { animation: jz-sacude 400ms ease-out; box-shadow: 0 0 0 4px var(--d-ilegal), var(--d-sombra); }
+.juzgado-app .acudir--solo-pistas { transform: rotate(-1deg); }
+.juzgado-app .acudir__pistas { list-style: none; display: grid; gap: .4rem; }
+.juzgado-app .acudir__pistas li { padding: .35rem .8rem; border-radius: 999px; background: #fff; border: 2.5px solid var(--d-tinta); box-shadow: 0 3px 0 var(--d-tinta); font-weight: 500; text-align: left; color: var(--d-tinta); }
+
+/* Libro de leyes: botón en la mesa y libro abierto en el centro */
+.juzgado-app .libro { position: relative; width: 140px; height: 170px; padding: 0; cursor: pointer; background: none; border: none; transform: rotate(6deg);
+         transition: transform var(--d-rapida); }
+.juzgado-app .libro:hover { transform: rotate(2deg) scale(1.05); }
+.juzgado-app .libro__lomo { position: absolute; inset: 0 auto 0 0; width: 22px; background: var(--granate-dark); border: var(--d-borde-g) solid var(--d-tinta); border-radius: 10px 0 0 10px; }
+.juzgado-app .libro__tapa { position: absolute; inset: 0 0 0 18px; display: grid; place-content: center; justify-items: center; gap: .2rem; font-size: 2rem;
+               background: var(--granate); color: var(--amarillo); border: var(--d-borde-g) solid var(--d-tinta); border-radius: 0 12px 12px 0; box-shadow: var(--d-sombra-g); }
+.juzgado-app .libro__tapa b { font-size: 1.1rem; letter-spacing: .15em; }
+.juzgado-app .libro__tapa small { font-size: .75rem; color: #fff; }
+.juzgado-app .libro-abierto { display: grid; grid-template-columns: 1fr 1fr; width: 100%; perspective: 1400px; padding: 10px; border-radius: 16px;
+                 background: var(--granate); border: var(--d-borde-g) solid var(--d-tinta); box-shadow: var(--d-sombra); }
+.juzgado-app .libro-abierto__pagina { display: grid; align-content: start; gap: .6rem; min-height: 260px; padding: 1.3rem; text-align: left; color: var(--d-tinta);
+                         background: var(--d-papel); border: 2.5px solid var(--d-tinta); }
+.juzgado-app .libro-abierto__pagina:first-child { border-radius: 10px 0 0 10px; box-shadow: inset -14px 0 18px -14px rgba(0,0,0,.35); }
+.juzgado-app .libro-abierto__pagina:last-child { border-radius: 0 10px 10px 0; box-shadow: inset 14px 0 18px -14px rgba(0,0,0,.35); }
+.juzgado-app .libro-abierto__pagina b { font-size: 1.15rem; color: var(--granate); }
+.juzgado-app .libro-abierto__pagina p { font-size: 1.2rem; line-height: 1.45; }
+.juzgado-app .libro-abierto__pagina small { align-self: end; color: #8A6A55; }
+.juzgado-app .libro-abierto__pagina--vacia { place-content: center; font-size: 3rem; opacity: .3; }
+.juzgado-app .gira-adelante .libro-abierto__pagina:last-child { transform-origin: left center; animation: jz-hoja-adelante 380ms ease-out; }
+.juzgado-app .gira-atras .libro-abierto__pagina:first-child { transform-origin: right center; animation: jz-hoja-atras 380ms ease-out; }
+.juzgado-app .paginas { display: flex; justify-content: center; align-items: center; gap: 1rem; font-weight: 600; }
+.juzgado-app .flecha { width: 48px; height: 48px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; color: var(--d-tinta); background: var(--amarillo);
+          border: var(--d-borde) solid var(--d-tinta); box-shadow: var(--d-sombra); transition: transform var(--d-rapida); }
+.juzgado-app .flecha:hover:not(:disabled) { transform: scale(1.1); }
+.juzgado-app .flecha:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--d-tinta); }
+.juzgado-app .flecha:disabled { opacity: .35; cursor: default; }
+
+/* Modales centrados: tarjeta blanca con contorno grueso, como las tarjetas de la web */
+.juzgado-app .modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 1rem; background: rgba(1, 25, 19, .78); animation: jz-fundido 150ms ease-out; }
+.juzgado-app .modal__caja { position: relative; width: min(560px, 100%); max-height: 90vh; overflow: auto; display: grid; gap: .9rem; justify-items: center; text-align: center;
+               padding: 2rem; border-radius: 28px; background: #fff; color: var(--d-tinta); border: var(--d-borde-g) solid var(--d-tinta);
+               box-shadow: 0 10px 0 var(--amarillo-dark), 0 24px 48px rgba(0, 0, 0, .4); animation: jz-emerge 200ms ease-out; }
+.juzgado-app .modal__caja.ok { box-shadow: 0 10px 0 var(--d-legal-osc), 0 24px 48px rgba(0, 0, 0, .4); }
+.juzgado-app .modal__caja.ko { box-shadow: 0 10px 0 var(--d-ilegal-osc), 0 24px 48px rgba(0, 0, 0, .4); }
+.juzgado-app .modal__caja--dni { justify-items: stretch; }
+.juzgado-app .modal__caja--libro { width: min(820px, 100%); justify-items: stretch; }
+.juzgado-app .modal__cerrar { position: absolute; top: 14px; right: 14px; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-weight: 700;
+                 color: var(--d-tinta); background: #fff; border: var(--d-borde) solid var(--d-tinta); box-shadow: 0 3px 0 var(--d-tinta); }
+.juzgado-app .modal__titulo { font-size: 1.4rem; font-weight: 600; text-align: center; }
+.juzgado-app .modal__caja > img { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; object-position: 50% 30%; border: var(--d-borde-g) solid var(--amarillo); }
+.juzgado-app .modal__caja h2 { font-size: 2rem; font-weight: 700; }
+.juzgado-app .modal__caja.ok h2 { color: var(--d-legal-osc); }
+.juzgado-app .modal__caja.ko h2 { color: var(--d-ilegal-osc); }
+.juzgado-app .modal__msg { font-size: 1.15rem; line-height: 1.45; }
+.juzgado-app .modal__penal { color: var(--naranja-dark); font-weight: 700; }
+.juzgado-app .modal__fallos, .juzgado-app .modal__leyes { list-style: none; display: grid; gap: .4rem; text-align: left; width: 100%; }
+.juzgado-app .modal__leyes li { display: grid; padding: .6rem .8rem; border-radius: 12px; background: #f0fdf4; border: 2px solid var(--d-tinta); }
+.juzgado-app .modal__leyes small { color: #4b5563; }
+.juzgado-app .modal__recurso { text-align: left; font-size: .95rem; }
+.juzgado-app .modal__estrellas { font-size: 1.6rem; }
+.juzgado-app .modal__caja .btn { justify-self: center; }
+
+@keyframes jz-mazazo {
+  0% { transform: rotate(0) scale(1); }
+  45% { transform: rotate(-35deg) scale(1.55); }
+  70% { transform: rotate(4deg) scale(.95); }
+  100% { transform: rotate(0) scale(1); }
+}
+@keyframes jz-impacto { 0% { opacity: 1; scale: .4; } 100% { opacity: 0; scale: 1.4; } }
+@keyframes jz-temblor { 25% { translate: 0 6px; } 50% { translate: 0 -3px; } 75% { translate: 0 2px; } }
+@keyframes jz-golpe { 0% { transform: translate(-50%, -50%) rotate(-14deg) scale(1.8); opacity: 0; } 100% { transform: translate(-50%, -50%) rotate(-14deg) scale(1); } }
+@keyframes jz-aparecer { from { opacity: 0; transform: translateY(-8px); } }
+@keyframes jz-rebote { 50% { transform: scale(.9) translateY(4px); } }
+@keyframes jz-latido { 50% { transform: scale(1.08); } }
+@keyframes jz-sacude { 20%, 60% { transform: translateX(-6px) rotate(1deg); } 40%, 80% { transform: translateX(6px) rotate(1deg); } }
+@keyframes jz-hoja-adelante { from { transform: rotateY(-120deg); } }
+@keyframes jz-hoja-atras { from { transform: rotateY(120deg); } }
+@keyframes jz-fundido { from { opacity: 0; } }
+@keyframes jz-emerge { from { opacity: 0; transform: scale(.92); } }
