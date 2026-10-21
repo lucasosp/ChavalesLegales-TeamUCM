@@ -2,7 +2,7 @@
  * End-to-end smoke test for "No lo reenvíes".
  *
  * Exercises the new content node types: chapter cards, messaging scenes, the
- * perspective switch, the multi-select needs menu, the information minigame,
+ * perspective switch, the educational information cards,
  * the interview, the ending router, and the rights panel.
  */
 import { JSDOM } from "jsdom";
@@ -120,27 +120,6 @@ function choose(labelPart) {
   button.click();
 }
 
-function handleMinigame() {
-  assert.equal(shown("[data-minigame]"), true, "minigame should be visible");
-  assert.equal(el("[data-minigame-title]").textContent, "Organiza la información");
-  el('[data-card-id="download"]').click();
-  el("[data-minigame-check]").click();
-  assert.equal(shown("[data-minigame-continue]"), false, "unsafe selection cannot complete");
-  el('[data-card-id="download"]').click();
-  assert.equal(shown("[data-minigame-feedback]"), false, "changing selection invalidates feedback");
-
-  for (const id of ["messages", "link", "witnesses"]) {
-    const card = el(`[data-card-id="${id}"]`);
-    assert.ok(card, `minigame card ${id} missing`);
-    card.click();
-  }
-
-  el("[data-minigame-check]").click();
-  assert.equal(shown("[data-minigame-feedback]"), true, "feedback should appear");
-  assert.equal(el("[data-minigame-continue]").hidden, false, "continue should appear");
-  el("[data-minigame-continue]").click();
-}
-
 try {
   app.start();
 
@@ -152,13 +131,15 @@ try {
   choose("Intervenir");
 
   assert.equal(pump(), "interstitial");
-  handleInterstitial("El grupo está hablando de ti");
+  handleInterstitial("Capítulo 1");
 
   assert.equal(pump({ stopAtChat: true }), "chat");
   assert.equal(el("[data-chat-title]").textContent, "4.º ESO | Los de siempre");
   app.view.skipTyping();
   assert.match(el("[data-chat-log]").textContent, /alguien ha visto lo de Sara/);
-  assert.match(el("[data-chat-log]").textContent, /Imagen oculta/);
+  assert.equal(el(".censored-preview").getAttribute("role"), "img");
+  assert.match(el(".censored-preview-art").src, /censored-preview\.svg/);
+  assert.equal(el(".censored-preview-art").alt, "");
   assert.equal(el(".is-hidden-content").parentElement.classList.contains("is-in"), true);
   app.advance();
 
@@ -166,46 +147,37 @@ try {
   choose("Pedir a Julia");
 
   assert.equal(pump(), "interstitial");
-  handleInterstitial("En tus manos");
+  handleInterstitial("Capítulo 2");
 
   assert.equal(pump({ stopAtChat: true }), "chat");
   assert.equal(el("[data-character]").dataset.character, "julia");
   app.view.skipTyping();
-  assert.match(el("[data-chat-log]").textContent, /Imagen oculta/);
+  assert.equal(el(".censored-preview").getAttribute("aria-label"), "Imagen censurada; el contenido no se muestra");
   app.advance();
 
   assert.equal(pump(), "choice");
   choose("Negarse a reenviarlo");
 
   assert.equal(pump(), "interstitial");
-  handleInterstitial("Alguien que te entiende");
+  handleInterstitial("Capítulo 3");
 
   assert.equal(pump(), "choice");
   choose("Ir con Sergio");
 
   assert.equal(pump(), "interstitial");
-  handleInterstitial("Romper el silencio");
-
-  assert.equal(pump(), "minigame");
-  assert.equal(el("[data-minigame-check]").disabled, true);
-  el('[data-card-id="needCompanion"]').click();
-  el('[data-card-id="needClearLanguage"]').click();
-  el('[data-card-id="needPause"]').click();
-  el('[data-card-id="needPause"]').click();
-  assert.equal(app.engine.nodeId, "needs-menu", "toggling must not reload the beat");
-  el("[data-minigame-check]").click();
-  assert.match(el("[data-minigame-feedback]").textContent, /No hay una respuesta única/);
-  el("[data-minigame-continue]").click();
-  assert.equal(app.engine.flags.needPause, false);
+  handleInterstitial("Capítulo 4");
 
   assert.equal(pump(), "interstitial");
-  handleInterstitial("Guardar pruebas sin hacer daño");
-
-  assert.equal(pump(), "minigame");
-  handleMinigame();
+  handleInterstitial("¿Qué necesita Sara para hablar?");
 
   assert.equal(pump(), "interstitial");
-  handleInterstitial("Contarlo a tu ritmo");
+  handleInterstitial("Capítulo 5");
+
+  assert.equal(pump(), "interstitial");
+  handleInterstitial("Organiza la información");
+
+  assert.equal(pump(), "interstitial");
+  handleInterstitial("Capítulo 6");
 
   assert.equal(pump(), "choice");
   choose("No recuerdo la hora exacta");
@@ -225,8 +197,6 @@ try {
 
   assert.equal(app.engine.flags.juliaHelped, true);
   assert.equal(app.engine.flags.helpRoute, true);
-  assert.equal(app.engine.flags.needCompanion, true);
-  assert.equal(app.engine.flags.needClearLanguage, true);
   assert.equal(saveStore.load(), null, "ending should clear the save");
 
   function routeEnding(flags, startNode = "ending-router-forward") {

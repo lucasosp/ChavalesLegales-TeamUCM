@@ -52,6 +52,7 @@ try {
     assert.ok(panel.y >= 0 && panel.y + panel.height <= viewport.height, "dialogue must fit the viewport");
     assert.ok(textBox.y + textBox.height <= advanceBox.y, "text and continue control must have separate rows");
     assert.equal(await text.evaluate((el) => el.scrollWidth > el.clientWidth + 1), false);
+    assert.ok(await text.evaluate((el) => parseFloat(getComputedStyle(el).fontSize) >= 18), "dialogue text must be larger and readable");
     await page.screenshot({ path: `/tmp/novela-dialogue-${viewport.width}.png` });
 
     await resume("ch4-2");
@@ -67,31 +68,27 @@ try {
     await page.getByRole("button", { name: /Pedir a Julia/ }).click();
 
     await resume("needs-menu");
-    const first = page.locator('[data-card-id="needCompanion"]');
-    const second = page.locator('[data-card-id="needPause"]');
-    await first.click();
-    await second.click();
-    await first.click();
-    assert.equal(await second.getAttribute("aria-pressed"), "true");
-    assert.equal(await first.getAttribute("aria-pressed"), "false");
-    await page.getByRole("button", { name: "Confirmar apoyos" }).click();
+    await page.locator("[data-interstitial]").waitFor();
+    assert.equal(await page.locator("[data-interstitial-title]").textContent(), "¿Qué necesita Sara para hablar?");
     await page.screenshot({ path: `/tmp/novela-support-${viewport.width}.png` });
-    await page.locator("[data-minigame-continue]").click();
-    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem("no-lo-reenvies.save")).flags.needPause), true);
+    await page.locator("[data-interstitial-next]").click();
 
     await resume("ch5-minigame");
-    await page.locator('[data-card-id="download"]').click();
-    await page.locator("[data-minigame-check]").click();
-    assert.equal(await page.locator("[data-minigame-continue]").isVisible(), false);
-    await page.locator('[data-card-id="download"]').click();
-    for (const id of ["messages", "link", "witnesses"]) await page.locator(`[data-card-id="${id}"]`).click();
-    await page.locator("[data-minigame-check]").click();
-    await page.locator("[data-minigame-continue]").click();
+    assert.equal(await page.locator("[data-interstitial-title]").textContent(), "Organiza la información");
+    await page.locator("[data-interstitial-next]").click();
     await resume("final1");
     await page.getByRole("button", { name: "Conoce tus derechos" }).click();
     await page.getByRole("link", { name: /INCIBE/ }).waitFor();
     await page.keyboard.press("Escape");
     assert.equal(await page.locator("[data-rights]").isVisible(), false);
+    await resume("ch1-chat-1");
+    const preview = page.locator(".censored-preview").first();
+    await preview.waitFor();
+    assert.equal(await preview.getAttribute("aria-label"), "Imagen censurada; el contenido no se muestra");
+    assert.ok(await preview.locator("img").evaluate((img) => img.complete && img.naturalWidth > 0), "pixelated preview must load");
+    assert.ok(await page.locator(".chat-text").first().evaluate((el) => parseFloat(getComputedStyle(el).fontSize) >= 17), "chat text must be larger");
+    await preview.scrollIntoViewIfNeeded();
+    await page.screenshot({ path: `/tmp/novela-censored-${viewport.width}.png` });
     assert.deepEqual(errors, []);
     console.log(`Browser checks passed at ${viewport.width}×${viewport.height}`);
     await page.close();

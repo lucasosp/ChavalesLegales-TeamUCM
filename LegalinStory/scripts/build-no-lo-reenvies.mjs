@@ -38,11 +38,7 @@ const branch = (id, when, then, otherwise, extra = {}) => {
 };
 
 const card = (id, kicker, title, text, next) => {
-  nodes[id] = { type: "interstitial", kicker, title, text, next };
-};
-
-const minigame = (id, title, prompt, cards, next) => {
-  nodes[id] = { type: "minigame", title, prompt, cards, next };
+  nodes[id] = { type: "interstitial", ...(kicker ? { kicker } : {}), title, text, next };
 };
 
 const ending = (id, kicker, title, text) => {
@@ -166,7 +162,7 @@ narrate(
 
 /* ----------------------------------------------------------------- chapter 1 */
 
-card("chapter1-card", "Capítulo 1", "El grupo está hablando de ti", "Martes, 18:42.", "ch1-1");
+card("chapter1-card", null, "Capítulo 1", "Martes, 18:42.", "ch1-1");
 
 narrate(
   "ch1-1",
@@ -300,8 +296,8 @@ narrate(
 
 card(
   "chapter2-card",
+  null,
   "Capítulo 2",
-  "En tus manos",
   "Hasta ahora has decidido qué hacer cuando algo te ocurre a ti.\nAhora eres la persona que recibe el contenido.",
   "ch2-1",
 );
@@ -417,7 +413,7 @@ narrate("ch2-end", "La historia continúa.", "chapter3-card");
 
 /* ----------------------------------------------------------------- chapter 3 */
 
-card("chapter3-card", "Capítulo 3", "Alguien que te entiende", "Miércoles, 08:05.", "ch3-1");
+card("chapter3-card", null, "Capítulo 3", "Miércoles, 08:05.", "ch3-1");
 
 narrate(
   "ch3-1",
@@ -579,8 +575,8 @@ branch(
 
 card(
   "chapter4-card",
+  null,
   "Capítulo 4",
-  "Romper el silencio",
   "Departamento de Orientación.",
   "ch4-0",
 );
@@ -666,19 +662,13 @@ say(
   "needs-menu",
 );
 
-nodes["needs-menu"] = {
-  type: "minigame",
-  mode: "support",
-  title: "¿Qué necesita Sara para hablar?",
-  prompt: "Ayuda a Sara a preparar la conversación con Marina. Marca todos los apoyos que quieras y confírmalos juntos. Puedes cambiar tu selección; no es un examen.",
-  cards: [
-    { id: "needCompanion", text: "Que una persona de confianza la acompañe.", flag: "needCompanion", feedback: "Tener apoyo puede hacer más fácil dar el primer paso." },
-    { id: "needClearLanguage", text: "Que le expliquen las cosas con palabras sencillas.", flag: "needClearLanguage", feedback: "Puede preguntar cuando algo no se entienda." },
-    { id: "needPause", text: "Poder pedir una pausa cuando esté nerviosa.", flag: "needPause", feedback: "No necesita contarlo todo de una vez." },
-    { id: "needProtection", text: "Saber cómo pueden protegerla en el instituto.", flag: "needProtection", feedback: "Marina puede explicar qué medidas se pueden valorar en el centro." },
-  ],
-  next: "needs-response",
-};
+card(
+  "needs-menu",
+  "Apoyos",
+  "¿Qué necesita Sara para hablar?",
+  "Puede ir acompañada por una persona de confianza, pedir explicaciones con palabras sencillas, hacer una pausa si se pone nerviosa y preguntar qué medidas de protección puede ofrecer el instituto.",
+  "needs-response",
+);
 
 say(
   "needs-response",
@@ -697,8 +687,8 @@ say(
 
 card(
   "chapter5-card",
+  null,
   "Capítulo 5",
-  "Guardar pruebas sin hacer daño",
   "Con Marina. Un paso cada vez.",
   "ch5-1",
 );
@@ -710,36 +700,11 @@ say(
   "ch5-minigame",
 );
 
-minigame(
+card(
   "ch5-minigame",
+  "Información útil",
   "Organiza la información",
-  "Selecciona la información que puede resultar útil sin generar nuevas copias de contenido íntimo.",
-  [
-    {
-      id: "messages",
-      text: "Conversación con comentarios ofensivos, fechas y nombres de usuario.",
-      correct: true,
-      feedback: "Útil. Permite documentar lo ocurrido sin reenviar la imagen.",
-    },
-    {
-      id: "link",
-      text: "Nombre del grupo o enlace donde se publicó el contenido.",
-      correct: true,
-      feedback: "Útil. Ayuda a identificar dónde se está difundiendo.",
-    },
-    {
-      id: "download",
-      text: "Descargar la fotografía íntima y reenviarla a otras personas para demostrar lo sucedido.",
-      correct: false,
-      feedback: "No. No necesitas crear nuevas copias ni reenviar el contenido.",
-    },
-    {
-      id: "witnesses",
-      text: "Información sobre compañeros que presenciaron los hechos.",
-      correct: true,
-      feedback: "Útil. Puede ayudar a reconstruir lo ocurrido.",
-    },
-  ],
+  "Guarda conversaciones con comentarios ofensivos, fechas y nombres de usuario; el nombre del grupo o enlace donde se publicó; e información de quienes lo vieron. No hace falta descargar ni reenviar contenido íntimo para pedir ayuda.",
   "ch5-2",
 );
 
@@ -779,8 +744,8 @@ narrate(
 
 card(
   "chapter6-card",
+  null,
   "Capítulo 6",
-  "Contarlo a tu ritmo",
   "Días después. Una sala tranquila.",
   "ch6-1",
 );
