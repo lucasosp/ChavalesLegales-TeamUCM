@@ -954,17 +954,22 @@ export default function SalaEsperaAlumnos({
           100% { transform: scale(1); opacity: 1; }
         }
 
-        @keyframes popAvatar {
+        @keyframes dropInAvatar {
           0% {
-            transform: scale(0.3) translateY(24px);
+            transform: translateY(-90px) scale(0.92, 1.08);
             opacity: 0;
           }
-          70% {
-            transform: scale(1.08) translateY(-4px);
+          50% {
             opacity: 1;
           }
+          65% {
+            transform: translateY(7px) scale(1.07, 0.93);
+          }
+          82% {
+            transform: translateY(-3px) scale(0.98, 1.02);
+          }
           100% {
-            transform: scale(1) translateY(0);
+            transform: translateY(0) scale(1);
             opacity: 1;
           }
         }
@@ -974,8 +979,10 @@ export default function SalaEsperaAlumnos({
           50% { transform: translateY(-3px); }
         }
 
+        .anim-drop-avatar,
         .anim-pop-avatar {
-          animation: popAvatar 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+          animation: dropInAvatar 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+          will-change: transform, opacity;
         }
 
         .anim-name-float {
@@ -1474,7 +1481,8 @@ export default function SalaEsperaAlumnos({
                   {/* --- AVATAR GEOMÉTRICO (ESTILO DUOLINGO SIN CONTORNOS) --- */}
                   {student && (
                     <g
-                      className="anim-pop-avatar"
+                      key={`avatar-seated-${student.id || student.player_id || seat.id}`}
+                      className="anim-drop-avatar"
                       style={{ transformOrigin: `${x}px ${y}px` }}
                     >
                       <AvatarGeometrico
