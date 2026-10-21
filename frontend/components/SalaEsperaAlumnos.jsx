@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import AvatarGeometrico from './AvatarGeometrico'
 
 const TOTAL_SEATS = 12
 
@@ -18,6 +19,40 @@ const NOMBRES_MOCK = [
   'Carla N.',
   'Pablo J.',
 ]
+
+const OPCIONES_PELO = [
+  { label: 'Castaño', hex: '#4A2810' },
+  { label: 'Rubio', hex: '#FACC15' },
+  { label: 'Oscuro', hex: '#18181B' },
+  { label: 'Pelirrojo', hex: '#B03921' },
+  { label: 'Verde', hex: '#86EFAC' },
+  { label: 'Rosa', hex: '#F472B6' },
+]
+
+const OPCIONES_ROPA = [
+  { label: 'Granate', hex: '#4A1A1C' },
+  { label: 'Verde bosque', hex: '#3D4A27' },
+  { label: 'Amarillo', hex: '#FACC15' },
+  { label: 'Verde claro', hex: '#86EFAC' },
+  { label: 'Naranja', hex: '#B03921' },
+  { label: 'Azul', hex: '#1E3A8A' },
+]
+
+// Genera un avatar aleatorio con la paleta de colores corporativa
+function generarAvatarAleatorio(nombre = 'Tú') {
+  const baseType = Math.floor(Math.random() * 3) + 1
+  const colorPelo = OPCIONES_PELO[Math.floor(Math.random() * OPCIONES_PELO.length)].hex
+  const tieneGorro = Math.random() > 0.5
+  const colorRopa = OPCIONES_ROPA[Math.floor(Math.random() * OPCIONES_ROPA.length)].hex
+
+  return {
+    nombre,
+    baseType,
+    colorPelo,
+    tieneGorro,
+    colorRopa,
+  }
+}
 
 // Coordenadas fijas para las 12 sillas en 3 filas de 4
 const SEAT_COORDS = [
@@ -39,22 +74,95 @@ const SEAT_COORDS = [
 ]
 
 export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
-  // Estado local para los alumnos en la sala de espera
-  const [students, setStudents] = useState([])
+  // Modal de personalización: cerrado al entrar (se genera uno random automáticamente estilo Kahoot)
+  const [mostrarPersonalizador, setMostrarPersonalizador] = useState(false)
 
-  // Simulación de entrada paulatina de alumnos cada 2-3 segundos
+  // Configuración del avatar del alumno actual (generado aleatoriamente al inicio)
+  const [miAvatar, setMiAvatar] = useState(() => generarAvatarAleatorio('Tú'))
+
+  // Estado local para los alumnos: el alumno actual ya ocupa la Silla 1 con su avatar aleatorio
+  const [students, setStudents] = useState(() => {
+    const avatarInicial = generarAvatarAleatorio('Tú')
+    return [
+      {
+        id: 'player-1',
+        nombre: avatarInicial.nombre,
+        seatIndex: 0,
+        baseType: avatarInicial.baseType,
+        colorPelo: avatarInicial.colorPelo,
+        tieneGorro: avatarInicial.tieneGorro,
+        colorRopa: avatarInicial.colorRopa,
+        isPlayer: true,
+      },
+    ]
+  })
+
+  // Sincronizar miAvatar con el avatar inicial colocado en el asiento 0
+  useEffect(() => {
+    if (students.length > 0 && students[0].isPlayer) {
+      setMiAvatar({
+        nombre: students[0].nombre,
+        baseType: students[0].baseType,
+        colorPelo: students[0].colorPelo,
+        tieneGorro: students[0].tieneGorro,
+        colorRopa: students[0].colorRopa,
+      })
+    }
+  }, [])
+
+  // Al confirmar el avatar modificado, actualiza el primer pupitre (asiento 0)
+  const confirmarMiAvatar = () => {
+    setMostrarPersonalizador(false)
+    setStudents((prev) => {
+      const alumnoJugador = {
+        id: 'player-1',
+        nombre: miAvatar.nombre || 'Tú',
+        seatIndex: 0,
+        baseType: miAvatar.baseType,
+        colorPelo: miAvatar.colorPelo,
+        tieneGorro: miAvatar.tieneGorro,
+        colorRopa: miAvatar.colorRopa,
+        isPlayer: true,
+      }
+      const sinAsientoCero = prev.filter((s) => s.seatIndex !== 0)
+      return [alumnoJugador, ...sinAsientoCero]
+    })
+  }
+
+  // Genera otro avatar aleatorio dentro del modal
+  const aleatorizarMiAvatar = () => {
+    const nuevo = generarAvatarAleatorio(miAvatar.nombre || 'Tú')
+    setMiAvatar(nuevo)
+  }
+
+  // Simulación de entrada paulatina de compañeros bots cada 2-3 segundos
   useEffect(() => {
     if (students.length >= TOTAL_SEATS) return
 
     const timer = setTimeout(() => {
       setStudents((prev) => {
         if (prev.length >= TOTAL_SEATS) return prev
-        const nextIndex = prev.length
+
+        // Buscar siguiente asiento libre
+        const asientosOcupados = prev.map((s) => s.seatIndex)
+        let siguienteAsiento = 0
+        for (let i = 0; i < TOTAL_SEATS; i++) {
+          if (!asientosOcupados.includes(i)) {
+            siguienteAsiento = i
+            break
+          }
+        }
+
+        // Generar alumno ficticio con avatar paramétrico aleatorio
         const nuevo = {
-          id: `alumno-${nextIndex + 1}`,
-          nombre: NOMBRES_MOCK[nextIndex] || `Alumno ${nextIndex + 1}`,
-          seatIndex: nextIndex,
-          avatarTipo: nextIndex % 6,
+          id: `bot-${siguienteAsiento + 1}`,
+          nombre: NOMBRES_MOCK[siguienteAsiento] || `Alumno ${siguienteAsiento + 1}`,
+          seatIndex: siguienteAsiento,
+          baseType: (siguienteAsiento % 3) + 1,
+          colorPelo: OPCIONES_PELO[siguienteAsiento % OPCIONES_PELO.length].hex,
+          tieneGorro: siguienteAsiento % 2 === 0,
+          colorRopa: OPCIONES_ROPA[(siguienteAsiento + 1) % OPCIONES_ROPA.length].hex,
+          isPlayer: false,
         }
         return [...prev, nuevo]
       })
@@ -64,14 +172,37 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
   }, [students.length])
 
   // Helpers para testing rápido
-  const reiniciarAula = () => setStudents([])
+  const reiniciarAula = () => {
+    // Mantener al jugador en el asiento 0 y vaciar el resto
+    const jugador = students.find((s) => s.isPlayer)
+    setStudents(jugador ? [jugador] : [])
+  }
+
   const llenarAula = () => {
-    const todos = SEAT_COORDS.map((seat, idx) => ({
-      id: `alumno-${idx + 1}`,
-      nombre: NOMBRES_MOCK[idx] || `Alumno ${idx + 1}`,
-      seatIndex: idx,
-      avatarTipo: idx % 6,
-    }))
+    const todos = SEAT_COORDS.map((seat, idx) => {
+      if (idx === 0) {
+        return {
+          id: 'player-1',
+          nombre: miAvatar.nombre || 'Tú',
+          seatIndex: 0,
+          baseType: miAvatar.baseType,
+          colorPelo: miAvatar.colorPelo,
+          tieneGorro: miAvatar.tieneGorro,
+          colorRopa: miAvatar.colorRopa,
+          isPlayer: true,
+        }
+      }
+      return {
+        id: `bot-${idx + 1}`,
+        nombre: NOMBRES_MOCK[idx] || `Alumno ${idx + 1}`,
+        seatIndex: idx,
+        baseType: (idx % 3) + 1,
+        colorPelo: OPCIONES_PELO[idx % OPCIONES_PELO.length].hex,
+        tieneGorro: idx % 2 === 0,
+        colorRopa: OPCIONES_ROPA[idx % OPCIONES_ROPA.length].hex,
+        isPlayer: false,
+      }
+    })
     setStudents(todos)
   }
 
@@ -247,6 +378,27 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
           transform: translateY(1px);
         }
 
+        .btn-avatar-edit {
+          background: #FACC15;
+          border: 2.5px solid #18181B;
+          padding: 6px 14px;
+          border-radius: 12px;
+          font-size: 12px;
+          font-weight: 800;
+          color: #18181B;
+          cursor: pointer;
+          box-shadow: 0 3px 0 #18181B;
+          transition: transform 0.1s ease, background 0.15s ease;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .btn-avatar-edit:hover {
+          background: #fed857;
+          transform: translateY(-1px);
+        }
+
         .btn-sala-volver {
           background: #4A1A1C;
           color: #FFFFFF;
@@ -301,9 +453,249 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
           color: #3D4A27;
         }
 
+        /* ==============================================================
+           MODAL DE PERSONALIZACIÓN DE AVATAR (ESTILO KAHOOT / DUOLINGO)
+           ============================================================== */
+        .avatar-modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(29, 4, 12, 0.78);
+          backdrop-filter: blur(6px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+          padding: 16px;
+        }
+
+        .avatar-modal-card {
+          background: #FFFFFF;
+          width: 100%;
+          max-width: 480px;
+          border-radius: 28px;
+          border: 4px solid #18181B;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 6px 0 #18181B;
+          overflow: hidden;
+          animation: popModal 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          display: flex;
+          flex-direction: column;
+        }
+
+        .modal-header {
+          background: #4A1A1C;
+          color: #FFFFFF;
+          padding: 16px 22px;
+          border-bottom: 3px solid #18181B;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .modal-title {
+          font-size: 20px;
+          font-weight: 900;
+          margin: 0;
+          color: #FFFFFF;
+        }
+
+        .modal-subtitle {
+          font-size: 13px;
+          color: #FACC15;
+          margin-top: 2px;
+          font-weight: 600;
+        }
+
+        .btn-modal-close {
+          background: rgba(255, 255, 255, 0.15);
+          border: 2px solid #FFFFFF;
+          color: #FFFFFF;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          font-size: 14px;
+          font-weight: 900;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background 0.15s ease, transform 0.1s ease;
+        }
+
+        .btn-modal-close:hover {
+          background: #B03921;
+          transform: scale(1.08);
+        }
+
+        .modal-body {
+          padding: 20px 24px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 16px;
+        }
+
+        .preview-box {
+          background: #FAF6EE;
+          border: 3px solid #18181B;
+          border-radius: 22px;
+          padding: 12px 24px 10px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 100%;
+          max-width: 240px;
+          box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+          position: relative;
+        }
+
+        .btn-randomize-pill {
+          background: #FACC15;
+          border: 2px solid #18181B;
+          color: #18181B;
+          font-size: 11px;
+          font-weight: 800;
+          padding: 5px 12px;
+          border-radius: 999px;
+          margin-top: 6px;
+          cursor: pointer;
+          box-shadow: 0 2px 0 #18181B;
+          transition: transform 0.1s ease, background 0.15s ease;
+        }
+
+        .btn-randomize-pill:hover {
+          background: #fed857;
+          transform: scale(1.05);
+        }
+
+        .selector-section {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .selector-label {
+          font-size: 12px;
+          font-weight: 800;
+          color: #4A1A1C;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+        }
+
+        .base-tabs-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 8px;
+          width: 100%;
+        }
+
+        .btn-base-tab {
+          background: #F4F1EA;
+          border: 2.5px solid #18181B;
+          border-radius: 14px;
+          padding: 8px 4px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+          cursor: pointer;
+          font-weight: 800;
+          font-size: 11px;
+          color: #18181B;
+          transition: transform 0.1s ease, background 0.15s ease;
+        }
+
+        .btn-base-tab.active {
+          background: #FACC15;
+          box-shadow: 0 3px 0 #18181B;
+          transform: translateY(-2px);
+        }
+
+        .swatches-row {
+          display: flex;
+          gap: 10px;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+
+        .btn-swatch {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border: 3px solid #18181B;
+          cursor: pointer;
+          box-shadow: 0 2px 0 #18181B;
+          transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .btn-swatch.active {
+          transform: scale(1.18);
+          border-color: #18181B;
+          box-shadow: 0 4px 0 #18181B;
+        }
+
+        .btn-toggle-hat {
+          background: #F4F1EA;
+          border: 2.5px solid #18181B;
+          border-radius: 14px;
+          padding: 10px 14px;
+          font-weight: 800;
+          font-size: 13px;
+          color: #18181B;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          width: 100%;
+          transition: transform 0.1s ease, background 0.15s ease;
+        }
+
+        .btn-toggle-hat.active {
+          background: #86EFAC;
+          box-shadow: 0 3px 0 #18181B;
+        }
+
+        .btn-confirm-avatar {
+          background: #3D4A27;
+          color: #FFFFFF;
+          border: 3px solid #18181B;
+          border-radius: 16px;
+          padding: 12px 24px;
+          font-size: 15px;
+          font-weight: 800;
+          cursor: pointer;
+          width: 100%;
+          box-shadow: 0 4px 0 #18181B;
+          transition: transform 0.1s ease, background 0.15s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          margin-top: 4px;
+        }
+
+        .btn-confirm-avatar:hover {
+          background: #4D5E33;
+          transform: translateY(-2px);
+        }
+
+        .btn-confirm-avatar:active {
+          transform: translateY(2px);
+          box-shadow: 0 1px 0 #18181B;
+        }
+
         @keyframes pulseAnim {
           0%, 100% { transform: scale(1); opacity: 1; }
           50% { transform: scale(1.3); opacity: 0.6; }
+        }
+
+        @keyframes popModal {
+          0% { transform: scale(0.85); opacity: 0; }
+          100% { transform: scale(1); opacity: 1; }
         }
 
         @keyframes popAvatar {
@@ -335,6 +727,164 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
         }
       `}</style>
 
+      {/* ==============================================================
+          MODAL DE PERSONALIZACIÓN DE AVATAR (ABIERTO SOLO SI EL USUARIO QUIERE)
+          ============================================================== */}
+      {mostrarPersonalizador && (
+        <div className="avatar-modal-overlay" onClick={() => setMostrarPersonalizador(false)}>
+          <div className="avatar-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div>
+                <h2 className="modal-title">🎨 Personaliza tu Personaje</h2>
+                <p className="modal-subtitle">Modifica tu estilo o genera otro aleatorio</p>
+              </div>
+              <button
+                type="button"
+                className="btn-modal-close"
+                onClick={() => setMostrarPersonalizador(false)}
+                title="Cerrar sin guardar"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="modal-body">
+              {/* Previsualización en tiempo real y botón de re-roll aleatorio */}
+              <div className="preview-box">
+                <AvatarGeometrico
+                  standalone
+                  size={120}
+                  baseType={miAvatar.baseType}
+                  colorPelo={miAvatar.colorPelo}
+                  tieneGorro={miAvatar.tieneGorro}
+                  colorRopa={miAvatar.colorRopa}
+                />
+                <button
+                  type="button"
+                  className="btn-randomize-pill"
+                  onClick={aleatorizarMiAvatar}
+                  title="Generar otro avatar al azar estilo Kahoot"
+                >
+                  🎲 Generar aleatorio
+                </button>
+              </div>
+
+              {/* Selector de tipo de base (1, 2 o 3) */}
+              <div className="selector-section">
+                <span className="selector-label">1. Elige tu base de personaje</span>
+                <div className="base-tabs-grid">
+                  <button
+                    type="button"
+                    className={`btn-base-tab ${miAvatar.baseType === 1 ? 'active' : ''}`}
+                    onClick={() => setMiAvatar((prev) => ({ ...prev, baseType: 1 }))}
+                  >
+                    <span>Curioso</span>
+                    <span style={{ fontSize: '10px', color: '#6B7280' }}>Base 1</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`btn-base-tab ${miAvatar.baseType === 2 ? 'active' : ''}`}
+                    onClick={() => setMiAvatar((prev) => ({ ...prev, baseType: 2 }))}
+                  >
+                    <span>Skater</span>
+                    <span style={{ fontSize: '10px', color: '#6B7280' }}>Base 2</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`btn-base-tab ${miAvatar.baseType === 3 ? 'active' : ''}`}
+                    onClick={() => setMiAvatar((prev) => ({ ...prev, baseType: 3 }))}
+                  >
+                    <span>Sabio</span>
+                    <span style={{ fontSize: '10px', color: '#6B7280' }}>Base 3</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Controles dinámicos según el baseType seleccionado */}
+              <div className="selector-section">
+                {miAvatar.baseType === 1 && (
+                  <div>
+                    <span className="selector-label" style={{ display: 'block', marginBottom: '8px' }}>
+                      2. Color de pelo
+                    </span>
+                    <div className="swatches-row">
+                      {OPCIONES_PELO.map((pelo) => (
+                        <button
+                          key={pelo.hex}
+                          type="button"
+                          className={`btn-swatch ${miAvatar.colorPelo === pelo.hex ? 'active' : ''}`}
+                          style={{ background: pelo.hex }}
+                          title={pelo.label}
+                          onClick={() => setMiAvatar((prev) => ({ ...prev, colorPelo: pelo.hex }))}
+                        >
+                          {miAvatar.colorPelo === pelo.hex && (
+                            <span style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: 'bold' }}>✓</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {miAvatar.baseType === 2 && (
+                  <div>
+                    <span className="selector-label" style={{ display: 'block', marginBottom: '8px' }}>
+                      2. Accesorio de cabeza
+                    </span>
+                    <button
+                      type="button"
+                      className={`btn-toggle-hat ${miAvatar.tieneGorro ? 'active' : ''}`}
+                      onClick={() => setMiAvatar((prev) => ({ ...prev, tieneGorro: !prev.tieneGorro }))}
+                    >
+                      <span>{miAvatar.tieneGorro ? '🧢 Con gorra hacia atrás' : '✂️ Sin gorra (Pelo moderno)'}</span>
+                      <span style={{ fontSize: '11px', fontWeight: 'bold' }}>
+                        {miAvatar.tieneGorro ? '(Puesto)' : '(Quitado)'}
+                      </span>
+                    </button>
+                  </div>
+                )}
+
+                {miAvatar.baseType === 3 && (
+                  <div>
+                    <span className="selector-label" style={{ display: 'block', marginBottom: '8px' }}>
+                      2. Color de sudadera
+                    </span>
+                    <div className="swatches-row">
+                      {OPCIONES_ROPA.map((ropa) => (
+                        <button
+                          key={ropa.hex}
+                          type="button"
+                          className={`btn-swatch ${miAvatar.colorRopa === ropa.hex ? 'active' : ''}`}
+                          style={{ background: ropa.hex }}
+                          title={ropa.label}
+                          onClick={() => setMiAvatar((prev) => ({ ...prev, colorRopa: ropa.hex }))}
+                        >
+                          {miAvatar.colorRopa === ropa.hex && (
+                            <span style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: 'bold' }}>✓</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Botón de confirmación */}
+              <button
+                type="button"
+                className="btn-confirm-avatar"
+                onClick={confirmarMiAvatar}
+              >
+                <span>Guardar cambios</span>
+                <span>✨</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Contenedor blanco principal de la sala */}
       <div className="sala-card-container">
         {/* Cabecera superior con estado y PIN */}
@@ -354,7 +904,7 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
           </div>
         </div>
 
-        {/* Barra de progreso y acciones de simulación */}
+        {/* Barra de progreso y acciones */}
         <div className="sala-subbar">
           <div className="sala-counter-wrap">
             <span className="sala-counter-text">
@@ -369,6 +919,14 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
           </div>
 
           <div className="sala-actions">
+            <button
+              type="button"
+              className="btn-avatar-edit"
+              onClick={() => setMostrarPersonalizador(true)}
+              title="Personalizar mi personaje"
+            >
+              🎨 Personalizar mi avatar
+            </button>
             <button
               type="button"
               className="btn-sala-pill"
@@ -415,28 +973,20 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
             </defs>
 
             {/* SUELO Y PARED POLIGONAL DEL AULA */}
-            {/* Pared trasera con paneles */}
             <rect x="0" y="0" width="960" height="130" fill="#EFE8DD" />
             <line x1="0" y1="130" x2="960" y2="130" stroke="#4A1A1C" strokeWidth="6" />
 
-            {/* Suelo poligonal estilo Duolingo con baldosas sutiles */}
             <rect x="0" y="133" width="960" height="427" fill="#F8F4EC" />
-            {/* Líneas geométricas de la perspectiva del suelo */}
             <line x1="0" y1="260" x2="960" y2="260" stroke="#ECE2D0" strokeWidth="2" strokeDasharray="6 6" />
             <line x1="0" y1="395" x2="960" y2="395" stroke="#ECE2D0" strokeWidth="2" strokeDasharray="6 6" />
             <line x1="240" y1="133" x2="160" y2="560" stroke="#EFE5D5" strokeWidth="1.5" />
             <line x1="480" y1="133" x2="480" y2="560" stroke="#EFE5D5" strokeWidth="1.5" />
             <line x1="720" y1="133" x2="800" y2="560" stroke="#EFE5D5" strokeWidth="1.5" />
 
-            {/* ==========================================================
-                PIZARRA DIGITAL FRONTAL
-               ========================================================== */}
+            {/* PIZARRA DIGITAL FRONTAL */}
             <g transform="translate(240, 18)">
-              {/* Marco de madera de la pizarra */}
               <rect x="0" y="0" width="480" height="96" rx="14" fill="#3D4A27" stroke="#18181B" strokeWidth="3" />
-              {/* Superficie pizarra */}
               <rect x="10" y="10" width="460" height="76" rx="10" fill="#1F2E22" />
-              {/* Título y estado en la pizarra */}
               <text x="240" y="34" textAnchor="middle" fill="#FACC15" fontSize="13" fontWeight="800" letterSpacing="2">
                 CHAVALES LEGALES · AULA 4B
               </text>
@@ -453,34 +1003,25 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
 
             {/* DECORACIÓN IZQUIERDA: MESA DE PROFESOR CON MARTILLO DE JUEZ */}
             <g transform="translate(40, 36)">
-              {/* Mesa docente */}
               <polygon points="0,50 140,50 130,85 10,85" fill="#DDD2C0" stroke="#18181B" strokeWidth="2.5" />
               <polygon points="10,85 130,85 125,92 15,92" fill="#C5B7A1" stroke="#18181B" strokeWidth="2.5" />
-              {/* Pila de libros legales */}
               <rect x="25" y="40" width="34" height="10" rx="2" fill="#4A1A1C" stroke="#18181B" strokeWidth="1.5" />
               <rect x="27" y="32" width="30" height="9" rx="2" fill="#3D4A27" stroke="#18181B" strokeWidth="1.5" />
               <rect x="29" y="25" width="26" height="8" rx="2" fill="#FACC15" stroke="#18181B" strokeWidth="1.5" />
-              {/* Martillo de juez (Legal Gavel) poligonal */}
               <g transform="translate(85, 34)">
-                {/* Base sonora */}
                 <ellipse cx="20" cy="16" rx="14" ry="4" fill="#4A1A1C" stroke="#18181B" strokeWidth="1.5" />
-                {/* Mango */}
                 <line x1="8" y1="14" x2="28" y2="4" stroke="#FACC15" strokeWidth="3" strokeLinecap="round" />
-                {/* Cabeza del martillo */}
                 <rect x="22" y="-2" width="12" height="7" rx="2" fill="#4A1A1C" stroke="#18181B" strokeWidth="1.5" transform="rotate(-30 26 2)" />
               </g>
             </g>
 
             {/* DECORACIÓN DERECHA: PLANTA POLIGONAL Y RELOJ */}
             <g transform="translate(840, 28)">
-              {/* Reloj de pared octogonal */}
               <polygon points="20,0 40,0 52,12 52,32 40,44 20,44 8,32 8,12" fill="#3D4A27" stroke="#18181B" strokeWidth="2.5" />
               <circle cx="30" cy="22" r="14" fill="#FFFFFF" />
               <line x1="30" y1="22" x2="30" y2="13" stroke="#18181B" strokeWidth="2" strokeLinecap="round" />
               <line x1="30" y1="22" x2="37" y2="22" stroke="#FACC15" strokeWidth="2" strokeLinecap="round" />
-              {/* Maceta poligonal con planta */}
               <polygon points="12,85 48,85 42,108 18,108" fill="#4A1A1C" stroke="#18181B" strokeWidth="2" />
-              {/* Hojas geométricas */}
               <polygon points="30,85 15,65 30,75" fill="#3D4A27" />
               <polygon points="30,85 45,65 30,75" fill="#86EFAC" />
               <polygon points="30,75 30,55 35,70" fill="#3D4A27" />
@@ -495,22 +1036,24 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
               const { x, y } = seat
 
               return (
-                <g key={`seat-${seat.id}`} id={`desk-group-${seat.id}`}>
+                <g
+                  key={`seat-${seat.id}`}
+                  id={`desk-group-${seat.id}`}
+                  onClick={student && student.isPlayer ? () => setMostrarPersonalizador(true) : undefined}
+                  style={{ cursor: student && student.isPlayer ? 'pointer' : 'default' }}
+                >
                   {/* --- SILLA VACÍA (SIEMPRE DETRÁS DEL PUPITRE) --- */}
                   <g>
-                    {/* Respaldo de la silla */}
                     <polygon
                       points={`${x - 22},${y - 28} ${x + 22},${y - 28} ${x + 18},${y - 4} ${x - 18},${y - 4}`}
                       fill={student ? '#3D4A27' : '#D8D1C4'}
                       stroke="#18181B"
                       strokeWidth="2.2"
                     />
-                    {/* Faceta superior con brillo */}
                     <polygon
                       points={`${x - 22},${y - 28} ${x + 22},${y - 28} ${x + 18},${y - 22} ${x - 18},${y - 22}`}
                       fill={student ? '#4D5E33' : '#E8E2D6'}
                     />
-                    {/* Asiento */}
                     <polygon
                       points={`${x - 18},${y - 4} ${x + 18},${y - 4} ${x + 14},${y + 8} ${x - 14},${y + 8}`}
                       fill={student ? '#2A3519' : '#C2BAAC'}
@@ -519,27 +1062,29 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
                     />
                   </g>
 
-                  {/* --- AVATAR POLIGONAL DEL ALUMNO (SI ESTÁ SENTADO) --- */}
+                  {/* --- AVATAR GEOMÉTRICO (ESTILO DUOLINGO SIN CONTORNOS) --- */}
                   {student && (
                     <g
                       className="anim-pop-avatar"
                       style={{ transformOrigin: `${x}px ${y}px` }}
                     >
-                      {/* Cuerpo / Sudadera poligonal */}
-                      {renderAvatarBody(x, y, student.avatarTipo)}
-
-                      {/* Cabeza poligonal y cara Duolingo */}
-                      {renderAvatarHead(x, y, student.avatarTipo)}
+                      <AvatarGeometrico
+                        standalone={false}
+                        x={x}
+                        y={y}
+                        baseType={student.baseType || 1}
+                        colorPelo={student.colorPelo}
+                        tieneGorro={student.tieneGorro}
+                        colorRopa={student.colorRopa}
+                      />
                     </g>
                   )}
 
-                  {/* --- PUPITRE DE MADERA POLIGONAL (EN FRENTE DEL ALUMNO) --- */}
+                  {/* --- PUPITRE DE MADERA (EN FRENTE DEL ALUMNO) --- */}
                   <g filter="url(#deskShadow)">
-                    {/* Patas metálicas oscuras */}
                     <line x1={x - 46} y1={y + 40} x2={x - 46} y2={y + 60} stroke="#18181B" strokeWidth="3.5" strokeLinecap="round" />
                     <line x1={x + 46} y1={y + 40} x2={x + 46} y2={y + 60} stroke="#18181B" strokeWidth="3.5" strokeLinecap="round" />
 
-                    {/* Superficie superior del pupitre (Trapecio con perspectiva) */}
                     <polygon
                       points={`${x - 64},${y + 4} ${x + 64},${y + 4} ${x + 54},${y + 36} ${x - 54},${y + 36}`}
                       fill="#FAF7F0"
@@ -547,7 +1092,6 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
                       strokeWidth="2.5"
                     />
 
-                    {/* Canto frontal biselado */}
                     <polygon
                       points={`${x - 54},${y + 36} ${x + 54},${y + 36} ${x + 50},${y + 44} ${x - 50},${y + 44}`}
                       fill="#DFD7C7"
@@ -558,7 +1102,6 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
 
                   {/* --- ELEMENTO ENCIMA DEL PUPITRE (VACÍO O CON UTENSILIOS) --- */}
                   {!student ? (
-                    // Indicador de pupitre vacío
                     <g>
                       <rect
                         x={x - 30}
@@ -583,14 +1126,13 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
                       </text>
                     </g>
                   ) : (
-                    // Manos del alumno y utensilio sobre el pupitre
                     <g>
-                      {/* Manos apoyadas en la mesa */}
-                      <ellipse cx={x - 24} cy={y + 16} rx="4.5" ry="3.5" fill="#FCD5B5" stroke="#18181B" strokeWidth="1.2" />
-                      <ellipse cx={x + 24} cy={y + 16} rx="4.5" ry="3.5" fill="#FCD5B5" stroke="#18181B" strokeWidth="1.2" />
+                      {/* Manos apoyadas en la mesa estilo flat */}
+                      <ellipse cx={x - 20} cy={y + 14} rx="4.5" ry="3.5" fill="#FDE0C5" />
+                      <ellipse cx={x + 20} cy={y + 14} rx="4.5" ry="3.5" fill="#FDE0C5" />
 
-                      {/* Objeto sobre el pupitre según avatarTipo */}
-                      {renderDeskItem(x, y, student.avatarTipo)}
+                      {/* Utensilio sobre el pupitre */}
+                      {renderDeskItem(x, y, seat.id)}
                     </g>
                   )}
 
@@ -600,31 +1142,33 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
                       className="anim-name-float"
                       style={{ transformOrigin: `${x}px ${y - 60}px` }}
                     >
-                      {/* Fondo blanco puro con borde grueso negro */}
                       <rect
-                        x={x - 48}
-                        y={y - 72}
-                        width="96"
-                        height="22"
-                        rx="11"
-                        fill="#FFFFFF"
+                        x={x - (student.isPlayer ? 54 : 48)}
+                        y={y - 74}
+                        width={student.isPlayer ? 108 : 96}
+                        height={23}
+                        rx={11.5}
+                        fill={student.isPlayer ? '#FACC15' : '#FFFFFF'}
                         stroke="#18181B"
                         strokeWidth="2.2"
                         filter="url(#cardShadow)"
                       />
-                      {/* Punto verde de conexión */}
-                      <circle cx={x - 36} cy={y - 61} r="3.5" fill="#22C55E" />
-                      {/* Nombre del alumno */}
+                      <circle
+                        cx={x - (student.isPlayer ? 40 : 36)}
+                        cy={y - 62.5}
+                        r={3.5}
+                        fill={student.isPlayer ? '#4A1A1C' : '#22C55E'}
+                      />
                       <text
-                        x={x + 6}
-                        y={y - 57}
+                        x={x + 5}
+                        y={y - 58.5}
                         textAnchor="middle"
                         fontSize="11"
                         fontWeight="800"
                         fill="#18181B"
                         letterSpacing="0.02em"
                       >
-                        {student.nombre}
+                        {student.isPlayer ? `⭐ ${student.nombre}` : student.nombre}
                       </text>
                     </g>
                   )}
@@ -650,157 +1194,10 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
   )
 }
 
-// ============================================================================
-// HELPERS SVG POLIGONALES PARA AVATARES (ESTILO DUOLINGO)
-// ============================================================================
-
-function renderAvatarBody(x, y, tipo) {
-  // Paleta corporativa: Granate (#4A1A1C), Verde oliva (#3D4A27), Amarillo (#FACC15), Verde claro (#86EFAC)
-  const COLORES_TORSO = [
-    { base: '#4A1A1C', sombra: '#320F11', detalle: '#FACC15' }, // Granate
-    { base: '#3D4A27', sombra: '#273117', detalle: '#86EFAC' }, // Verde oliva
-    { base: '#FACC15', sombra: '#D4A808', detalle: '#4A1A1C' }, // Amarillo
-    { base: '#86EFAC', sombra: '#5BC285', detalle: '#3D4A27' }, // Verde claro
-    { base: '#4A1A1C', sombra: '#320F11', detalle: '#86EFAC' }, // Granate + verde
-    { base: '#3D4A27', sombra: '#273117', detalle: '#FACC15' }, // Verde + amarillo
-  ]
-
-  const color = COLORES_TORSO[tipo % COLORES_TORSO.length]
-
-  return (
-    <g>
-      {/* Torso poligonal (trapecio) */}
-      <polygon
-        points={`${x - 26},${y + 4} ${x + 26},${y + 4} ${x + 20},${y - 24} ${x - 20},${y - 24}`}
-        fill={color.base}
-        stroke="#18181B"
-        strokeWidth="2.2"
-      />
-      {/* Sombra lateral para efecto facetado 2.5D */}
-      <polygon
-        points={`${x + 10},${y + 4} ${x + 26},${y + 4} ${x + 20},${y - 24} ${x + 8},${y - 24}`}
-        fill={color.sombra}
-      />
-      {/* Cuello / cremallera */}
-      <line x1={x} y1={y - 24} x2={x} y2={y - 6} stroke={color.detalle} strokeWidth="2.5" strokeLinecap="round" />
-    </g>
-  )
-}
-
-function renderAvatarHead(x, y, tipo) {
-  // Cuello
-  const cuello = (
-    <polygon
-      points={`${x - 6},${y - 24} ${x + 6},${y - 24} ${x + 4},${y - 19} ${x - 4},${y - 19}`}
-      fill="#FCD5B5"
-      stroke="#18181B"
-      strokeWidth="1.5"
-    />
-  )
-
-  // Cara poligonal geométrica
-  const cara = (
-    <g>
-      {cuello}
-      <polygon
-        points={`${x - 16},${y - 36} ${x - 12},${y - 22} ${x + 12},${y - 22} ${x + 16},${y - 36} ${x + 10},${y - 48} ${x - 10},${y - 48}`}
-        fill="#FDE0C5"
-        stroke="#18181B"
-        strokeWidth="2"
-      />
-      {/* Ojos estilo Duolingo (círculos oscuros con brillo blanco) */}
-      <circle cx={x - 6} cy={y - 34} r="2.8" fill="#18181B" />
-      <circle cx={x - 5.2} cy={y - 35} r="0.9" fill="#FFFFFF" />
-      <circle cx={x + 6} cy={y - 34} r="2.8" fill="#18181B" />
-      <circle cx={x + 6.8} cy={y - 35} r="0.9" fill="#FFFFFF" />
-      {/* Sonrisa amigable */}
-      <path
-        d={`M ${x - 4} ${y - 27} Q ${x} ${y - 24} ${x + 4} ${y - 27}`}
-        stroke="#18181B"
-        strokeWidth="1.8"
-        fill="none"
-        strokeLinecap="round"
-      />
-      {/* Mejillas sonrosadas */}
-      <ellipse cx={x - 9} cy={y - 29} rx="2.5" ry="1.5" fill="#F43F5E" opacity="0.45" />
-      <ellipse cx={x + 9} cy={y - 29} rx="2.5" ry="1.5" fill="#F43F5E" opacity="0.45" />
-    </g>
-  )
-
-  // Peinado o accesorios distintivos según el tipo
-  switch (tipo) {
-    case 0:
-      // Moño alto / coleta poligonal con detalle amarillo
-      return (
-        <g>
-          {cara}
-          <polygon points={`${x - 14},${y - 44} ${x + 14},${y - 44} ${x + 12},${y - 38} ${x - 12},${y - 38}`} fill="#4A2810" stroke="#18181B" strokeWidth="1.8" />
-          <circle cx={x} cy={y - 53} r="7" fill="#4A2810" stroke="#18181B" strokeWidth="2" />
-          <rect x={x - 4} y={y - 47} width="8" height="3" rx="1.5" fill="#FACC15" />
-        </g>
-      )
-    case 1:
-      // Pelo corto angular con gafas poligonales
-      return (
-        <g>
-          {cara}
-          <polygon points={`${x - 14},${y - 46} ${x - 6},${y - 52} ${x + 8},${y - 50} ${x + 14},${y - 42} ${x - 12},${y - 42}`} fill="#18181B" />
-          {/* Gafas poligonales */}
-          <rect x={x - 11} y={y - 38} width="9" height="7" rx="1.5" fill="none" stroke="#18181B" strokeWidth="2" />
-          <rect x={x + 2} y={y - 38} width="9" height="7" rx="1.5" fill="none" stroke="#18181B" strokeWidth="2" />
-          <line x1={x - 2} y1={y - 35} x2={x + 2} y2={y - 35} stroke="#18181B" strokeWidth="2" />
-        </g>
-      )
-    case 2:
-      // Gorra verde bosque hacia atrás con visera amarilla
-      return (
-        <g>
-          {cara}
-          <polygon points={`${x - 14},${y - 42} ${x + 14},${y - 42} ${x + 12},${y - 52} ${x - 12},${y - 52}`} fill="#3D4A27" stroke="#18181B" strokeWidth="2" />
-          <polygon points={`${x - 16},${y - 42} ${x - 6},${y - 42} ${x - 10},${y - 45}`} fill="#FACC15" stroke="#18181B" strokeWidth="1.8" />
-          <circle cx={x} cy={y - 52} r="2" fill="#FACC15" />
-        </g>
-      )
-    case 3:
-      // Cascos de gamer amarillos y diadema
-      return (
-        <g>
-          {cara}
-          {/* Diadema de cascos */}
-          <path d={`M ${x - 16} ${y - 34} Q ${x} ${y - 55} ${x + 16} ${y - 34}`} stroke="#3D4A27" strokeWidth="3" fill="none" />
-          {/* Almohadillas amarillas */}
-          <rect x={x - 19} y={y - 39} width="5" height="10" rx="2" fill="#FACC15" stroke="#18181B" strokeWidth="1.5" />
-          <rect x={x + 14} y={y - 39} width="5" height="10" rx="2" fill="#FACC15" stroke="#18181B" strokeWidth="1.5" />
-          {/* Flequillo */}
-          <polygon points={`${x - 10},${y - 48} ${x},${y - 42} ${x + 10},${y - 48}`} fill="#6B3A1C" />
-        </g>
-      )
-    case 4:
-      // Melena bob geométrica granate
-      return (
-        <g>
-          <polygon points={`${x - 18},${y - 46} ${x + 18},${y - 46} ${x + 18},${y - 26} ${x - 18},${y - 26}`} fill="#53272B" stroke="#18181B" strokeWidth="2" />
-          {cara}
-          <polygon points={`${x - 14},${y - 48} ${x + 6},${y - 44} ${x - 10},${y - 40}`} fill="#53272B" />
-        </g>
-      )
-    default:
-      // Pelo rizado / peinado spiky con mechones poligonales
-      return (
-        <g>
-          {cara}
-          <polygon points={`${x - 14},${y - 46} ${x - 7},${y - 54} ${x},${y - 47} ${x + 7},${y - 55} ${x + 14},${y - 46}`} fill="#2D1810" stroke="#18181B" strokeWidth="1.8" />
-        </g>
-      )
-  }
-}
-
-function renderDeskItem(x, y, tipo) {
-  // 3 tipos de objetos sobre el pupitre: Mini portátil, libreta con lápiz, o tablet legal
-  const itemVariant = tipo % 3
+function renderDeskItem(x, y, id) {
+  const itemVariant = id % 3
 
   if (itemVariant === 0) {
-    // Portátil abierto con pantalla verde clara
     return (
       <g>
         <polygon points={`${x - 14},${y + 7} ${x + 14},${y + 7} ${x + 11},${y + 24} ${x - 11},${y + 24}`} fill="#18181B" />
@@ -810,7 +1207,6 @@ function renderDeskItem(x, y, tipo) {
   }
 
   if (itemVariant === 1) {
-    // Libreta blanca y lápiz amarillo
     return (
       <g>
         <rect
@@ -829,7 +1225,6 @@ function renderDeskItem(x, y, tipo) {
     )
   }
 
-  // Tablet con sello legal
   return (
     <g>
       <rect x={x - 16} y={y + 10} width="32" height="19" rx="3" fill="#4A1A1C" stroke="#18181B" strokeWidth="1.5" />
@@ -840,4 +1235,3 @@ function renderDeskItem(x, y, tipo) {
     </g>
   )
 }
-
