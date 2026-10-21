@@ -2,7 +2,7 @@
  * End-to-end smoke test for "No soy yo".
  *
  * Exercises the cyberbullying story: chat discovery, evidence handling,
- * platform reporting, the bystander perspective, the proof minigame, the
+ * platform reporting, the bystander perspective, the proof guidance, the
  * ending router, and the rights panel.
  */
 import { JSDOM } from "jsdom";
@@ -124,22 +124,6 @@ function finishChat(expectedTitle) {
   app.advance();
 }
 
-function handleMinigame() {
-  assert.equal(shown("[data-minigame]"), true, "minigame should be visible");
-  assert.equal(el("[data-minigame-title]").textContent, "Qué hago con las pruebas");
-
-  for (const id of ["capturas", "url", "testigos"]) {
-    const card = el(`[data-card-id="${id}"]`);
-    assert.ok(card, `minigame card ${id} missing`);
-    card.click();
-  }
-
-  el("[data-minigame-check]").click();
-  assert.equal(shown("[data-minigame-feedback]"), true, "feedback should appear");
-  assert.equal(el("[data-minigame-continue]").hidden, false, "continue should appear");
-  el("[data-minigame-continue]").click();
-}
-
 try {
   app.start();
 
@@ -150,7 +134,8 @@ try {
   assert.equal(el("[data-chat-title]").textContent, "4.º ESO | Los de siempre");
   app.view.skipTyping();
   assert.match(el("[data-chat-log]").textContent, /una que se ha hecho con tu nombre/);
-  assert.match(el("[data-chat-log]").textContent, /Publicación con contenido editado no mostrada/);
+  assert.equal(el(".censored-preview").getAttribute("role"), "img");
+  assert.match(el(".censored-preview-art").src, /censored-preview\.svg/);
   app.advance();
 
   assert.equal(pump({ stopAtChat: true }), "chat");
@@ -161,13 +146,13 @@ try {
   choose("Guardar capturas");
 
   assert.equal(pump(), "interstitial");
-  handleInterstitial("La bola de nieve");
+  handleInterstitial("Capítulo 1");
 
   assert.equal(pump(), "choice");
   choose("Reportar la cuenta");
 
   assert.equal(pump(), "interstitial");
-  handleInterstitial("Ahora eres Hugo");
+  handleInterstitial("Capítulo 2");
 
   assert.equal(pump({ stopAtChat: true }), "chat");
   assert.equal(el("[data-character]").dataset.character, "hugo");
@@ -180,13 +165,13 @@ try {
   finishChat("Sergio");
 
   assert.equal(pump(), "interstitial");
-  handleInterstitial("Las pruebas no se reenvían");
-
-  assert.equal(pump(), "minigame");
-  handleMinigame();
+  handleInterstitial("Capítulo 3");
 
   assert.equal(pump(), "interstitial");
-  handleInterstitial("No estás solo");
+  handleInterstitial("Qué hago con las pruebas");
+
+  assert.equal(pump(), "interstitial");
+  handleInterstitial("Capítulo 4");
 
   assert.equal(pump(), "ending");
   assert.equal(el("[data-ending-title]").textContent, "No estás solo");

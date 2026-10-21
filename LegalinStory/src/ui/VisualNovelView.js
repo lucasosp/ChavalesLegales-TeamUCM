@@ -318,16 +318,27 @@ export class VisualNovelView {
       bubble.append(author);
     }
 
-    const text = document.createElement("p");
-    text.className = "chat-text";
-    text.textContent = message.hidden
-      ? "▧ Imagen oculta · contenido privado"
-      : message.text ?? "";
-    bubble.append(text);
     if (message.hidden) {
-      const caption = document.createElement("small");
-      caption.textContent = "La imagen no se muestra ni se descarga en esta experiencia.";
-      bubble.append(caption);
+      const preview = document.createElement("div");
+      preview.className = "censored-preview";
+      preview.setAttribute("role", "img");
+      preview.setAttribute("aria-label", "Imagen censurada; el contenido no se muestra");
+      const mosaic = document.createElement("img");
+      mosaic.className = "censored-preview-art";
+      mosaic.src = new URL("assets/censored-preview.svg", document.baseURI).href;
+      mosaic.alt = "";
+      mosaic.setAttribute("aria-hidden", "true");
+      const label = document.createElement("span");
+      label.className = "censored-preview-label";
+      label.textContent = "Imagen censurada";
+      label.setAttribute("aria-hidden", "true");
+      preview.append(mosaic, label);
+      bubble.append(preview);
+    } else {
+      const text = document.createElement("p");
+      text.className = "chat-text";
+      text.textContent = message.text ?? "";
+      bubble.append(text);
     }
 
     if (message.time) {

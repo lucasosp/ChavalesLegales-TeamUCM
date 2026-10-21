@@ -22,16 +22,16 @@ Los comandos de desarrollo y compilación del frontend generan la novela en
 | --- | --- | --- |
 | Seleccionar apoyos recargaba la pregunta | Opciones de elección simple enlazadas al mismo nodo | Tarjetas que se marcan/desmarcan juntas y se confirman una vez; se conservan sus variables |
 | Comprobar permitía seguir con respuestas inseguras | Continuar se mostraba incondicionalmente | Validación de la selección completa; feedback por tarjeta; cambiar una tarjeta invalida el resultado |
-| Imágenes ocultas parecían avisos del sistema | Mensajes atribuidos a Sistema | Burbuja de Hugo con marcador de imagen privada, sin cargar ningún archivo sensible |
+| Imágenes ocultas parecían avisos del sistema | Mensajes atribuidos a Sistema | Burbuja del remitente con miniatura pixelada genérica; no se carga ningún archivo sensible |
 | Chat demasiado rápido | Intervalo fijo de 480 ms | Pausas de 1,4–4,2 s según longitud y botón para mostrarlo completo |
 | Saltos al escribir y cambiar de escena | Altura dependiente de cada fragmento y animaciones activas fuera del diálogo | Reserva de altura final, panel ampliado y cancelación de escritura/opciones al cambiar de modo |
 | Escenario incorrecto al recuperar escenas especiales | Los eventos especiales omitían el escenario del motor | Instantánea del escenario para chat, capítulos y actividades |
 | Decisiones y diálogo podían solaparse en móvil | Posiciones absolutas independientes | Espacios separados con altura máxima y scroll, incluidos móviles en horizontal |
 | Historias de ejemplo aparecían en el inicio | Catálogo y selector como entrada | Una sola historia publicada y apertura directa; ejemplos conservados como fixtures |
 
-Los capítulos son ahora: «El grupo está hablando de ti», «En tus manos»,
-«Alguien que te entiende», «Romper el silencio», «Guardar pruebas sin hacer
-daño» y «Contarlo a tu ritmo». Se mantienen las decisiones y los cuatro finales.
+Las tarjetas de capítulo muestran solo «Capítulo 1», «Capítulo 2», etc., en
+ambas historias. Se mantienen las decisiones y los cuatro finales de «No lo
+reenvíes».
 La actividad de apoyos explica su propósito y no puntúa necesidades personales.
 
 Se añadieron controles en español, botones reales para continuar, navegación por
