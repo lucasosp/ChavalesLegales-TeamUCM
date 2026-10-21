@@ -25,10 +25,12 @@ try {
   const app = new App({ root, ...content });
   try {
     app.start();
+    assert.equal(root.querySelector("[data-welcome]").hidden, false, "new game should show intro");
+    root.querySelector("[data-welcome-start]").click();
     assert.equal(root.querySelector("[data-interstitial-title]").textContent, "No lo reenvíes");
     root.querySelector("[data-interstitial-next]").click();
     assert.equal(app.engine.nodeId, "prologo-1");
-    assert.ok(root.querySelector(".scene-bg.is-active").style.backgroundImage.includes("hallway-day.svg"));
+    assert.ok(root.querySelector(".scene-bg.is-active").style.backgroundImage.includes("school-hallway.jpg"));
     assert.ok(root.querySelector("[data-text]").textContent.length > 0);
   } finally { app.destroy(); dom.window.close(); }
   console.log("Published experience HTTP smoke test passed");

@@ -126,6 +126,7 @@ function finishChat(expectedTitle) {
 
 try {
   app.start();
+  el("[data-welcome-start]").click();
 
   assert.equal(pump(), "interstitial");
   handleInterstitial("No soy yo");

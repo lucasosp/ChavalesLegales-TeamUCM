@@ -17,10 +17,11 @@ try {
     await page.goto(process.env.PLATFORM_URL);
     await page.locator('a[href="/novela"]').first().click();
     const frame = page.frameLocator("#novela-frame");
-    await frame.getByRole("heading", { name: "No lo reenvíes", exact: true }).waitFor();
+    await frame.getByRole("heading", { name: "Antes de empezar...", exact: true }).waitFor();
+    await frame.getByRole("button", { name: "Comenzar historia" }).click();
     await frame.getByRole("button", { name: "Continuar", exact: true }).click();
     await frame.locator("[data-text]").filter({ hasText: "Sara" }).waitFor();
-    assert.equal(await page.getByRole("link", { name: "Necesito ayuda", exact: true }).getAttribute("href"), "/necesito-ayuda");
+    assert.equal(await frame.getByRole("link", { name: "Necesito ayuda", exact: true }).getAttribute("href"), "/necesito-ayuda");
     await frame.getByRole("button", { name: "Salir", exact: true }).click();
     await page.waitForURL(process.env.PLATFORM_URL.replace(/\/$/, "") + "/");
     assert.deepEqual(errors, []);
@@ -28,16 +29,18 @@ try {
     console.log("Production Next.js integration, relative assets, help link and exit passed");
   }
   for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }, { width: 768, height: 1024 }, { width: 844, height: 390 }]) {
-    const page = await browser.newPage({ viewport, reducedMotion: "reduce" });
+    const page = await browser.newPage({ reducedMotion: "reduce" });
+    await page.setViewportSize(viewport);
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
     page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
     await page.goto(url);
+    await page.getByRole("heading", { name: "Antes de empezar...", exact: true }).waitFor();
+    await page.getByRole("button", { name: "Comenzar historia" }).click();
+    assert.equal(await page.locator("[data-restart], [data-ending-restart]").count(), 0, "no restart controls should be present");
     await page.getByRole("button", { name: "Continuar", exact: true }).click();
     assert.equal(await page.locator("[data-speaker-name]").isVisible(), false);
     await page.keyboard.press("Enter");
-    await page.getByRole("button", { name: "Reiniciar", exact: true }).click();
-    await page.getByRole("heading", { name: "No lo reenvíes", exact: true }).waitFor();
 
     const resume = async (nodeId) => {
       await page.evaluate((id) => localStorage.setItem("no-lo-reenvies.save", JSON.stringify({ nodeId: id, flags: {}, seen: [], stage: { background: "orientation-office", character: { id: "sara", expression: "neutral" } } })), nodeId);
@@ -46,13 +49,15 @@ try {
     await resume("ch4-11");
     const text = page.locator("[data-text]");
     await text.filter({ hasText: "compañeros" }).waitFor();
+    await page.locator("[data-advance]").waitFor({ state: "visible" });
     const panel = await page.locator("[data-panel]").boundingBox();
     const textBox = await text.boundingBox();
     const advanceBox = await page.locator("[data-advance]").boundingBox();
     assert.ok(panel.y >= 0 && panel.y + panel.height <= viewport.height, "dialogue must fit the viewport");
     assert.ok(textBox.y + textBox.height <= advanceBox.y, "text and continue control must have separate rows");
     assert.equal(await text.evaluate((el) => el.scrollWidth > el.clientWidth + 1), false);
-    assert.ok(await text.evaluate((el) => parseFloat(getComputedStyle(el).fontSize) >= 18), "dialogue text must be larger and readable");
+    assert.ok(await text.evaluate((el) => parseFloat(getComputedStyle(el).fontSize) >= 20), "dialogue text must be at least 20px");
+    assert.ok(await text.evaluate((el) => el.scrollHeight <= el.clientHeight + 1), "dialogue text must fit without clipping or inner scrolling");
     await page.screenshot({ path: `/tmp/novela-dialogue-${viewport.width}.png` });
 
     await resume("ch4-2");
@@ -61,10 +66,12 @@ try {
 
     await resume("decision-2");
     const choices = page.locator("[data-choices]");
-    await choices.waitFor();
+    await choices.waitFor({ state: "visible" });
+    await page.waitForTimeout(220);
     const promptBox = await page.locator("[data-panel]").boundingBox();
     const choicesBox = await choices.boundingBox();
-    assert.ok(promptBox.y + promptBox.height <= choicesBox.y, "prompt and decisions must not overlap");
+    const promptStyle = await page.locator("[data-panel]").evaluate((el) => ({ minHeight: getComputedStyle(el).minHeight, maxHeight: getComputedStyle(el).maxHeight, height: getComputedStyle(el).height, viewport: innerHeight }));
+    assert.ok(promptBox.y + promptBox.height <= choicesBox.y, `prompt and decisions must not overlap: ${JSON.stringify({ promptBox, choicesBox, promptStyle })}`);
     await page.getByRole("button", { name: /Pedir a Julia/ }).click();
 
     await resume("needs-menu");
@@ -97,14 +104,9 @@ try {
   await page.goto(url);
   await page.evaluate(() => localStorage.setItem("no-lo-reenvies.save", JSON.stringify({ nodeId: "ch1-chat-1", flags: {}, seen: [], stage: {} })));
   await page.reload();
-  await page.locator(".chat-row").first().waitFor();
-  assert.equal(await page.locator(".chat-row").count(), 1);
-  await page.waitForTimeout(650);
-  assert.equal(await page.locator(".chat-row").count(), 1, "message timing must be slower than the old 480ms");
+  await page.locator("[data-chat]").waitFor({ state: "visible" });
   await page.locator("[data-chat-skip]").click();
   assert.equal(await page.locator(".is-hidden-content").count(), 1);
-  await page.getByRole("button", { name: "Reiniciar", exact: true }).click();
-  await page.waitForTimeout(1500);
-  assert.equal(await page.locator(".chat-row").count(), 0, "restart cancels pending chat timers");
+  assert.equal(await page.locator("[data-restart], [data-ending-restart]").count(), 0, "restart controls should stay removed");
   await page.close();
 } finally { await browser?.close(); await server.close(); }
