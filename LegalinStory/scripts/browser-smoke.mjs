@@ -34,7 +34,7 @@ try {
     await page.close();
     console.log("Production Next.js integration, relative assets, help link and exit passed");
   }
-  for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }, { width: 768, height: 1024 }, { width: 844, height: 390 }]) {
+  for (const viewport of [{ width: 1920, height: 1080 }, { width: 1440, height: 900 }, { width: 1366, height: 768 }, { width: 1280, height: 720 }, { width: 390, height: 844 }, { width: 768, height: 1024 }, { width: 844, height: 390 }]) {
     const page = await browser.newPage({ reducedMotion: "reduce" });
     await page.setViewportSize(viewport);
     const errors = [];

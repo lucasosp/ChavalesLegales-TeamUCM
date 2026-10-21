@@ -2417,57 +2417,7 @@ button:disabled { opacity: .45; cursor: default; }
   }
 }
 
-/* ------------------------------------------- location and cast clarity */
-
-.location-chip {
-  padding: 0.38rem 0.7rem;
-  border: 1px solid rgb(255 226 233 / 18%);
-  border-radius: 999px;
-  background: rgb(10 8 16 / 38%);
-  color: rgb(255 235 238 / 74%);
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  backdrop-filter: blur(8px);
-  pointer-events: none;
-  white-space: nowrap;
-}
-
-.location-banner {
-  position: absolute;
-  top: clamp(84px, 14vh, 142px);
-  left: 50%;
-  z-index: 11;
-  display: flex;
-  gap: 0.7rem;
-  align-items: baseline;
-  padding: 0.65rem 1rem;
-  border: 1px solid rgb(255 226 233 / 18%);
-  border-radius: 4px;
-  background: rgb(8 6 13 / 82%);
-  box-shadow: 0 18px 50px rgb(0 0 0 / 42%);
-  transform: translateX(-50%);
-  backdrop-filter: blur(10px);
-  pointer-events: none;
-  animation: location-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-
-.location-banner-kicker {
-  color: var(--rose);
-  font-size: 0.56rem;
-  font-weight: 700;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  opacity: 0.8;
-}
-
-.location-banner-text {
-  font-family: var(--serif);
-  font-size: 1rem;
-  color: var(--ink);
-  white-space: nowrap;
-}
+/* ------------------------------------------------------- remote voice */
 
 .nameplate.is-voice::after {
   content: "voz";
@@ -2481,40 +2431,6 @@ button:disabled { opacity: .45; cursor: default; }
   letter-spacing: 0.16em;
   vertical-align: middle;
   opacity: 0.75;
-}
-
-@keyframes location-in {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-}
-
-@media (max-width: 760px), (max-height: 700px) {
-  .location-chip {
-    font-size: 0.54rem;
-    letter-spacing: 0.1em;
-  }
-
-  .location-banner {
-    top: 72px;
-    padding: 0.5rem 0.75rem;
-  }
-
-  .location-banner-text {
-    font-size: 0.9rem;
-  }
-
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .location-banner {
-    animation: none;
-  }
 }
 
 /* ---------------------------------------------------- sprite hand-off */
@@ -2555,4 +2471,48 @@ button:disabled { opacity: .45; cursor: default; }
 .quiz-prompt,
 .lesson-choice { color: #d8c9cf; }
 
-.location-banner-text { color: #fff; }
+
+/* ------------------------------------------------- responsive text boxes */
+
+.interstitial-card,
+.minigame-card,
+.quiz-card,
+.lesson-card,
+.notice-card,
+.rights-card,
+.welcome-card {
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+}
+
+.choice-label,
+.dialogue-text,
+.interstitial-text,
+.notice-text,
+.notice-lesson,
+.lesson-consequence,
+.lesson-teach-text,
+.quiz-prompt,
+.quiz-option,
+.quiz-feedback,
+.minigame-label,
+.chat-text,
+.rights-body {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-height: 800px) and (min-height: 541px) and (min-width: 761px) {
+  .dialogue {
+    padding-top: 16px;
+  }
+
+  .dialogue-text {
+    font-size: clamp(1.16rem, 1.55vw, 1.38rem);
+    line-height: 1.5;
+  }
+
+  .choice-label {
+    font-size: clamp(1.06rem, 1.35vw, 1.2rem);
+  }
+}

@@ -41,7 +41,6 @@ export class VisualNovelView {
   #quizTitle = "";
   #noticeTimer = null;
   #interactionLockBeforeNotice = false;
-  #locationTimer = null;
 
   /**
    * @param {HTMLElement} root
@@ -97,10 +96,7 @@ export class VisualNovelView {
       character: root.querySelector("[data-character]"),
       sprite: root.querySelector("[data-sprite]"),
       brand: root.querySelector("[data-brand]"),
-      locationChip: root.querySelector("[data-location-chip]"),
       perspectiveBadge: root.querySelector("[data-perspective-badge]"),
-      locationBanner: root.querySelector("[data-location-banner]"),
-      locationText: root.querySelector("[data-location-text]"),
       notice: root.querySelector("[data-notice]"),
       noticeTitle: root.querySelector("[data-notice-title]"),
       noticeText: root.querySelector("[data-notice-text]"),
@@ -173,7 +169,6 @@ export class VisualNovelView {
     this.#choiceReadyTimer = null;
     this.#chatTimer = null;
     this.#hideNotice();
-    clearTimeout(this.#locationTimer);
     this.typewriter.stop();
   }
 
@@ -1115,20 +1110,8 @@ export class VisualNovelView {
     previousLayer.classList.remove("is-active");
 
     this.#activeBackgroundLayer = nextIndex;
-    this.#showLocation(name);
   }
 
-  #showLocation(name) {
-    const label = this.resolveSceneLabel?.(name) ?? name;
-    this.refs.locationChip.hidden = false;
-    this.refs.locationChip.textContent = label;
-    this.refs.locationText.textContent = label;
-    this.refs.locationBanner.hidden = false;
-    clearTimeout(this.#locationTimer);
-    this.#locationTimer = setTimeout(() => {
-      this.refs.locationBanner.hidden = true;
-    }, 2600);
-  }
 
   #renderChoices(options) {
     const fragment = document.createDocumentFragment();

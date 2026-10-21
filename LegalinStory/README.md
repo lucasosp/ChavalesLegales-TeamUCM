@@ -239,11 +239,12 @@ tiny data-only DSL: `{ "banderas_rojas": { "add": 1 } }`
 increments a counter, `{ "confidencialidad": true }` sets a flag. Nodes and
 options may carry `perspective` (`maya`, `sofi`, `elena`, `red`) and `mood`
 (`neutral`, `cold`, `tense`, `warm`, `safe`, `hope`); the view uses them for the
-perspective badge and the cold/warm palette treatment. The scene `label` feeds
-the location chip and the room-change banner. Character entrances and exits are
-written as narration inside the story (for example, “Papá entra en el salón…”),
-not as a floating UI chip. Remote voices use `remote: true` and show a “voz”
-badge without swapping the on-stage sprite.
+perspective badge and the cold/warm palette treatment. The scene `label` is a
+short human-readable zone name; room changes are conveyed by the background
+transition and by narration. Character entrances and exits are written as
+narration inside the story (for example, “Papá entra en el salón…”), not as a
+floating UI chip. Remote voices use `remote: true` and show a “voz” badge
+without swapping the on-stage sprite.
 
 An ending can point at a story-wide `rights.json` through
 `novel.json.content.rights`; the ending screen then exposes a **Conoce tus

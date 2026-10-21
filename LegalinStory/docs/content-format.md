@@ -90,9 +90,9 @@ schema changes.
 ## 3. `scene.json` — scene graph
 
 Scenes are **presentation**, not narrative. They are templates: a beat may
-enter a scene, then patch one character's expression. The `label` is shown in
-the location chip and in the room-change banner, so authors should give each
-scene a short, human-readable zone name.
+enter a scene, then patch one character's expression. The `label` is a short
+human-readable zone name used by tooling; the visual room change comes from the
+background transition and the story narration.
 
 ```json
 {

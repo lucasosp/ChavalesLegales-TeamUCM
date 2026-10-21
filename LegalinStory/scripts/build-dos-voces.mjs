@@ -2402,7 +2402,7 @@ for (const [choiceId, choiceNode] of Object.entries(nodes)) {
 /* ------------------------------------------------------ room choreography */
 
 // Make every decision happen in an explicit room. This keeps the background in
-// sync with the dialogue and triggers the location banner on real zone changes.
+// sync with the dialogue on real zone changes.
 const CHOICE_SCENES = {
   "c1-m1": "home-living-cold",
   "c1-m2": "home-kitchen-cold",

@@ -17,7 +17,6 @@ export function appTemplate() {
 
         <header class="topbar">
           <span class="brand" data-brand></span>
-          <span class="location-chip" data-location-chip hidden></span>
           <span class="perspective-badge" data-perspective-badge hidden></span>
           <div class="topbar-actions">
             <button class="library" type="button" data-library>Salir</button>
@@ -59,10 +58,6 @@ export function appTemplate() {
           </div>
         </section>
 
-        <div class="location-banner" data-location-banner hidden>
-          <span class="location-banner-kicker">Ubicación</span>
-          <span class="location-banner-text" data-location-text></span>
-        </div>
         <div class="choices" data-choices hidden></div>
 
         <p class="sr-only" data-announcement role="status"></p>
