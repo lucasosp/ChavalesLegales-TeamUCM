@@ -69,6 +69,7 @@ const pressSpace = () => {
 
 try {
   app.start();
+  root.querySelector("[data-welcome-start]").click();
   app.view.skipTyping();
   app.advance(); // start -> single-message chat, which ends immediately
   assert.equal(app.engine.nodeId, "chat", "the chat should be current");

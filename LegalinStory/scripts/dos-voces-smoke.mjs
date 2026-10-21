@@ -170,6 +170,8 @@ for (const id of ["c1-s2-risk2-3", "c2-m4-risk1-3", "c4-m2-risk2-4"]) {
 
 try {
   app.start();
+  assert.equal(shown("[data-welcome]"), true, "new game should show the welcome screen");
+  el("[data-welcome-start]").click();
   assert.equal(el("[data-scene]").dataset.mood, "cold");
   assert.equal(el("[data-perspective-badge]").textContent, "Maya · en casa");
   assert.equal(el("[data-location-chip]").textContent, "Casa · Salón");

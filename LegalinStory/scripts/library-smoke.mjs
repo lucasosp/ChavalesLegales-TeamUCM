@@ -25,6 +25,8 @@ try {
   const app = new App({ root, ...content });
   try {
     app.start();
+    assert.equal(root.querySelector("[data-welcome]").hidden, false, "new game should show intro");
+    root.querySelector("[data-welcome-start]").click();
     assert.equal(root.querySelector("[data-interstitial-title]").textContent, "Dos voces");
     root.querySelector("[data-interstitial-next]").click();
     assert.equal(app.engine.nodeId, "modo");

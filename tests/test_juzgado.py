@@ -45,6 +45,17 @@ def test_falta_info_flujo_completo():
         verificar(p, "ilegal", "juzgado_guardia")
 
 
+def test_racha_de_tres_da_estrella_extra_y_un_fallo_la_rompe():
+    p = crear_partida(9, [caso("mock-despl-1"), caso("mock-ciber-1"), caso("mock-auto-1"), caso("mock-despl-2")])
+    assert verificar(p, "legal", None)["racha"] == 1
+    assert verificar(p, "ilegal", None)["racha"] == 2
+    r = verificar(p, "ilegal", None)
+    assert r["racha"] == 3 and r["bonus"] == 1 and r["puntos"] == 10 and "🔥" in r["mensaje"]
+    r = verificar(p, "legal", "juzgado_guardia")  # falta información: es un fallo
+    assert r["racha"] == 0 and r["mejorRacha"] == 3
+    assert siguiente(p)["mejorRacha"] == 3
+
+
 def test_partida_por_http():
     c = TestClient(app)
     inicio = c.post("/api/cases/start", json={"edad": 9, "temas": ["desplazamiento_familiar"], "n": 3}).json()

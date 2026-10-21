@@ -83,6 +83,25 @@ const SEAT_COORDS = [
   { id: 11, x: 805, y: 465, row: 3 },
 ]
 
+// Generación dinámica de coordenadas de asientos para cualquier capacidad
+function getSeatCoords(totalSeats) {
+  const X_COLS = [155, 370, 590, 805]
+  const Y_START = 195
+  const Y_STEP = 135
+  const seats = []
+  for (let i = 0; i < totalSeats; i++) {
+    const col = i % 4
+    const row = Math.floor(i / 4) + 1
+    seats.push({
+      id: i,
+      x: X_COLS[col],
+      y: Y_START + (row - 1) * Y_STEP,
+      row,
+    })
+  }
+  return seats
+}
+
 export default function SalaEsperaAlumnos({
   pin = '734 912',
   cleanPin: rawCleanPin,
@@ -93,64 +112,140 @@ export default function SalaEsperaAlumnos({
   isHost = false,
   currentSeat = null,
   roomUrl = '',
+  onUpdateAvatar,
+  capacidad: externalCapacidad = null,
+  modoInfinito: externalModoInfinito = null,
+  onCapacidadChange,
 }) {
   const isLive = Array.isArray(externalStudents)
   const cleanPin = rawCleanPin || (pin ? String(pin).replace(/\s+/g, '') : '')
-  const displayUrl = roomUrl || (cleanPin ? `http://localhost:3001/profesores/sala/${cleanPin}` : '')
 
-  // Modal de personalización: cerrado al entrar (se genera uno random automáticamente estilo Kahoot)
+  // Estado para la capacidad del aula y modo infinito (sincronizado con backend)
+  const [localCapacidadAula, setLocalCapacidadAula] = useState(TOTAL_SEATS)
+  const [localModoInfinito, setLocalModoInfinito] = useState(false)
+
+  const capacidadAula = externalCapacidad !== null && externalCapacidad !== undefined
+    ? externalCapacidad
+    : localCapacidadAula
+
+  const modoInfinito = externalModoInfinito !== null && externalModoInfinito !== undefined
+    ? externalModoInfinito
+    : localModoInfinito
+
+  // Mantener sincronizado el estado local si cambian las props externas
+  useEffect(() => {
+    if (externalCapacidad !== null && externalCapacidad !== undefined) {
+      setLocalCapacidadAula(externalCapacidad)
+    }
+  }, [externalCapacidad])
+
+  useEffect(() => {
+    if (externalModoInfinito !== null && externalModoInfinito !== undefined) {
+      setLocalModoInfinito(externalModoInfinito)
+    }
+  }, [externalModoInfinito])
+
+  const aumentarCapacidad = () => {
+    const nueva = capacidadAula + 4
+    setLocalCapacidadAula(nueva)
+    if (onCapacidadChange) {
+      onCapacidadChange(nueva, modoInfinito)
+    }
+  }
+
+  const disminuirCapacidad = () => {
+    const count = isLive ? (externalStudents?.length || 0) : (mockStudents?.length || 0)
+    const minOcupado = Math.ceil(count / 4) * 4 || 4
+    const nueva = Math.max(minOcupado, capacidadAula - 4)
+    setLocalCapacidadAula(nueva)
+    if (onCapacidadChange) {
+      onCapacidadChange(nueva, modoInfinito)
+    }
+  }
+
+  const toggleModoInfinito = () => {
+    const nuevo = !modoInfinito
+    setLocalModoInfinito(nuevo)
+    if (onCapacidadChange) {
+      onCapacidadChange(capacidadAula, nuevo)
+    }
+  }
+
   const [mostrarPersonalizador, setMostrarPersonalizador] = useState(false)
 
-  // Configuración del avatar del alumno actual (generado aleatoriamente al inicio)
-  const [miAvatar, setMiAvatar] = useState(() => generarAvatarAleatorio('Tú'))
+  // Configuración del avatar del alumno actual (recupera de localStorage o genera aleatorio)
+  const [miAvatar, setMiAvatar] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const guardado = localStorage.getItem('chavales_mi_avatar')
+        if (guardado) return JSON.parse(guardado)
+      } catch {}
+    }
+    return generarAvatarAleatorio('Tú')
+  })
+
+  // Estado del avatar confirmado que se visualiza en el pupitre
+  const [avatarConfirmado, setAvatarConfirmado] = useState(miAvatar)
+
+  const miAsiento = currentSeat !== null && currentSeat !== undefined ? currentSeat : 0
 
   // Estado local para los alumnos en la sala de espera simulada
   const [mockStudents, setMockStudents] = useState(() => {
-    const avatarInicial = generarAvatarAleatorio('Tú')
     return [
       {
         id: 'player-1',
-        nombre: avatarInicial.nombre,
-        seatIndex: 0,
-        baseType: avatarInicial.baseType,
-        colorPelo: avatarInicial.colorPelo,
-        tieneGorro: avatarInicial.tieneGorro,
-        colorRopa: avatarInicial.colorRopa,
+        nombre: miAvatar.nombre || 'Tú',
+        seatIndex: miAsiento,
+        baseType: miAvatar.baseType,
+        colorPelo: miAvatar.colorPelo,
+        tieneGorro: miAvatar.tieneGorro,
+        colorRopa: miAvatar.colorRopa,
         isPlayer: true,
       },
     ]
   })
 
-  // Sincronizar miAvatar con el avatar inicial colocado en el asiento 0
-  useEffect(() => {
-    if (mockStudents.length > 0 && mockStudents[0].isPlayer) {
-      setMiAvatar({
-        nombre: mockStudents[0].nombre,
-        baseType: mockStudents[0].baseType,
-        colorPelo: mockStudents[0].colorPelo,
-        tieneGorro: mockStudents[0].tieneGorro,
-        colorRopa: mockStudents[0].colorRopa,
-      })
-    }
-  }, [])
-
-  // Al confirmar el avatar modificado, actualiza el primer pupitre (asiento 0)
+  // Al confirmar el avatar modificado, actualiza el pupitre y notifica cambios
   const confirmarMiAvatar = () => {
     setMostrarPersonalizador(false)
+    setAvatarConfirmado(miAvatar)
+
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('chavales_mi_avatar', JSON.stringify(miAvatar))
+      } catch {}
+    }
+
+    if (onUpdateAvatar) {
+      onUpdateAvatar(miAvatar)
+    }
+
     setMockStudents((prev) => {
       const alumnoJugador = {
         id: 'player-1',
         nombre: miAvatar.nombre || 'Tú',
-        seatIndex: 0,
+        seatIndex: miAsiento,
         baseType: miAvatar.baseType,
         colorPelo: miAvatar.colorPelo,
         tieneGorro: miAvatar.tieneGorro,
         colorRopa: miAvatar.colorRopa,
         isPlayer: true,
       }
-      const sinAsientoCero = prev.filter((s) => s.seatIndex !== 0)
-      return [alumnoJugador, ...sinAsientoCero]
+      const sinMiAsiento = prev.filter((s) => s.seatIndex !== miAsiento)
+      return [alumnoJugador, ...sinMiAsiento]
     })
+  }
+
+  // Cancelar personalización y revertir a la versión confirmada
+  const cancelarPersonalizacion = () => {
+    setMostrarPersonalizador(false)
+    setMiAvatar(avatarConfirmado)
+  }
+
+  // Abrir modal asegurando sincronización con el confirmado
+  const abrirPersonalizador = () => {
+    setMiAvatar(avatarConfirmado)
+    setMostrarPersonalizador(true)
   }
 
   // Genera otro avatar aleatorio dentro del modal
@@ -162,16 +257,16 @@ export default function SalaEsperaAlumnos({
   // Simulación de entrada paulatina de compañeros bots cada 2-3 segundos solo si NO estamos en vivo
   useEffect(() => {
     if (isLive) return
-    if (mockStudents.length >= TOTAL_SEATS) return
+    if (mockStudents.length >= capacidadAula) return
 
     const timer = setTimeout(() => {
       setMockStudents((prev) => {
-        if (prev.length >= TOTAL_SEATS) return prev
+        if (prev.length >= capacidadAula) return prev
 
         // Buscar siguiente asiento libre
         const asientosOcupados = prev.map((s) => s.seatIndex)
         let siguienteAsiento = 0
-        for (let i = 0; i < TOTAL_SEATS; i++) {
+        for (let i = 0; i < capacidadAula; i++) {
           if (!asientosOcupados.includes(i)) {
             siguienteAsiento = i
             break
@@ -181,7 +276,7 @@ export default function SalaEsperaAlumnos({
         // Generar alumno ficticio con avatar paramétrico aleatorio
         const nuevo = {
           id: `bot-${siguienteAsiento + 1}`,
-          nombre: NOMBRES_MOCK[siguienteAsiento] || `Alumno ${siguienteAsiento + 1}`,
+          nombre: NOMBRES_MOCK[siguienteAsiento % NOMBRES_MOCK.length] || `Alumno ${siguienteAsiento + 1}`,
           seatIndex: siguienteAsiento,
           baseType: BASES_DISPONIBLES[siguienteAsiento % BASES_DISPONIBLES.length],
           colorPelo: OPCIONES_PELO[siguienteAsiento % OPCIONES_PELO.length].hex,
@@ -194,7 +289,7 @@ export default function SalaEsperaAlumnos({
     }, 2400)
 
     return () => clearTimeout(timer)
-  }, [isLive, mockStudents.length])
+  }, [isLive, mockStudents.length, capacidadAula])
 
   // Helpers para testing rápido
   const reiniciarAula = () => {
@@ -204,22 +299,24 @@ export default function SalaEsperaAlumnos({
   }
 
   const llenarAula = () => {
-    const todos = SEAT_COORDS.map((seat, idx) => {
-      if (idx === 0) {
+    const currentCoords = getSeatCoords(capacidadAula)
+    const todos = currentCoords.map((seat, idx) => {
+      if (idx === miAsiento) {
+        const activo = avatarConfirmado || miAvatar
         return {
           id: 'player-1',
-          nombre: miAvatar.nombre || 'Tú',
-          seatIndex: 0,
-          baseType: miAvatar.baseType,
-          colorPelo: miAvatar.colorPelo,
-          tieneGorro: miAvatar.tieneGorro,
-          colorRopa: miAvatar.colorRopa,
+          nombre: activo.nombre || 'Tú',
+          seatIndex: miAsiento,
+          baseType: activo.baseType,
+          colorPelo: activo.colorPelo,
+          tieneGorro: activo.tieneGorro,
+          colorRopa: activo.colorRopa,
           isPlayer: true,
         }
       }
       return {
         id: `bot-${idx + 1}`,
-        nombre: NOMBRES_MOCK[idx] || `Alumno ${idx + 1}`,
+        nombre: NOMBRES_MOCK[idx % NOMBRES_MOCK.length] || `Alumno ${idx + 1}`,
         seatIndex: idx,
         baseType: BASES_DISPONIBLES[idx % BASES_DISPONIBLES.length],
         colorPelo: OPCIONES_PELO[idx % OPCIONES_PELO.length].hex,
@@ -232,7 +329,21 @@ export default function SalaEsperaAlumnos({
   }
 
   const students = isLive ? externalStudents : mockStudents
-  const porcentajeLleno = Math.min(100, Math.round((students.length / TOTAL_SEATS) * 100))
+  const porcentajeLleno = Math.min(100, Math.round((students.length / capacidadAula) * 100))
+  const seatCoords = getSeatCoords(capacidadAula)
+  const numRows = Math.max(3, Math.ceil(capacidadAula / 4))
+  const svgHeight = 195 + (numRows - 1) * 135 + 95
+
+  // Modo Infinito: añade automáticamente una fila de pupitres vacíos cuando se llena el aforo
+  useEffect(() => {
+    if (modoInfinito && students.length >= capacidadAula) {
+      const nueva = capacidadAula + 4
+      setLocalCapacidadAula(nueva)
+      if (isHost && onCapacidadChange) {
+        onCapacidadChange(nueva, modoInfinito)
+      }
+    }
+  }, [modoInfinito, students.length, capacidadAula, isHost, onCapacidadChange])
 
   return (
     <div className="sala-page-wrapper">
@@ -265,7 +376,7 @@ export default function SalaEsperaAlumnos({
         }
 
         .sala-top-banner {
-          background: #4A1A1C;
+          background: #461020;
           color: #FFFFFF;
           padding: 16px 28px;
           display: flex;
@@ -280,8 +391,8 @@ export default function SalaEsperaAlumnos({
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          background: #3D4A27;
-          border: 2px solid #86EFAC;
+          background: #3e6b32;
+          border: 2px solid #608841;
           padding: 6px 14px;
           border-radius: 999px;
           font-size: 13px;
@@ -308,7 +419,7 @@ export default function SalaEsperaAlumnos({
 
         .sala-subtitle {
           font-size: 14px;
-          color: #FACC15;
+          color: #fdc623;
           font-weight: 500;
           margin: 0;
         }
@@ -327,7 +438,7 @@ export default function SalaEsperaAlumnos({
           display: block;
           font-size: 11px;
           font-weight: 800;
-          color: #3D4A27;
+          color: #3e6b32;
           letter-spacing: 0.08em;
           text-transform: uppercase;
         }
@@ -337,7 +448,7 @@ export default function SalaEsperaAlumnos({
           font-size: 22px;
           font-weight: 900;
           letter-spacing: 0.08em;
-          color: #4A1A1C;
+          color: #461020;
         }
 
         .sala-subbar {
@@ -374,7 +485,7 @@ export default function SalaEsperaAlumnos({
 
         .sala-progress-fill {
           height: 100%;
-          background: #86EFAC;
+          background: #608841;
           transition: width 0.4s ease;
         }
 
@@ -397,7 +508,7 @@ export default function SalaEsperaAlumnos({
         }
 
         .btn-sala-pill:hover {
-          background: #FACC15;
+          background: #fdc623;
           transform: translateY(-1px);
         }
 
@@ -406,7 +517,7 @@ export default function SalaEsperaAlumnos({
         }
 
         .btn-avatar-edit {
-          background: #FACC15;
+          background: #fdc623;
           border: 2.5px solid #18181B;
           padding: 6px 14px;
           border-radius: 12px;
@@ -427,7 +538,7 @@ export default function SalaEsperaAlumnos({
         }
 
         .btn-sala-volver {
-          background: #4A1A1C;
+          background: #461020;
           color: #FFFFFF;
           border: 2px solid #18181B;
           padding: 6px 14px;
@@ -438,12 +549,12 @@ export default function SalaEsperaAlumnos({
         }
 
         .btn-sala-volver:hover {
-          background: #3D4A27;
+          background: #3e6b32;
         }
 
         .btn-sala-iniciar {
-          background: #22C55E;
-          color: #0F172A;
+          background: #608841;
+          color: #FFFFFF;
           border: 2px solid #18181B;
           padding: 8px 18px;
           border-radius: 14px;
@@ -455,7 +566,7 @@ export default function SalaEsperaAlumnos({
         }
 
         .btn-sala-iniciar:hover:not(:disabled) {
-          background: #4ADE80;
+          background: #74A152;
           transform: translateY(-2px);
           box-shadow: 0 6px 0 #18181B;
         }
@@ -472,19 +583,117 @@ export default function SalaEsperaAlumnos({
           position: relative;
           width: 100%;
           flex: 1;
-          padding: 14px 20px 20px;
+          padding: 16px 20px 32px;
           box-sizing: border-box;
           display: flex;
           justify-content: center;
-          align-items: center;
+          align-items: flex-start;
+          overflow-y: auto;
+          min-height: calc(100vh - 150px);
+        }
+
+        .sala-canvas-stage::-webkit-scrollbar {
+          width: 8px;
+        }
+        .sala-canvas-stage::-webkit-scrollbar-track {
+          background: #EFE8DD;
+          border-radius: 4px;
+        }
+        .sala-canvas-stage::-webkit-scrollbar-thumb {
+          background: #C5B7A1;
+          border-radius: 4px;
+        }
+        .sala-canvas-stage::-webkit-scrollbar-thumb:hover {
+          background: #461020;
         }
 
         .classroom-svg {
           width: 100%;
-          max-width: 1100px;
+          max-width: 1180px;
           height: auto;
           display: block;
-          max-height: calc(100vh - 180px);
+          flex-shrink: 0;
+        }
+
+        .sala-aforo-controls {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: #FFFFFF;
+          border: 2px solid #18181B;
+          border-radius: 12px;
+          padding: 3px 8px;
+          box-shadow: 0 2px 0 #18181B;
+        }
+
+        .sala-aforo-label {
+          font-size: 11px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: #461020;
+        }
+
+        .btn-aforo-stepper {
+          width: 24px;
+          height: 24px;
+          border-radius: 6px;
+          border: 1.5px solid #18181B;
+          background: #F4F1EA;
+          color: #18181B;
+          font-weight: 900;
+          font-size: 14px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          line-height: 1;
+          transition: background 0.15s ease, transform 0.1s ease;
+        }
+
+        .btn-aforo-stepper:hover:not(:disabled) {
+          background: #fdc623;
+          transform: translateY(-1px);
+        }
+
+        .btn-aforo-stepper:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+
+        .sala-aforo-val {
+          font-size: 13px;
+          font-weight: 900;
+          color: #18181B;
+          min-width: 20px;
+          text-align: center;
+        }
+
+        .btn-aforo-infinito {
+          background: #F4F1EA;
+          border: 1.5px solid #18181B;
+          border-radius: 8px;
+          padding: 3px 8px;
+          font-size: 11px;
+          font-weight: 800;
+          color: #18181B;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          margin-left: 2px;
+          transition: all 0.15s ease;
+        }
+
+        .btn-aforo-infinito:hover {
+          background: #fdc623;
+        }
+
+        .btn-aforo-infinito.active {
+          background: #608841;
+          color: #FFFFFF;
+          border-color: #3e6b32;
+          box-shadow: 0 1px 0 #18181B;
         }
 
         .sala-footer-legal {
@@ -537,7 +746,7 @@ export default function SalaEsperaAlumnos({
         }
 
         .modal-header {
-          background: #4A1A1C;
+          background: #461020;
           color: #FFFFFF;
           padding: 16px 22px;
           border-bottom: 3px solid #18181B;
@@ -555,7 +764,7 @@ export default function SalaEsperaAlumnos({
 
         .modal-subtitle {
           font-size: 13px;
-          color: #FACC15;
+          color: #fdc623;
           margin-top: 2px;
           font-weight: 600;
         }
@@ -577,7 +786,7 @@ export default function SalaEsperaAlumnos({
         }
 
         .btn-modal-close:hover {
-          background: #B03921;
+          background: #b03921;
           transform: scale(1.08);
         }
 
@@ -604,7 +813,7 @@ export default function SalaEsperaAlumnos({
         }
 
         .btn-randomize-pill {
-          background: #FACC15;
+          background: #fdc623;
           border: 2px solid #18181B;
           color: #18181B;
           font-size: 11px;
@@ -632,7 +841,7 @@ export default function SalaEsperaAlumnos({
         .selector-label {
           font-size: 12px;
           font-weight: 800;
-          color: #4A1A1C;
+          color: #461020;
           text-transform: uppercase;
           letter-spacing: 0.06em;
         }
@@ -778,7 +987,7 @@ export default function SalaEsperaAlumnos({
           MODAL DE PERSONALIZACIÓN DE AVATAR (ABIERTO SOLO SI EL USUARIO QUIERE)
           ============================================================== */}
       {mostrarPersonalizador && (
-        <div className="avatar-modal-overlay" onClick={() => setMostrarPersonalizador(false)}>
+        <div className="avatar-modal-overlay" onClick={cancelarPersonalizacion}>
           <div className="avatar-modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <div>
@@ -788,7 +997,7 @@ export default function SalaEsperaAlumnos({
               <button
                 type="button"
                 className="btn-modal-close"
-                onClick={() => setMostrarPersonalizador(false)}
+                onClick={cancelarPersonalizacion}
                 title="Cerrar sin guardar"
               >
                 ✕
@@ -916,25 +1125,6 @@ export default function SalaEsperaAlumnos({
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            {displayUrl && (
-              <div
-                style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  border: '1.5px solid rgba(255, 255, 255, 0.25)',
-                  borderRadius: 14,
-                  padding: '6px 14px',
-                  textAlign: 'right',
-                }}
-              >
-                <span style={{ display: 'block', fontSize: 10, fontWeight: 800, color: '#FACC15', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                  Enlace de sala
-                </span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#FFFFFF', letterSpacing: '0.02em', fontFamily: 'monospace' }}>
-                  {displayUrl}
-                </span>
-              </div>
-            )}
-
             <div className="sala-pin-pill">
               <span className="sala-pin-label">CÓDIGO PIN</span>
               <span className="sala-pin-value">{pin || cleanPin}</span>
@@ -946,7 +1136,7 @@ export default function SalaEsperaAlumnos({
         <div className="sala-subbar">
           <div className="sala-counter-wrap">
             <span className="sala-counter-text">
-              Alumnos en el aula: <b>{students.length}</b> / {TOTAL_SEATS}
+              Alumnos en el aula: <b>{students.length}</b> / {capacidadAula}
             </span>
             <div className="sala-progress-track">
               <div
@@ -954,6 +1144,41 @@ export default function SalaEsperaAlumnos({
                 style={{ width: `${porcentajeLleno}%` }}
               />
             </div>
+
+            {/* Controles de gestión de aforo para el profesor */}
+            {(isHost || !isLive) && (
+              <div className="sala-aforo-controls">
+                <span className="sala-aforo-label">Aforo:</span>
+                <button
+                  type="button"
+                  className="btn-aforo-stepper"
+                  onClick={disminuirCapacidad}
+                  disabled={capacidadAula <= Math.max(4, students.length)}
+                  title="Reducir pupitres (-4)"
+                >
+                  -
+                </button>
+                <span className="sala-aforo-val">{capacidadAula}</span>
+                <button
+                  type="button"
+                  className="btn-aforo-stepper"
+                  onClick={aumentarCapacidad}
+                  title="Añadir pupitres (+4)"
+                >
+                  +
+                </button>
+                <button
+                  type="button"
+                  className={`btn-aforo-infinito ${modoInfinito ? 'active' : ''}`}
+                  onClick={toggleModoInfinito}
+                  title={modoInfinito ? 'Modo Infinito activo (añade filas automáticamente)' : 'Activar Modo Infinito (∞)'}
+                >
+                  ∞ Modo Infinito
+                </button>
+              </div>
+            )}
+
+            {/* Indicador de pupitre y botón de personalización para el alumno */}
             {!isHost && currentSeat !== null && (
               <span
                 style={{
@@ -972,19 +1197,22 @@ export default function SalaEsperaAlumnos({
                 Tu pupitre: #{currentSeat + 1}
               </span>
             )}
+
+            {!isHost && (
+              <button
+                type="button"
+                className="btn-avatar-edit"
+                onClick={abrirPersonalizador}
+                title="Personalizar mi personaje"
+              >
+                Personalizar avatar
+              </button>
+            )}
           </div>
 
           <div className="sala-actions">
             {!isLive ? (
               <>
-                <button
-                  type="button"
-                  className="btn-avatar-edit"
-                  onClick={() => setMostrarPersonalizador(true)}
-                  title="Personalizar mi personaje"
-                >
-                  Personalizar avatar
-                </button>
                 <button
                   type="button"
                   className="btn-sala-pill"
@@ -1018,15 +1246,14 @@ export default function SalaEsperaAlumnos({
                 type="button"
                 className="btn-sala-iniciar"
                 onClick={onIniciar}
-                disabled={students.length === 0}
-                title={students.length === 0 ? 'Esperando alumnos' : 'Iniciar la actividad'}
+                title="Iniciar la actividad"
               >
                 Iniciar partida ({students.length})
               </button>
             ) : !isHost ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span style={{ fontSize: 13, color: '#64748B', fontWeight: 600 }}>
-                  Esperando a que el profesor inicie la partida...
+                  Esperando a que el profesor lance un juego a la clase...
                 </span>
                 {onVolver && (
                   <button
@@ -1057,7 +1284,8 @@ export default function SalaEsperaAlumnos({
         <div className="sala-canvas-stage">
           <svg
             className="classroom-svg"
-            viewBox="0 0 960 560"
+            viewBox={`0 0 960 ${svgHeight}`}
+            style={{ minHeight: svgHeight, width: '100%', maxWidth: 1180 }}
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -1071,92 +1299,175 @@ export default function SalaEsperaAlumnos({
             </defs>
 
             {/* SUELO Y PARED POLIGONAL DEL AULA */}
-            <rect x="0" y="0" width="960" height="130" fill="#EFE8DD" />
-            <line x1="0" y1="130" x2="960" y2="130" stroke="#4A1A1C" strokeWidth="6" />
+            {/* Pared superior cálida y limpia */}
+            <rect x="0" y="0" width="960" height="116" fill="#FAF6EE" />
+            <rect x="0" y="112" width="960" height="4" fill="#461020" />
+            <rect x="0" y="116" width="960" height="8" fill="#E8DBC9" />
 
-            <rect x="0" y="133" width="960" height="427" fill="#F8F4EC" />
-            <line x1="0" y1="260" x2="960" y2="260" stroke="#ECE2D0" strokeWidth="2" strokeDasharray="6 6" />
-            <line x1="0" y1="395" x2="960" y2="395" stroke="#ECE2D0" strokeWidth="2" strokeDasharray="6 6" />
-            <line x1="240" y1="133" x2="160" y2="560" stroke="#EFE5D5" strokeWidth="1.5" />
-            <line x1="480" y1="133" x2="480" y2="560" stroke="#EFE5D5" strokeWidth="1.5" />
-            <line x1="720" y1="133" x2="800" y2="560" stroke="#EFE5D5" strokeWidth="1.5" />
+            {/* Suelo continuo y amplio */}
+            <rect x="0" y="124" width="960" height={svgHeight - 124} fill="#F8F4EC" />
+            {Array.from({ length: numRows }, (_, i) => {
+              const lineY = 265 + i * 135
+              return (
+                <line
+                  key={`floor-line-${i}`}
+                  x1="40"
+                  y1={lineY}
+                  x2="920"
+                  y2={lineY}
+                  stroke="#EDE4D6"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+              )
+            })}
 
             {/* PIZARRA DIGITAL FRONTAL */}
-            <g transform="translate(240, 18)">
-              <rect x="0" y="0" width="480" height="96" rx="14" fill="#3D4A27" stroke="#18181B" strokeWidth="3" />
-              <rect x="10" y="10" width="460" height="76" rx="10" fill="#1F2E22" />
-              <text x="240" y="34" textAnchor="middle" fill="#FACC15" fontSize="13" fontWeight="800" letterSpacing="2">
-                CHAVALES LEGALES · AULA 4B
-              </text>
-              <text x="240" y="58" textAnchor="middle" fill="#FFFFFF" fontSize="18" fontWeight="900" letterSpacing="1">
-                SALA DE ESPERA
-              </text>
-              <g transform="translate(140, 66)">
-                <circle cx="8" cy="8" r="4" fill="#86EFAC" />
-                <text x="22" y="12" fill="#86EFAC" fontSize="11" fontWeight="700">
+            <g transform="translate(220, 18)">
+              {/* Marco exterior en granate corporativo */}
+              <rect x="0" y="0" width="520" height="82" rx="16" fill="#461020" stroke="#18181B" strokeWidth="2.5" />
+              {/* Borde interior decorativo */}
+              <rect x="6" y="6" width="508" height="70" rx="12" fill="#3e6b32" opacity="0.35" />
+              {/* Fondo de pizarra verde oscura */}
+              <rect x="8" y="8" width="504" height="66" rx="10" fill="#1F2E22" />
+
+              {/* Repisa para tizas con tizas decorativas */}
+              <rect x="170" y="74" width="180" height="5" rx="2.5" fill="#fdc623" />
+              <rect x="190" y="70" width="18" height="4" rx="2" fill="#FFFFFF" />
+              <rect x="215" y="70" width="16" height="4" rx="2" fill="#fdc623" />
+              <rect x="295" y="68" width="24" height="6" rx="2" fill="#8C7A6B" />
+
+              {/* Texto único requerido en la pizarra */}
+              <g transform="translate(260, 42)">
+                <circle cx="-168" cy="-1" r="5" fill="#608841" />
+                <circle cx="-168" cy="-1" r="8" fill="#86EFAC" opacity="0.4" className="sala-dot-pulse" />
+                <text
+                  x="-152"
+                  y="4"
+                  textAnchor="start"
+                  fill="#FFFFFF"
+                  fontSize="15"
+                  fontWeight="800"
+                  letterSpacing="0.3"
+                  fontFamily="'Plus Jakarta Sans', system-ui, sans-serif"
+                >
                   Esperando a que el profesor inicie la partida...
                 </text>
               </g>
             </g>
 
             {/* DECORACIÓN IZQUIERDA: MESA DE PROFESOR CON MARTILLO DE JUEZ */}
-            <g transform="translate(40, 36)">
-              <polygon points="0,50 140,50 130,85 10,85" fill="#DDD2C0" stroke="#18181B" strokeWidth="2.5" />
-              <polygon points="10,85 130,85 125,92 15,92" fill="#C5B7A1" stroke="#18181B" strokeWidth="2.5" />
-              <rect x="25" y="40" width="34" height="10" rx="2" fill="#4A1A1C" stroke="#18181B" strokeWidth="1.5" />
-              <rect x="27" y="32" width="30" height="9" rx="2" fill="#3D4A27" stroke="#18181B" strokeWidth="1.5" />
-              <rect x="29" y="25" width="26" height="8" rx="2" fill="#FACC15" stroke="#18181B" strokeWidth="1.5" />
-              <g transform="translate(85, 34)">
-                <ellipse cx="20" cy="16" rx="14" ry="4" fill="#4A1A1C" stroke="#18181B" strokeWidth="1.5" />
-                <line x1="8" y1="14" x2="28" y2="4" stroke="#FACC15" strokeWidth="3" strokeLinecap="round" />
-                <rect x="22" y="-2" width="12" height="7" rx="2" fill="#4A1A1C" stroke="#18181B" strokeWidth="1.5" transform="rotate(-30 26 2)" />
+            <g transform="translate(42, 26)">
+              <ellipse cx="65" cy="84" rx="55" ry="6" fill="#18181B" opacity="0.08" />
+              <rect x="14" y="52" width="6" height="30" rx="3" fill="#2C2830" />
+              <rect x="110" y="52" width="6" height="30" rx="3" fill="#2C2830" />
+              <rect x="10" y="44" width="110" height="32" rx="8" fill="#EADBC6" />
+              <rect x="16" y="50" width="98" height="20" rx="6" fill="#FDFBF7" />
+              <circle cx="65" cy="60" r="6" fill="#461020" />
+              <circle cx="65" cy="60" r="4" fill="#fdc623" />
+              <rect x="0" y="38" width="130" height="12" rx="6" fill="#FFFDF9" stroke="#DFD2BD" strokeWidth="1.5" />
+              {/* Libros en mesa de juez */}
+              <rect x="18" y="30" width="30" height="8" rx="2" fill="#461020" />
+              <rect x="20" y="23" width="26" height="7" rx="2" fill="#3e6b32" />
+              <rect x="22" y="17" width="22" height="6" rx="2" fill="#fdc623" />
+              {/* Martillo de juez apoyado plano sobre la mesa */}
+              <g id="teacher-gavel">
+                {/* Taco de golpeo apoyado sobre la mesa */}
+                <rect x="70" y="33" width="22" height="5" rx="2.5" fill="#461020" />
+                {/* Cabeza del martillo apoyada horizontal sobre la mesa */}
+                <rect x="96" y="29" width="14" height="9" rx="3" fill="#461020" />
+                <rect x="94.5" y="30.5" width="2" height="6" rx="1" fill="#fdc623" />
+                {/* Mango horizontal apoyado */}
+                <rect x="74" y="32" width="24" height="3" rx="1.5" fill="#fdc623" />
+                <circle cx="73.5" cy="33.5" r="2.2" fill="#461020" />
               </g>
             </g>
 
             {/* DECORACIÓN DERECHA: PLANTA POLIGONAL Y RELOJ */}
-            <g transform="translate(840, 28)">
-              <polygon points="20,0 40,0 52,12 52,32 40,44 20,44 8,32 8,12" fill="#3D4A27" stroke="#18181B" strokeWidth="2.5" />
-              <circle cx="30" cy="22" r="14" fill="#FFFFFF" />
-              <line x1="30" y1="22" x2="30" y2="13" stroke="#18181B" strokeWidth="2" strokeLinecap="round" />
-              <line x1="30" y1="22" x2="37" y2="22" stroke="#FACC15" strokeWidth="2" strokeLinecap="round" />
-              <polygon points="12,85 48,85 42,108 18,108" fill="#4A1A1C" stroke="#18181B" strokeWidth="2" />
-              <polygon points="30,85 15,65 30,75" fill="#3D4A27" />
-              <polygon points="30,85 45,65 30,75" fill="#86EFAC" />
-              <polygon points="30,75 30,55 35,70" fill="#3D4A27" />
+            <g transform="translate(846, 20)">
+              {/* Reloj flat */}
+              <g transform="translate(18, 0)">
+                <circle cx="22" cy="22" r="22" fill="#461020" />
+                <circle cx="22" cy="22" r="18" fill="#FFFFFF" />
+                <circle cx="22" cy="7" r="1.5" fill="#3e6b32" />
+                <circle cx="22" cy="37" r="1.5" fill="#3e6b32" />
+                <circle cx="7" cy="22" r="1.5" fill="#3e6b32" />
+                <circle cx="37" cy="22" r="1.5" fill="#3e6b32" />
+                <line x1="22" y1="22" x2="16" y2="14" stroke="#18181B" strokeWidth="2.2" strokeLinecap="round" />
+                <line x1="22" y1="22" x2="31" y2="17" stroke="#fdc623" strokeWidth="2.2" strokeLinecap="round" />
+                <circle cx="22" cy="22" r="2.5" fill="#b03921" />
+              </g>
+
+              {/* Planta flat */}
+              <g transform="translate(18, 52)">
+                <ellipse cx="22" cy="46" rx="18" ry="4" fill="#18181B" opacity="0.08" />
+                <ellipse cx="10" cy="18" rx="10" ry="15" fill="#3e6b32" transform="rotate(-35 10 18)" />
+                <ellipse cx="11" cy="17" rx="7" ry="12" fill="#608841" transform="rotate(-35 10 18)" />
+                <ellipse cx="34" cy="18" rx="10" ry="15" fill="#3e6b32" transform="rotate(35 34 18)" />
+                <ellipse cx="33" cy="17" rx="7" ry="12" fill="#608841" transform="rotate(35 34 18)" />
+                <ellipse cx="22" cy="10" rx="9" ry="16" fill="#608841" />
+                <ellipse cx="22" cy="10" rx="5" ry="12" fill="#86EFAC" opacity="0.5" />
+                <line x1="22" y1="12" x2="22" y2="30" stroke="#3e6b32" strokeWidth="2.5" strokeLinecap="round" />
+                <path d="M 9 24 L 35 24 L 31 44 L 13 44 Z" fill="#b03921" />
+                <rect x="7" y="22" width="30" height="5" rx="2.5" fill="#C44830" />
+              </g>
             </g>
 
             {/* ==========================================================
                 RENDERIZADO DE LOS 12 PUPITRES / SILLAS
                 (Renderizados de atrás hacia adelante para correcta oclusión)
                ========================================================== */}
-            {SEAT_COORDS.map((seat) => {
-              const student = students.find((s) => s.seatIndex === seat.id)
+            {seatCoords.map((seat) => {
+              const student = students.find((s) => (s.seatIndex !== undefined ? s.seatIndex : s.seat_index) === seat.id)
               const { x, y } = seat
+              const isMe = student && ((!isHost && (currentSeat !== null && currentSeat !== undefined ? (student.seatIndex !== undefined ? student.seatIndex : student.seat_index) === currentSeat : seat.id === 0)) || Boolean(student.isPlayer))
+              const activeAvatar = isMe ? (avatarConfirmado || miAvatar) : student
+              const activeBase = (activeAvatar && (activeAvatar.baseType ?? activeAvatar.base_type)) || (student && (student.baseType ?? student.base_type)) || (student && student.avatarTipo !== undefined ? BASES_DISPONIBLES[student.avatarTipo % BASES_DISPONIBLES.length] : 1)
+              const activePelo = (activeAvatar && (activeAvatar.colorPelo ?? activeAvatar.color_pelo)) || (student && (student.colorPelo ?? student.color_pelo)) || OPCIONES_PELO[seat.id % OPCIONES_PELO.length].hex
+              const activeRopa = (activeAvatar && (activeAvatar.colorRopa ?? activeAvatar.color_ropa)) || (student && (student.colorRopa ?? student.color_ropa)) || OPCIONES_ROPA[(seat.id + 1) % OPCIONES_ROPA.length].hex
+              const activeGorro = activeAvatar ? Boolean(activeAvatar.tieneGorro !== undefined ? activeAvatar.tieneGorro : activeAvatar.tiene_gorro) : (student ? Boolean(student.tieneGorro !== undefined ? student.tieneGorro : student.tiene_gorro) : false)
 
               return (
                 <g
                   key={`seat-${seat.id}`}
                   id={`desk-group-${seat.id}`}
-                  onClick={student && student.isPlayer ? () => setMostrarPersonalizador(true) : undefined}
-                  style={{ cursor: student && student.isPlayer ? 'pointer' : 'default' }}
+                  onClick={isMe ? abrirPersonalizador : undefined}
+                  style={{ cursor: isMe ? 'pointer' : 'default' }}
                 >
                   {/* --- SILLA VACÍA (SIEMPRE DETRÁS DEL PUPITRE) --- */}
                   <g>
-                    <polygon
-                      points={`${x - 22},${y - 28} ${x + 22},${y - 28} ${x + 18},${y - 4} ${x - 18},${y - 4}`}
-                      fill={student ? '#3D4A27' : '#D8D1C4'}
-                      stroke="#18181B"
-                      strokeWidth="2.2"
+                    {/* Patas del respaldo */}
+                    <rect x={x - 18} y={y - 6} width="5" height="14" rx="2.5" fill="#4B4552" />
+                    <rect x={x + 13} y={y - 6} width="5" height="14" rx="2.5" fill="#4B4552" />
+                    {/* Respaldo suave redondeado */}
+                    <rect
+                      x={x - 26}
+                      y={y - 28}
+                      width="52"
+                      height="26"
+                      rx="10"
+                      fill={student ? '#608841' : '#E8DFD0'}
+                      stroke={student ? '#3e6b32' : '#D2C5B4'}
+                      strokeWidth="2"
                     />
-                    <polygon
-                      points={`${x - 22},${y - 28} ${x + 22},${y - 28} ${x + 18},${y - 22} ${x - 18},${y - 22}`}
-                      fill={student ? '#4D5E33' : '#E8E2D6'}
+                    {/* Brillo / relieve superior del respaldo */}
+                    <rect
+                      x={x - 20}
+                      y={y - 26}
+                      width="40"
+                      height="5"
+                      rx="2.5"
+                      fill="#FFFFFF"
+                      opacity={student ? 0.22 : 0.4}
                     />
-                    <polygon
-                      points={`${x - 18},${y - 4} ${x + 18},${y - 4} ${x + 14},${y + 8} ${x - 14},${y + 8}`}
-                      fill={student ? '#2A3519' : '#C2BAAC'}
-                      stroke="#18181B"
-                      strokeWidth="1.8"
+                    {/* Cojín del asiento */}
+                    <rect
+                      x={x - 23}
+                      y={y - 4}
+                      width="46"
+                      height="12"
+                      rx="5"
+                      fill={student ? '#3e6b32' : '#D6CBBA'}
                     />
                   </g>
 
@@ -1170,31 +1481,46 @@ export default function SalaEsperaAlumnos({
                         standalone={false}
                         x={x}
                         y={y}
-                        baseType={student.baseType || 1}
-                        colorPelo={student.colorPelo}
-                        tieneGorro={student.tieneGorro}
-                        colorRopa={student.colorRopa}
+                        baseType={activeBase}
+                        colorPelo={activePelo}
+                        tieneGorro={activeGorro}
+                        colorRopa={activeRopa}
                       />
                     </g>
                   )}
 
                   {/* --- PUPITRE DE MADERA (EN FRENTE DEL ALUMNO) --- */}
-                  <g filter="url(#deskShadow)">
-                    <line x1={x - 46} y1={y + 40} x2={x - 46} y2={y + 60} stroke="#18181B" strokeWidth="3.5" strokeLinecap="round" />
-                    <line x1={x + 46} y1={y + 40} x2={x + 46} y2={y + 60} stroke="#18181B" strokeWidth="3.5" strokeLinecap="round" />
+                  <g>
+                    {/* Sombra suave en el suelo */}
+                    <ellipse cx={x} cy={y + 64} rx="56" ry="6" fill="#18181B" opacity="0.08" />
 
-                    <polygon
-                      points={`${x - 64},${y + 4} ${x + 64},${y + 4} ${x + 54},${y + 36} ${x - 54},${y + 36}`}
-                      fill="#FAF7F0"
-                      stroke="#18181B"
-                      strokeWidth="2.5"
+                    {/* Patas cilíndricas del pupitre */}
+                    <rect x={x - 48} y={y + 36} width="7" height="26" rx="3.5" fill="#2C2830" />
+                    <rect x={x + 41} y={y + 36} width="7" height="26" rx="3.5" fill="#2C2830" />
+                    <ellipse cx={x - 44.5} cy={y + 62} rx="5.5" ry="2.5" fill="#18181B" />
+                    <ellipse cx={x + 44.5} cy={y + 62} rx="5.5" ry="2.5" fill="#18181B" />
+                    {/* Barra transversal */}
+                    <rect x={x - 44} y={y + 49} width="88" height="4" rx="2" fill="#4B4552" />
+
+                    {/* Tablero del pupitre con borde 2.5D redondeado */}
+                    <rect
+                      x={x - 64}
+                      y={y + 6}
+                      width="128"
+                      height="30"
+                      rx="10"
+                      fill="#FFFDF9"
+                      stroke="#E5DAC9"
+                      strokeWidth="2"
                     />
-
-                    <polygon
-                      points={`${x - 54},${y + 36} ${x + 54},${y + 36} ${x + 50},${y + 44} ${x - 50},${y + 44}`}
-                      fill="#DFD7C7"
-                      stroke="#18181B"
-                      strokeWidth="2.5"
+                    {/* Canto frontal biselado de madera cálida */}
+                    <rect
+                      x={x - 62}
+                      y={y + 26}
+                      width="124"
+                      height="9"
+                      rx="4.5"
+                      fill="#E8DEC9"
                     />
                   </g>
 
@@ -1202,32 +1528,34 @@ export default function SalaEsperaAlumnos({
                   {!student ? (
                     <g>
                       <rect
-                        x={x - 30}
+                        x={x - 38}
                         y={y + 12}
-                        width="60"
+                        width="76"
                         height="18"
-                        rx="6"
-                        fill="#F3EFE7"
-                        stroke="#B8B0A2"
+                        rx="9"
+                        fill="#F4EFE6"
+                        stroke="#D5CBB9"
                         strokeWidth="1.5"
-                        strokeDasharray="3 3"
                       />
+                      <circle cx={x - 26} cy={y + 21} r="3" fill="#B0A694" />
                       <text
-                        x={x}
-                        y={y + 24}
+                        x={x + 4}
+                        y={y + 25}
                         textAnchor="middle"
                         fontSize="10"
-                        fontWeight="700"
-                        fill="#8A8274"
+                        fontWeight="800"
+                        fill="#7D715F"
+                        letterSpacing="0.03em"
+                        fontFamily="'Plus Jakarta Sans', system-ui, sans-serif"
                       >
-                        Silla {seat.id + 1}
+                        Pupitre {seat.id + 1}
                       </text>
                     </g>
                   ) : (
                     <g>
                       {/* Manos apoyadas en la mesa estilo flat */}
-                      <ellipse cx={x - 20} cy={y + 14} rx="4.5" ry="3.5" fill="#FDE0C5" />
-                      <ellipse cx={x + 20} cy={y + 14} rx="4.5" ry="3.5" fill="#FDE0C5" />
+                      <ellipse cx={x - 22} cy={y + 14} rx="4.5" ry="3.5" fill="#FDE0C5" />
+                      <ellipse cx={x + 22} cy={y + 14} rx="4.5" ry="3.5" fill="#FDE0C5" />
 
                       {/* Utensilio sobre el pupitre */}
                       {renderDeskItem(x, y, seat.id)}
@@ -1235,42 +1563,39 @@ export default function SalaEsperaAlumnos({
                   )}
 
                   {/* --- CARTEL FLOTANTE CON NOMBRE DEL ALUMNO --- */}
-                  {student && (() => {
-                    const isMe = (!isHost && seat.id === currentSeat) || Boolean(student.isPlayer)
-                    return (
-                      <g
-                        className="anim-name-float"
-                        style={{ transformOrigin: `${x}px ${y - 60}px` }}
+                  {student && (
+                    <g
+                      className="anim-name-float"
+                      style={{ transformOrigin: `${x}px ${y - 60}px` }}
+                    >
+                      {/* Fondo blanco puro o dorado si es el alumno actual */}
+                      <rect
+                        x={x - (isMe ? 54 : 48)}
+                        y={y - 74}
+                        width={isMe ? 108 : 96}
+                        height={24}
+                        rx={12}
+                        fill={isMe ? '#FEF08A' : '#FFFFFF'}
+                        stroke={isMe ? '#CA8A04' : '#18181B'}
+                        strokeWidth={isMe ? '2.8' : '2.2'}
+                        filter="url(#cardShadow)"
+                      />
+                      {/* Punto verde de conexión */}
+                      <circle cx={x - (isMe ? 40 : 36)} cy={y - 62} r={3.5} fill={isMe ? '#CA8A04' : '#608841'} />
+                      {/* Nombre del alumno */}
+                      <text
+                        x={x + 4}
+                        y={y - 58}
+                        textAnchor="middle"
+                        fontSize="11"
+                        fontWeight={isMe ? '900' : '800'}
+                        fill="#18181B"
+                        letterSpacing="0.02em"
                       >
-                        {/* Fondo blanco puro o dorado si es el alumno actual */}
-                        <rect
-                          x={x - (isMe ? 54 : 48)}
-                          y={y - 74}
-                          width={isMe ? 108 : 96}
-                          height={24}
-                          rx={12}
-                          fill={isMe ? '#FEF08A' : '#FFFFFF'}
-                          stroke={isMe ? '#CA8A04' : '#18181B'}
-                          strokeWidth={isMe ? '2.8' : '2.2'}
-                          filter="url(#cardShadow)"
-                        />
-                        {/* Punto verde de conexión */}
-                        <circle cx={x - (isMe ? 40 : 36)} cy={y - 62} r={3.5} fill={isMe ? '#CA8A04' : '#22C55E'} />
-                        {/* Nombre del alumno */}
-                        <text
-                          x={x + 4}
-                          y={y - 58}
-                          textAnchor="middle"
-                          fontSize="11"
-                          fontWeight={isMe ? '900' : '800'}
-                          fill="#18181B"
-                          letterSpacing="0.02em"
-                        >
-                          {isMe ? `${student.nombre} (Tú)` : student.nombre}
-                        </text>
-                      </g>
-                    )
-                  })()}
+                        {isMe ? `${student.nombre || 'Tú'} (Tú)` : student.nombre}
+                      </text>
+                    </g>
+                  )}
                 </g>
               )
             })}
@@ -1298,8 +1623,9 @@ function renderDeskItem(x, y, id) {
   if (itemVariant === 0) {
     return (
       <g>
-        <polygon points={`${x - 14},${y + 7} ${x + 14},${y + 7} ${x + 11},${y + 24} ${x - 11},${y + 24}`} fill="#18181B" />
-        <polygon points={`${x - 11},${y + 9} ${x + 11},${y + 9} ${x + 9},${y + 21} ${x - 9},${y + 21}`} fill="#86EFAC" />
+        <rect x={x - 16} y={y + 10} width="32" height="14" rx="7" fill="#b03921" />
+        <line x1={x - 12} y1={y + 17} x2={x + 12} y2={y + 17} stroke="#fdc623" strokeWidth="2" strokeLinecap="round" />
+        <circle cx={x + 10} cy={y + 17} r="2" fill="#FFFFFF" />
       </g>
     )
   }
@@ -1308,28 +1634,37 @@ function renderDeskItem(x, y, id) {
     return (
       <g>
         <rect
-          x={x - 14}
-          y={y + 11}
-          width="24"
-          height="17"
-          rx="2"
-          fill="#FFFFFF"
-          stroke="#3D4A27"
-          strokeWidth="1.5"
-          transform={`rotate(-5 ${x - 2} ${y + 19})`}
+          x={x - 15}
+          y={y + 9}
+          width="26"
+          height="18"
+          rx="3"
+          fill="#608841"
+          transform={`rotate(-4 ${x - 2} ${y + 18})`}
         />
-        <line x1={x + 13} y1={y + 11} x2={x + 19} y2={y + 25} stroke="#FACC15" strokeWidth="2.8" strokeLinecap="round" />
+        <rect
+          x={x - 11}
+          y={y + 12}
+          width="18"
+          height="12"
+          rx="2"
+          fill="#FAF8F5"
+          transform={`rotate(-4 ${x - 2} ${y + 18})`}
+        />
+        <line x1={x + 13} y1={y + 10} x2={x + 20} y2={y + 24} stroke="#fdc623" strokeWidth="2.8" strokeLinecap="round" />
+        <circle cx={x + 20} cy={y + 24} r="1.4" fill="#b03921" />
       </g>
     )
   }
 
   return (
     <g>
-      <rect x={x - 16} y={y + 10} width="32" height="19" rx="3" fill="#4A1A1C" stroke="#18181B" strokeWidth="1.5" />
-      <rect x={x - 13} y={y + 12} width="26" height="15" rx="2" fill="#FACC15" />
-      <text x={x} y={y + 23} textAnchor="middle" fontSize="8" fontWeight="900" fill="#4A1A1C">
+      <rect x={x - 16} y={y + 9} width="32" height="18" rx="3" fill="#461020" />
+      <rect x={x - 13} y={y + 11} width="26" height="14" rx="2" fill="#5A182B" />
+      <text x={x} y={y + 22} textAnchor="middle" fontSize="9" fontWeight="900" fill="#fdc623" fontFamily="'Plus Jakarta Sans', system-ui, sans-serif">
         § LEX
       </text>
+      <path d={`M ${x + 6} ${y + 25} L ${x + 6} ${y + 29} L ${x + 8} ${y + 27} L ${x + 10} ${y + 29} L ${x + 10} ${y + 25} Z`} fill="#fdc623" />
     </g>
   )
 }

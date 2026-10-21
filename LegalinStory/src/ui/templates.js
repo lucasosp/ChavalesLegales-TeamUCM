@@ -21,9 +21,28 @@ export function appTemplate() {
           <span class="perspective-badge" data-perspective-badge hidden></span>
           <div class="topbar-actions">
             <button class="library" type="button" data-library>Salir</button>
-            <button class="restart" type="button" data-restart>Reiniciar</button>
           </div>
         </header>
+
+        <section class="welcome" data-welcome hidden aria-hidden="true" aria-labelledby="welcome-title">
+          <div class="welcome-card" role="dialog" aria-modal="true">
+            <p class="welcome-kicker">Chavales Legales · Novela visual</p>
+            <h1 class="welcome-title" id="welcome-title">Antes de empezar...</h1>
+            <div class="welcome-copy">
+              <p>En esta historia, tus decisiones importan.</p>
+              <p>Vivirás situaciones relacionadas con la seguridad en casa, tus derechos y las consecuencias de lo que decides hacer.</p>
+              <p>A lo largo de la aventura tendrás que elegir cómo actuar. Algunas decisiones serán fáciles; otras te harán pensar.</p>
+              <p>No se trata solo de llegar al final, sino de aprender a reconocer los riesgos, protegerte y saber cuándo pedir ayuda.</p>
+            </div>
+            <ul class="welcome-instructions">
+              <li>Lee los diálogos y avanza por la historia.</li>
+              <li>Elige cómo actuar cuando aparezcan decisiones.</li>
+              <li>Descubre las consecuencias de tus elecciones.</li>
+              <li>Aprende a protegerte y a ayudar a los demás.</li>
+            </ul>
+            <button class="welcome-button" type="button" data-welcome-start>Comenzar historia</button>
+          </div>
+        </section>
 
         <section class="notice" data-notice hidden aria-hidden="true">
           <div class="notice-card" role="alertdialog" aria-modal="true" aria-labelledby="notice-title">
@@ -44,7 +63,6 @@ export function appTemplate() {
           <span class="location-banner-kicker">Ubicación</span>
           <span class="location-banner-text" data-location-text></span>
         </div>
-
         <div class="choices" data-choices hidden></div>
 
         <p class="sr-only" data-announcement role="status"></p>
@@ -132,9 +150,6 @@ export function appTemplate() {
           <div class="ending-actions">
             <button class="ending-rights" type="button" data-ending-rights hidden>
               Conoce tus derechos
-            </button>
-            <button class="ending-button" type="button" data-ending-restart>
-              Volver a empezar
             </button>
             <button class="ending-library" type="button" data-ending-library>
               Volver a Chavales Legales

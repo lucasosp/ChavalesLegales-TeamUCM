@@ -75,7 +75,6 @@ export class App {
     this.view = new VisualNovelView(root, {
       onAdvance: () => this.advance(),
       onChoose: (optionId) => this.engine.choose(optionId),
-      onRestart: () => this.restart(),
       onExit,
       title,
       resolveCharacter,
@@ -89,7 +88,10 @@ export class App {
   }
 
   start() {
-    this.engine.start();
+    const saved = this.engine.saveStore?.load();
+    const canResume = saved && typeof saved.nodeId === "string" && Boolean(this.engine.story[saved.nodeId]);
+    if (canResume) this.engine.start();
+    else this.view.showWelcome(() => this.engine.start({ resume: false }));
   }
 
   advance() {

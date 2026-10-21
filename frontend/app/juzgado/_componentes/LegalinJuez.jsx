@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 
 // Legalín visto desde arriba, sentado ante la mesa: cabeza con peluca, brazos
 // que se estiran hacia lo que pulsa el jugador y mazazo al acertar.
-const PELO = '#8B5A2B', PELO_OSC = '#6B4226', CARA = '#F2C79B', PELUCA = '#F4F1EA', TOGA = '#064e3b', TINTA = '#18181B' // toga en el esmeralda de la web
+const PELO = '#8B5A2B', PELO_OSC = '#6B4226', CARA = '#F2C79B', PELUCA = '#F4F1EA', TOGA = '#064e3b', TINTA = '#2B2B2B' // toga en el esmeralda de la web
 const LARGO_BRAZO = 560   // brazo + antebrazo (px de la mesa)
 const DURACION = 240      // ms que tarda la mano en llegar
 const DOBLEZ_MAX = 90     // el codo apenas se abre: visto desde arriba, el brazo «se acorta» hacia la cámara
@@ -20,9 +20,9 @@ export function LegalinHead({ mira = 0 }) {
   return (
     <svg className="legalin-cabeza" viewBox="0 0 280 190" aria-label="Legalín, el juez" style={{ transform: `rotate(${mira * 8}deg)` }}>
       <circle cx="36" cy="132" r="30" fill={PELO} className="trazo" />
-      <circle cx="36" cy="132" r="15" fill={CARA} />
+      <path d="M30 120 q10 12 0 24" fill="none" stroke={PELO_OSC} strokeWidth="4" strokeLinecap="round" />
       <circle cx="244" cy="132" r="30" fill={PELO} className="trazo" />
-      <circle cx="244" cy="132" r="15" fill={CARA} />
+      <path d="M250 120 q-10 12 0 24" fill="none" stroke={PELO_OSC} strokeWidth="4" strokeLinecap="round" />
       <circle cx="140" cy="155" r="100" fill={PELO} className="trazo" />
       {/* Flequillo que asoma bajo la peluca */}
       <path d="M118 52 q8 -16 22 -2 q14 -14 22 2 z" fill={PELO_OSC} className="trazo" />
@@ -72,6 +72,8 @@ function useMano(reposo, objetivo) {
   return pos
 }
 
+const CABEZA_MAZO = 113 // distancia de la palma al centro de la cabeza del mazo
+
 function Brazo({ hombro, mano, fuera, conMazo, mazazoId }) {
   const c = codo(hombro, mano, fuera)
   const recorrido = `M${hombro.x} ${hombro.y} L${c.x} ${c.y} L${mano.x} ${mano.y}`
@@ -81,25 +83,42 @@ function Brazo({ hombro, mano, fuera, conMazo, mazazoId }) {
       <path d={recorrido} stroke={TINTA} strokeWidth="66" fill="none" strokeLinecap="round" strokeLinejoin="round" />
       <path d={recorrido} stroke={TOGA} strokeWidth="58" fill="none" strokeLinecap="round" strokeLinejoin="round" />
       <g transform={`translate(${mano.x} ${mano.y}) rotate(${angulo})`}>
+        {/* Sombra del mazo sobre la mesa: no sube con la mano, solo se aclara y se separa */}
+        {conMazo && <g transform="translate(10 12)"><g key={`s${mazazoId}`} className="mazo-sombra"><GavelSlam sombra /></g></g>}
         <rect x="-44" y="-32" width="22" height="64" rx="10" fill={PELUCA} className="trazo" />
-        <ellipse cx="0" cy="0" rx="36" ry="30" fill={PELO} className="trazo" />
-        {[[30, -22], [40, -6], [40, 10], [30, 25]].map(([x, y]) => <circle key={y} cx={x} cy={y} r="10" fill={PELO} className="trazo" />)}
-        <ellipse cx="2" cy="0" rx="16" ry="13" fill={CARA} />
-        {conMazo && <GavelSlam key={mazazoId} />}
+        <g key={mazazoId} className={conMazo ? 'mano-mazazo' : undefined}>
+          {conMazo && <GavelSlam />}
+          <ellipse cx="0" cy="0" rx="36" ry="30" fill={PELO} className="trazo" />
+          {[[30, -22], [40, -6], [40, 10], [30, 25]].map(([x, y]) => <circle key={y} cx={x} cy={y} r="10" fill={PELO} className="trazo" />)}
+          {/* Dorso de la mano: nudillos en vez de palma */}
+          <path d="M14 -16 q6 8 0 16 M18 4 q6 8 0 16" fill="none" stroke={PELO_OSC} strokeWidth="3.5" strokeLinecap="round" />
+        </g>
       </g>
     </g>
   )
 }
 
-// Mazo visto desde arriba. La animación CSS lo levanta (más grande = más cerca
-// de la cámara) y lo baja de golpe sobre el papel.
-export function GavelSlam() {
+// Mazo visto desde arriba, en coordenadas de la mano: el mango sale hacia +x y la
+// cabeza (un cilindro) queda perpendicular. Con `sombra` se dibuja solo la silueta.
+export function GavelSlam({ sombra = false }) {
+  if (sombra) {
+    return (
+      <g fill="rgba(0, 0, 0, .22)">
+        <rect x="-10" y="-8" width="116" height="16" rx="8" />
+        <rect x="94" y="-48" width="38" height="96" rx="14" />
+      </g>
+    )
+  }
   return (
-    <g className="mazo">
-      <rect x="0" y="-7" width="92" height="14" rx="6" fill="#A0612F" className="trazo" />
-      <rect x="78" y="-34" width="38" height="68" rx="10" fill="#6B3E1F" className="trazo" />
-      <rect x="78" y="-22" width="38" height="8" fill="#F5C21B" />
-      <rect x="78" y="14" width="38" height="8" fill="#F5C21B" />
+    <g>
+      <rect x="-12" y="-8" width="118" height="16" rx="8" fill="url(#jz-mango)" stroke={TINTA} strokeWidth="4" />
+      <path d="M8 -2 H86" stroke="#E2A06A" strokeWidth="3" strokeLinecap="round" opacity=".7" />
+      <rect x="94" y="-48" width="38" height="96" rx="14" fill="url(#jz-cabeza)" stroke={TINTA} strokeWidth="4" />
+      <rect x="96" y="-46" width="34" height="9" rx="4" fill="#5A2F12" />
+      <rect x="96" y="37" width="34" height="9" rx="4" fill="#5A2F12" />
+      <rect x="94" y="-32" width="38" height="11" fill="url(#jz-oro)" stroke={TINTA} strokeWidth="2.5" />
+      <rect x="94" y="21" width="38" height="11" fill="url(#jz-oro)" stroke={TINTA} strokeWidth="2.5" />
+      <path d="M104 -18 V16" stroke="#fff" strokeOpacity=".45" strokeWidth="5" strokeLinecap="round" />
     </g>
   )
 }
@@ -115,9 +134,15 @@ export function JudgeArms({ ancho, alto, alcance, mazazo }) {
   const reposo = { izq: { x: cx - 215, y: alto - 80 }, der: { x: cx + 215, y: alto - 80 } }
   const objetivo = lado => {
     if (mazazo && lado === 'der') {
-      // La mano se queda a un mango de distancia para que la cabeza del mazo caiga en el punto.
-      const dx = mazazo.x - hombros.der.x, dy = mazazo.y - hombros.der.y, d = Math.hypot(dx, dy)
-      return alcanzable(hombros.der, { x: mazazo.x - (dx / d) * 97, y: mazazo.y - (dy / d) * 97 })
+      // La mano se queda a un mango de distancia, en la dirección del antebrazo, para que
+      // la cabeza del mazo caiga justo en el punto (dos pasadas: el codo depende de la mano).
+      let mano = mazazo
+      for (let i = 0; i < 2; i++) {
+        const c = codo(hombros.der, mano, 1)
+        const dx = mano.x - c.x, dy = mano.y - c.y, d = Math.hypot(dx, dy) || 1
+        mano = alcanzable(hombros.der, { x: mazazo.x - (dx / d) * CABEZA_MAZO, y: mazazo.y - (dy / d) * CABEZA_MAZO })
+      }
+      return mano
     }
     if (alcance && alcance.lado === lado) return alcanzable(hombros[lado], alcance)
     return null
@@ -127,6 +152,17 @@ export function JudgeArms({ ancho, alto, alcance, mazazo }) {
 
   return (
     <svg className="brazos" viewBox={`0 0 ${ancho} ${alto}`} width={ancho} height={alto} aria-hidden="true">
+      <defs>
+        <linearGradient id="jz-mango" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#C77A43" /><stop offset=".45" stopColor="#A35A2A" /><stop offset="1" stopColor="#6E3415" />
+        </linearGradient>
+        <linearGradient id="jz-cabeza" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#6E3415" /><stop offset=".35" stopColor="#B86A35" /><stop offset=".55" stopColor="#C97C45" /><stop offset="1" stopColor="#5E2C10" />
+        </linearGradient>
+        <linearGradient id="jz-oro" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#B9861B" /><stop offset=".45" stopColor="#FBE07A" /><stop offset="1" stopColor="#B9861B" />
+        </linearGradient>
+      </defs>
       <Brazo hombro={hombros.izq} mano={manoIzq} fuera={-1} />
       <Brazo hombro={hombros.der} mano={manoDer} fuera={1} conMazo={!!mazazo} mazazoId={mazazo?.id} />
       {mazazo && (

@@ -42,7 +42,12 @@ const { nodes: story, startId } = compileStory({
 const root = document.querySelector("#app");
 const saveStore = new MemorySaveStore();
 const app = new App({ root, story, startId, saveStore, title: "Between the Lines" });
+const fail = (message) => {
+  throw new Error(message);
+};
 app.start();
+if (root.querySelector("[data-welcome]").hidden) fail("new story should show the introduction");
+root.querySelector("[data-welcome-start]").click();
 
 const text = root.querySelector("[data-text]");
 const speaker = root.querySelector("[data-speaker-name]");
@@ -52,10 +57,6 @@ const endingTitle = root.querySelector("[data-ending-title]");
 const panel = root.querySelector("[data-panel]");
 const character = root.querySelector("[data-character]");
 const background = root.querySelector(".scene-bg.is-active");
-
-const fail = (message) => {
-  throw new Error(message);
-};
 
 if (text.textContent.length === 0 && !app.view.isTyping()) fail("typewriter did not start");
 app.view.skipTyping();
@@ -92,9 +93,10 @@ if (!ending.classList.contains("is-visible")) fail("ending was never shown");
 if (endingTitle.textContent !== "The First Page") fail(`unexpected ending: ${endingTitle.textContent}`);
 if (saveStore.load() !== null) fail("save should be cleared after the ending");
 
-ending.querySelector("[data-ending-restart]").click();
-if (ending.classList.contains("is-visible")) fail("ending stayed visible after restart");
-if (app.engine.nodeId !== "start") fail(`restart went to ${app.engine.nodeId}`);
+if (root.querySelector("[data-restart], [data-ending-restart]")) fail("restart controls should not be present");
+app.restart();
+if (ending.classList.contains("is-visible")) fail("ending stayed visible after internal restart");
+if (app.engine.nodeId !== "start") fail(`internal restart went to ${app.engine.nodeId}`);
 app.view.skipTyping();
 if (text.textContent !== story[startId].text) fail("restart did not render the first line");
 
@@ -130,6 +132,7 @@ resumed.start();
 if (resumed.engine.nodeId !== saved.nodeId) {
   fail(`resume went to ${resumed.engine.nodeId}, expected ${saved.nodeId}`);
 }
+if (!secondRoot.querySelector("[data-welcome]").hidden) fail("resumed story should skip the introduction");
 if (resumed.engine.flags.acceptedInvitation !== true) {
   fail("resume lost choice flags");
 }

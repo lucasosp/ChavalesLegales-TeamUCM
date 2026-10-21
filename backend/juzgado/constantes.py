@@ -28,18 +28,37 @@ FRANJAS = {
         "lenguaje": "Frases muy cortas y palabras sencillas, como en un cuento. Sin tecnicismos: si nombras una ley, explícala con un ejemplo cotidiano. Trata los temas delicados con muchísimo tacto: nada de detalles de daño, solo la idea de que está mal y de pedir ayuda a un adulto.",
         "dificultad": "Casi todos fáciles; como mucho alguno medio.",
         "instrucciones": "¡Hoy eres juez o jueza! Lee lo que ha pasado, mira las leyes fáciles y pulsa si lo que hicieron está BIEN (legal) o MAL (ilegal). Si fallas, ¡puedes volver a intentarlo!",
+        # Tutorial del primer caso: fichas, sellos, libro y «¿A quién acudir?»
+        "tutorial": [
+            "Estas son las fichas de las personas del caso. ¡Tócalas para verlas!",
+            "Con los sellos decides: verde si está BIEN, rojo si está MAL. El amarillo, si falta algo.",
+            "En mi libro están las leyes explicadas fácil.",
+            "Aquí tienes pistas. Si la familia pregunta, lleva la tarjeta correcta a la bandeja.",
+        ],
     },
     "10-12": {
         "nombre": "Medianos (10-12)",
         "lenguaje": "Frases cortas y claras. Puedes usar palabras jurídicas básicas (denuncia, juez, delito) explicándolas. Sin detalles gráficos ni métodos de daño.",
         "dificultad": "Mezcla de fáciles y medios, y algún difícil.",
         "instrucciones": "Revisa cada expediente como un juez de verdad: lee el caso, pide más documentos si los hay y consulta las leyes simplificadas. A veces la familia te pedirá a quién acudir: ¡elige el recurso correcto!",
+        "tutorial": [
+            "Aquí están las fichas de las personas del caso. Púlsalas para ver sus datos.",
+            "Sella LEGAL o ILEGAL. Si falta una ficha o un papel importante, usa FALTA INFO.",
+            "El libro tiene las leyes explicadas fácil. Consúltalo cuando dudes.",
+            "Si la familia pregunta a quién acudir, arrastra la tarjeta correcta a la bandeja.",
+        ],
     },
     "13-16": {
         "nombre": "Mayores (13-16)",
         "lenguaje": "Lenguaje cercano y juvenil pero preciso. Puedes usar términos jurídicos (Fiscalía de Menores, prueba, difusión no consentida) explicándolos en una frase. Sin detalles gráficos ni métodos de daño.",
         "dificultad": "Sobre todo medios y difíciles.",
         "instrucciones": "Cada expediente puede esconder un giro: pide la documentación antes de decidir. Juzga la conducta de quien actúa, cita la norma que aplica y deriva a la familia al recurso oficial adecuado. Cada intento fallido resta estrellas.",
+        "tutorial": [
+            "Revisa las fichas: la edad o el papel de cada persona puede cambiar el veredicto.",
+            "Dicta sentencia con LEGAL o ILEGAL. Si al expediente le falta algo clave, sella FALTA INFO.",
+            "El libro recoge las normas aplicables explicadas en lenguaje claro.",
+            "Cuando la familia pida orientación, entrega en la bandeja el recurso oficial adecuado.",
+        ],
     },
 }
 
@@ -134,7 +153,8 @@ def config_publica(ia_disponible: bool) -> dict:
     return {
         "temas": TEMAS,
         "temasSensibles": sorted(TEMAS_SENSIBLES),
-        "franjas": {k: {"nombre": v["nombre"], "instrucciones": v["instrucciones"]} for k, v in FRANJAS.items()},
+        "franjas": {k: {"nombre": v["nombre"], "instrucciones": v["instrucciones"], "tutorial": v["tutorial"]}
+                    for k, v in FRANJAS.items()},
         "lineasAyuda": LINEAS_AYUDA,
         "iaDisponible": ia_disponible,
     }

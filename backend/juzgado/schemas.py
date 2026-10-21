@@ -63,6 +63,8 @@ class RespuestaSiguiente(BaseModel):
     fin: bool
     caso: Optional[CasoPublico]
     puntos: int
+    racha: int = 0
+    mejorRacha: int = 0
 
 
 class Revelado(BaseModel):
@@ -83,3 +85,6 @@ class ResultadoVerificacion(BaseModel):
     leyes: Optional[list[LeyBOE]] = None
     recurso: Optional[OpcionRecurso] = None
     finPartida: bool = False
+    racha: int = 0               # aciertos seguidos a la primera
+    mejorRacha: int = 0
+    bonus: int = 0               # estrella extra ganada por racha en este sello

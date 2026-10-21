@@ -65,6 +65,7 @@ const root = document.querySelector("#app");
 const app = new App({ root, story, startId, saveStore: store });
 try {
   app.start();
+  root.querySelector("[data-welcome-start]").click();
   root.querySelector("[data-interstitial-next]").click();
   assert.equal(frames.size, 1);
   app.view.showChat({ self: "Sara", messages: [{ from: "Julia", text: "uno" }, { from: "Julia", text: "dos" }] });

@@ -94,7 +94,19 @@ async def unirse_a_sala(pin: str, req: JoinRoomRequest):
     if room.state != RoomState.LOBBY:
         raise HTTPException(400, "La partida ya ha comenzado en esta sala.")
 
-    player = await room_manager.join_player(pin, req.nickname)
+    base_type = req.base_type if req.base_type is not None else req.baseType
+    color_pelo = req.color_pelo if req.color_pelo is not None else req.colorPelo
+    color_ropa = req.color_ropa if req.color_ropa is not None else req.colorRopa
+    tiene_gorro = req.tiene_gorro if req.tiene_gorro is not None else req.tieneGorro
+
+    player = await room_manager.join_player(
+        pin,
+        req.nickname,
+        base_type=base_type,
+        color_pelo=color_pelo,
+        color_ropa=color_ropa,
+        tiene_gorro=tiene_gorro,
+    )
     if not player:
         raise HTTPException(500, "No se pudo unir a la sala.")
 
@@ -104,7 +116,13 @@ async def unirse_a_sala(pin: str, req: JoinRoomRequest):
         nickname=player.nickname,
         seat_index=player.seat_index,
         avatar_tipo=player.avatar_tipo,
+        base_type=player.base_type,
+        color_pelo=player.color_pelo,
+        color_ropa=player.color_ropa,
+        tiene_gorro=player.tiene_gorro,
         modo=room.modo,
+        capacidad_aula=room.capacidad_aula,
+        modo_infinito=room.modo_infinito,
     )
 
 
@@ -130,16 +148,19 @@ async def ws_host(websocket: WebSocket, pin: str, token: str = Query(...)):
 
             if action == "PING":
                 await websocket.send_json({"event": "PONG"})
+            elif action == "LAUNCH_GAME":
+                url = data.get("url", "/novela")
+                game = data.get("game", "novela")
+                await room_manager.launch_game(room, url=url, game=game)
             elif action == "START_GAME":
                 modo = data.get("modo")
                 await room_manager.start_game(room, modo=modo)
-            elif action == "REVEAL":
-                await room_manager.reveal_question(room)
-            elif action == "LEADERBOARD":
-                await room_manager.show_leaderboard(room)
-            elif action == "NEXT_QUESTION":
-                await room_manager.next_question(room)
+            elif action == "UPDATE_CAPACITY":
+                capacidad = data.get("capacidad") or data.get("capacidad_aula")
+                modo_infinito = data.get("modo_infinito")
+                await room_manager.update_room_capacity(room, capacidad=capacidad, modo_infinito=modo_infinito)
             elif action == "RETURN_TO_LOBBY":
+                room.active_game = None
                 await room_manager.return_to_lobby(room)
     except WebSocketDisconnect:
         await room_manager.disconnect_host(room)
@@ -169,6 +190,19 @@ async def ws_player(websocket: WebSocket, pin: str, player_id: str = Query(...))
                 answer_index = data.get("answer_index")
                 if answer_index is not None and isinstance(answer_index, int):
                     await room_manager.submit_answer(room, player_id, answer_index)
+            elif action == "UPDATE_AVATAR":
+                base_type = data.get("baseType") if data.get("baseType") is not None else data.get("base_type")
+                color_pelo = data.get("colorPelo") if data.get("colorPelo") is not None else data.get("color_pelo")
+                color_ropa = data.get("colorRopa") if data.get("colorRopa") is not None else data.get("color_ropa")
+                tiene_gorro = data.get("tieneGorro") if data.get("tieneGorro") is not None else data.get("tiene_gorro")
+                await room_manager.update_player_avatar(
+                    room,
+                    player_id,
+                    base_type=base_type,
+                    color_pelo=color_pelo,
+                    color_ropa=color_ropa,
+                    tiene_gorro=tiene_gorro,
+                )
     except WebSocketDisconnect:
         await room_manager.disconnect_player(room, player_id)
     except Exception:

@@ -26,6 +26,9 @@ class Room:
         self.players: Dict[str, Player] = {}
         self.host_ws: Optional[WebSocket] = None
         self.player_ws: Dict[str, WebSocket] = {}
+        self.active_game: Optional[Dict[str, str]] = None
+        self.capacidad_aula: int = 12
+        self.modo_infinito: bool = False
 
     @property
     def current_item(self) -> Optional[Dict[str, Any]]:
@@ -39,7 +42,17 @@ class Room:
                 "id": p.id,
                 "nombre": p.nickname,
                 "seatIndex": p.seat_index,
+                "seat_index": p.seat_index,
                 "avatarTipo": p.avatar_tipo,
+                "avatar_tipo": p.avatar_tipo,
+                "baseType": p.base_type,
+                "base_type": p.base_type,
+                "colorPelo": p.color_pelo,
+                "color_pelo": p.color_pelo,
+                "colorRopa": p.color_ropa,
+                "color_ropa": p.color_ropa,
+                "tieneGorro": p.tiene_gorro,
+                "tiene_gorro": p.tiene_gorro,
                 "score": p.score,
                 "hasAnswered": p.current_answer is not None,
                 "isConnected": p.is_connected,
@@ -56,6 +69,10 @@ class Room:
                 "score": p.score,
                 "streak": p.streak,
                 "avatarTipo": p.avatar_tipo,
+                "baseType": p.base_type,
+                "colorPelo": p.color_pelo,
+                "colorRopa": p.color_ropa,
+                "tieneGorro": p.tiene_gorro,
                 "seatIndex": p.seat_index,
                 "rank": idx + 1,
             }
@@ -110,7 +127,15 @@ class RoomManager:
         clean_pin = pin.replace(" ", "").strip()
         return self.rooms.get(clean_pin)
 
-    async def join_player(self, pin: str, nickname: str) -> Optional[Player]:
+    async def join_player(
+        self,
+        pin: str,
+        nickname: str,
+        base_type: Optional[int] = None,
+        color_pelo: Optional[str] = None,
+        color_ropa: Optional[str] = None,
+        tiene_gorro: Optional[bool] = None,
+    ) -> Optional[Player]:
         room = self.get_room(pin)
         if not room:
             return None
@@ -122,8 +147,10 @@ class RoomManager:
         async with self.lock:
             player_id = secrets.token_hex(8)
             existing_seats = {p.seat_index for p in room.players.values()}
-            # Buscar el primer pupitre libre entre 0 y TOTAL_SEATS - 1
-            seat_index = next((s for s in range(TOTAL_SEATS) if s not in existing_seats), len(room.players))
+            if room.modo_infinito and len(existing_seats) >= room.capacidad_aula:
+                room.capacidad_aula += 4
+            # Buscar el primer pupitre libre entre 0 y capacidad_aula - 1
+            seat_index = next((s for s in range(room.capacidad_aula) if s not in existing_seats), len(room.players))
             avatar_tipo = len(room.players) % 6
 
             player = Player(
@@ -131,6 +158,10 @@ class RoomManager:
                 nickname=clean_name,
                 seat_index=seat_index,
                 avatar_tipo=avatar_tipo,
+                base_type=int(base_type) if base_type is not None else 1,
+                color_pelo=str(color_pelo) if color_pelo is not None else "#4A2810",
+                color_ropa=str(color_ropa) if color_ropa is not None else "#4A1A1C",
+                tiene_gorro=bool(tiene_gorro) if tiene_gorro is not None else False,
             )
             room.players[player_id] = player
 
@@ -150,6 +181,14 @@ class RoomManager:
         if player_id in room.players:
             room.players[player_id].is_connected = True
             room.player_ws[player_id] = ws
+            if room.active_game:
+                try:
+                    await ws.send_json({
+                        "event": "LAUNCH_GAME",
+                        **room.active_game,
+                    })
+                except Exception:
+                    pass
             await self.broadcast_room_state(room)
 
     async def disconnect_player(self, room: Room, player_id: str):
@@ -158,6 +197,24 @@ class RoomManager:
         if player_id in room.player_ws:
             del room.player_ws[player_id]
         await self.broadcast_room_state(room)
+
+    async def launch_game(self, room: Room, url: str, game: str):
+        room.active_game = {"url": url, "game": game}
+        payload = {
+            "event": "LAUNCH_GAME",
+            "url": url,
+            "game": game,
+        }
+        for ws in list(room.player_ws.values()):
+            try:
+                await ws.send_json(payload)
+            except Exception:
+                pass
+        if room.host_ws:
+            try:
+                await room.host_ws.send_json(payload)
+            except Exception:
+                pass
 
     # =========================================================================
     # LÓGICA DE JUEGO (MÁQUINA DE ESTADOS)
@@ -251,6 +308,50 @@ class RoomManager:
 
         return True
 
+    async def update_player_avatar(
+        self,
+        room: Room,
+        player_id: str,
+        base_type: Optional[int] = None,
+        color_pelo: Optional[str] = None,
+        color_ropa: Optional[str] = None,
+        tiene_gorro: Optional[bool] = None,
+    ):
+        async with self.lock:
+            if player_id not in room.players:
+                return
+            player = room.players[player_id]
+            if base_type is not None:
+                try:
+                    player.base_type = int(base_type)
+                except (ValueError, TypeError):
+                    pass
+            if color_pelo is not None:
+                player.color_pelo = str(color_pelo)
+            if color_ropa is not None:
+                player.color_ropa = str(color_ropa)
+            if tiene_gorro is not None:
+                player.tiene_gorro = bool(tiene_gorro)
+
+        await self.broadcast_room_state(room)
+
+    async def update_room_capacity(
+        self,
+        room: Room,
+        capacidad: Optional[int] = None,
+        modo_infinito: Optional[bool] = None,
+    ):
+        async with self.lock:
+            if capacidad is not None:
+                try:
+                    room.capacidad_aula = max(4, int(capacidad))
+                except (ValueError, TypeError):
+                    pass
+            if modo_infinito is not None:
+                room.modo_infinito = bool(modo_infinito)
+
+        await self.broadcast_room_state(room)
+
     async def reveal_question(self, room: Room):
         if room.state != RoomState.QUESTION:
             return
@@ -295,6 +396,7 @@ class RoomManager:
             "state": room.state.value,
             "pin": room.pin,
             "modo": room.modo,
+            "active_game": room.active_game,
             "current_index": room.current_index,
             "total_items": len(room.items),
             "question_duration": room.question_duration,
@@ -305,6 +407,8 @@ class RoomManager:
             "answer_stats": room.get_answer_stats() if room.state != RoomState.LOBBY else {},
             "answered_count": answered_count,
             "total_players": len(room.players),
+            "capacidad_aula": room.capacidad_aula,
+            "modo_infinito": room.modo_infinito,
         }
 
     def _build_player_payload(self, room: Room, player_id: str) -> Dict[str, Any]:
@@ -335,6 +439,7 @@ class RoomManager:
             "state": room.state.value,
             "pin": room.pin,
             "modo": room.modo,
+            "active_game": room.active_game,
             "current_index": room.current_index,
             "total_items": len(room.items),
             "item": base_item,
@@ -344,12 +449,18 @@ class RoomManager:
                 "nickname": player.nickname if player else "",
                 "seat_index": player.seat_index if player else 0,
                 "avatar_tipo": player.avatar_tipo if player else 0,
+                "base_type": player.base_type if player else 1,
+                "color_pelo": player.color_pelo if player else None,
+                "color_ropa": player.color_ropa if player else None,
+                "tiene_gorro": player.tiene_gorro if player else False,
                 "score": player.score if player else 0,
                 "rank": player_rank,
                 "current_answer": player.current_answer if player else None,
                 "is_correct": is_correct,
             } if player else None,
             "leaderboard_preview": leaderboard[:5],
+            "capacidad_aula": room.capacidad_aula,
+            "modo_infinito": room.modo_infinito,
         }
 
     async def send_host_state(self, room: Room):

@@ -48,7 +48,6 @@ export class VisualNovelView {
    * @param {{
    *   onAdvance: () => void,
    *   onChoose: (optionId: string) => void,
-   *   onRestart: () => void,
    *   onExit?: () => void,
    *   title?: string,
    *   resolveCharacter?: (character: { id: string, expression: string }) => string,
@@ -63,7 +62,6 @@ export class VisualNovelView {
     {
       onAdvance,
       onChoose,
-      onRestart,
       onExit = null,
       title = "Visual Novel",
       resolveCharacter = defaultCharacterSource,
@@ -79,7 +77,6 @@ export class VisualNovelView {
 
     this.onAdvance = onAdvance;
     this.onChoose = onChoose;
-    this.onRestart = onRestart;
     this.onExit = onExit;
     this.resolveCharacter = resolveCharacter;
     this.resolveCharacterName = resolveCharacterName;
@@ -93,6 +90,9 @@ export class VisualNovelView {
 
     this.refs = {
       scene: root.querySelector("[data-scene]"),
+      topbar: root.querySelector(".topbar"),
+      welcome: root.querySelector("[data-welcome]"),
+      welcomeStart: root.querySelector("[data-welcome-start]"),
       backgrounds: [...root.querySelectorAll("[data-bg-layer]")],
       character: root.querySelector("[data-character]"),
       sprite: root.querySelector("[data-sprite]"),
@@ -144,13 +144,11 @@ export class VisualNovelView {
       lessonTeach: root.querySelector("[data-lesson-teach]"),
       lessonClose: root.querySelector("[data-lesson-close]"),
       library: root.querySelector("[data-library]"),
-      restart: root.querySelector("[data-restart]"),
       ending: root.querySelector("[data-ending]"),
       endingKicker: root.querySelector("[data-ending-kicker]"),
       endingTitle: root.querySelector("[data-ending-title]"),
       endingText: root.querySelector("[data-ending-text]"),
       endingRights: root.querySelector("[data-ending-rights]"),
-      endingRestart: root.querySelector("[data-ending-restart]"),
       endingLibrary: root.querySelector("[data-ending-library]"),
       rights: root.querySelector("[data-rights]"),
       rightsTitle: root.querySelector("[data-rights-title]"),
@@ -177,6 +175,24 @@ export class VisualNovelView {
     this.#hideNotice();
     clearTimeout(this.#locationTimer);
     this.typewriter.stop();
+  }
+
+  showWelcome(onStart) {
+    this.refs.welcome.hidden = false;
+    this.refs.welcome.setAttribute("aria-hidden", "false");
+    this.refs.welcomeStart.addEventListener("click", () => {
+      this.refs.welcome.hidden = true;
+      this.refs.welcome.setAttribute("aria-hidden", "true");
+      this.refs.topbar.inert = false;
+      for (const element of this.root.querySelectorAll("[inert]")) element.inert = false;
+      onStart();
+    }, { once: true });
+    this.refs.topbar.inert = true;
+    for (const selector of ["[data-panel]", "[data-choices]", "[data-chat]", "[data-interstitial]", "[data-minigame]", "[data-ending]", "[data-rights]"]) {
+      const element = this.root.querySelector(selector);
+      if (element) element.inert = true;
+    }
+    this.refs.welcomeStart.focus({ preventScroll: true });
   }
 
   /* ------------------------------------------------------------ story events */
@@ -238,7 +254,7 @@ export class VisualNovelView {
 
     this.refs.ending.classList.add("is-visible");
     this.refs.ending.setAttribute("aria-hidden", "false");
-    this.refs.endingRestart.focus({ preventScroll: true });
+    (this.rights ? this.refs.endingRights : this.refs.endingLibrary).focus({ preventScroll: true });
   }
 
   /* --------------------------------------------------------------- typewriter */
@@ -893,6 +909,7 @@ export class VisualNovelView {
     this.refs.chatSkip.addEventListener("click", () => this.#skipChat());
     this.refs.scene.addEventListener("click", (event) => {
       if (event.target.closest("button")) return;
+      if (!this.refs.welcome.hidden) return;
       if (this.#interactionLocked || this.#rightsVisible) return;
       if (this.#awaitingChoice || this.#endingVisible) return;
       this.onAdvance();
@@ -904,18 +921,6 @@ export class VisualNovelView {
       event.stopPropagation();
       this.refs.library.blur();
       this.onExit?.();
-    });
-
-    this.refs.restart.addEventListener("click", (event) => {
-      event.stopPropagation();
-      this.refs.restart.blur();
-      this.onRestart();
-    });
-
-    this.refs.endingRestart.addEventListener("click", (event) => {
-      event.stopPropagation();
-      this.refs.endingRestart.blur();
-      this.onRestart();
     });
 
     this.refs.endingLibrary.addEventListener("click", (event) => {
@@ -943,6 +948,13 @@ export class VisualNovelView {
 
   #handleKeyDown(event) {
     if (event.repeat) return;
+    if (!this.refs.welcome.hidden) {
+      if (event.key === "Tab") {
+        event.preventDefault();
+        this.refs.welcomeStart.focus({ preventScroll: true });
+      }
+      return;
+    }
     if (!this.refs.notice.hidden) {
       if (event.key === "Escape") {
         event.preventDefault();
@@ -1171,7 +1183,6 @@ export class VisualNovelView {
 
     this.#endingVisible = false;
     this.#closeRights();
-    this.refs.endingRestart.blur();
     this.refs.endingRights.blur();
     this.refs.endingLibrary.blur();
     this.refs.ending.classList.remove("is-visible");
