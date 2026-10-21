@@ -18,7 +18,6 @@ export function appTemplate() {
         <header class="topbar">
           <span class="brand" data-brand></span>
           <div class="topbar-actions">
-            <a class="library help-link" href="/necesito-ayuda" target="_top">Necesito ayuda</a>
             <button class="library" type="button" data-library>Salir</button>
           </div>
         </header>

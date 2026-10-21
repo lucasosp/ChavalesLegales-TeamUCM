@@ -15,6 +15,7 @@ from .constantes import LEYES_SIMPLIFICADAS, RECURSOS_JUSTICIA
 from .textos import adaptar_texto, mensaje, pildoras_ayuda
 
 ESTRELLAS_MAX = 3      # por caso; cada intento fallido resta una
+RACHA_PREMIO = 3       # cada 3 aciertos seguidos a la primera: +1 estrella extra
 PARTIDAS_MAX = 500     # se descartan las más antiguas
 N_OPCIONES = 3         # tarjetas en la zona «¿A quién acudir?»
 
@@ -34,10 +35,13 @@ class Partida:
     edad: int
     casos: list[dict]
     estados: list[EstadoCaso] = field(default_factory=list)
+    racha: int = 0          # aciertos seguidos a la primera
+    mejor_racha: int = 0
+    bonus: int = 0          # estrellas extra ganadas por rachas
 
     @property
     def puntos(self) -> int:
-        return sum(e.estrellas for e in self.estados)
+        return sum(e.estrellas for e in self.estados) + self.bonus
 
     @property
     def actual(self) -> int | None:
@@ -101,7 +105,8 @@ def vista_publica(partida: Partida, i: int) -> dict:
 
 def siguiente(partida: Partida) -> dict:
     i = partida.actual
-    return {"fin": i is None, "caso": None if i is None else vista_publica(partida, i), "puntos": partida.puntos}
+    return {"fin": i is None, "caso": None if i is None else vista_publica(partida, i), "puntos": partida.puntos,
+            "racha": partida.racha, "mejorRacha": partida.mejor_racha}
 
 
 def verificar(partida: Partida, sello: str, recurso: str | None) -> dict:
@@ -114,8 +119,9 @@ def verificar(partida: Partida, sello: str, recurso: str | None) -> dict:
     def respuesta(tipo, correcto, texto, **extra):
         if not correcto:
             estado.fallos += 1
+            partida.racha = 0  # cualquier fallo rompe la racha
         return {"tipo": tipo, "correcto": correcto, "mensaje": texto, "fallos": estado.fallos,
-                "puntos": partida.puntos, **extra}
+                "puntos": partida.puntos, "racha": partida.racha, "mejorRacha": partida.mejor_racha, **extra}
 
     # 1) Sello «Falta información».
     if sello == "falta_info":
@@ -139,10 +145,18 @@ def verificar(partida: Partida, sello: str, recurso: str | None) -> dict:
 
     estado.resuelto = True
     estado.estrellas = max(0, ESTRELLAS_MAX - estado.fallos)
+    texto, bonus = caso["explanation"], 0
+    if estado.fallos == 0:  # solo los aciertos a la primera suman racha
+        partida.racha += 1
+        partida.mejor_racha = max(partida.mejor_racha, partida.racha)
+        if partida.racha % RACHA_PREMIO == 0:
+            bonus = 1
+            partida.bonus += 1
+            texto += " " + mensaje("racha", edad).format(n=partida.racha)
     return respuesta(
-        "correcto", True, caso["explanation"],
-        veredictoOk=True, recursoOk=True, estrellas=estado.estrellas,
-        leyes=caso["boeLaws"],
+        "correcto", True, texto,
+        veredictoOk=True, recursoOk=True, estrellas=estado.estrellas, bonus=bonus,
+        leyes=[{**ley, "simplified": adaptar_texto(ley["simplified"], edad)} for ley in caso["boeLaws"]],
         recurso=_recurso(caso["expectedJusticeResource"]) if caso["requiresJusticeInfo"] else None,
         finPartida=partida.actual is None,
     )

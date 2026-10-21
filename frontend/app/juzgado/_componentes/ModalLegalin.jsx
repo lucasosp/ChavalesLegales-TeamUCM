@@ -9,6 +9,9 @@ const TITULO = {
   incorrecto: '¡Incorrecto!',
 }
 
+// Identificador BOE dentro de la cita oficial, p. ej. «… (BOE-A-1995-25444), art. 172 ter».
+const idBoe = ref => ref?.match(/\((BOE-[A-Z]-\d{4}-\d+)\)/)?.[1]
+
 export default function ModalLegalin({ resultado, esUltimo, onCerrar, onSiguiente }) {
   const { tipo, correcto, mensaje } = resultado
   return (
@@ -28,7 +31,20 @@ export default function ModalLegalin({ resultado, esUltimo, onCerrar, onSiguient
       {tipo === 'correcto' && (
         <>
           <ul className="modal__leyes">
-            {resultado.leyes.map(l => <li key={l.code}><b>{l.code}</b><small>{l.officialRef}</small></li>)}
+            {resultado.leyes.map(l => {
+              const id = idBoe(l.officialRef)
+              return (
+                <li key={l.code}>
+                  <b>{l.code}</b>
+                  <span>{l.kidText || l.simplified || l.summary}</span>
+                  {id && (
+                    <a className="ley-link" href={`https://www.boe.es/buscar/act.php?id=${id}`} target="_blank" rel="noopener noreferrer">
+                      📜 Ver la ley en el BOE ↗
+                    </a>
+                  )}
+                </li>
+              )
+            })}
           </ul>
           {resultado.recurso && (
             <p className="modal__recurso">📞 <b>{resultado.recurso.nombre}</b> ({resultado.recurso.contacto}): {resultado.recurso.cuando}</p>
