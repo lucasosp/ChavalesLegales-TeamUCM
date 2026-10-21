@@ -28,11 +28,13 @@
   "resources": [
     {
       "name": "INCIBE 017",
-      "text": "Ayuda en ciberseguridad para menores, familias y centros educativos."
+      "text": "Orientación en ciberseguridad para menores, familias y centros educativos. Este servicio no presenta una denuncia por ti.",
+      "url": "https://www.incibe.es/linea-de-ayuda-en-ciberseguridad"
     },
     {
       "name": "Canal Prioritario de la AEPD",
-      "text": "Solicitud urgente de retirada de contenidos sexuales o violentos cuando proceda."
+      "text": "Recurso para solicitar la retirada urgente de contenido sexual o violento difundido sin permiso cuando existe un riesgo grave. No equivale a presentar una denuncia penal.",
+      "url": "https://www.aepd.es/canalprioritario"
     },
     {
       "name": "Policía y Fiscalía de Menores",

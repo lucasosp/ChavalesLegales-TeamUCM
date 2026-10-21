@@ -96,6 +96,7 @@ function compileNode(id, node, context) {
   }
 
   if (node.type === "minigame") {
+    compiled.mode = node.mode;
     compiled.prompt = node.prompt;
     compiled.cards = (node.cards ?? []).map((card) => ({ ...card }));
   }

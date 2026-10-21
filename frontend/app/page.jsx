@@ -416,6 +416,7 @@ export default function Home() {
 
       {/* Acceso a profesores en la barra superior */}
       <header className="kahoot-topbar">
+        <Link href="/necesito-ayuda" className="btn-help-access">Necesito ayuda <span aria-hidden="true">→</span></Link>
         <Link
           href="/profesores"
           className="btn-pro-opt1"
@@ -577,10 +578,9 @@ export default function Home() {
                 width: '100%',
               }}
             >
-              {/* Opción 1: Modo Historieta */}
-              <button
-                type="button"
-                onClick={() => handleSoloGameSelect('historieta')}
+              {/* Opción 1: Modo Historieta / Novela visual */}
+              <Link
+                href="/novela"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -588,13 +588,14 @@ export default function Home() {
                   padding: '12px 14px',
                   borderRadius: 16,
                   border: '3px solid #18181B',
-                  background: selectedSoloGame === 'historieta' ? '#FEF08A' : '#FFFFFF',
-                  boxShadow: selectedSoloGame === 'historieta' ? '0 2px 0 #18181B' : '0 4px 0 #18181B',
-                  transform: selectedSoloGame === 'historieta' ? 'translateY(2px)' : 'none',
+                  background: '#FFFFFF',
+                  boxShadow: '0 4px 0 #18181B',
                   cursor: 'pointer',
                   textAlign: 'left',
+                  textDecoration: 'none',
                   transition: 'all 0.15s ease',
                   width: '100%',
+                  boxSizing: 'border-box',
                 }}
               >
                 <div
@@ -624,10 +625,10 @@ export default function Home() {
                       letterSpacing: '0.04em',
                     }}
                   >
-                    Narrativa & Debate
+                    Narrativa & Novela Visual
                   </span>
                   <strong style={{ fontSize: 15, fontWeight: 900, color: '#18181B' }}>
-                    Modo Historieta
+                    No lo reenvíes
                   </strong>
                 </div>
                 <span
@@ -641,14 +642,13 @@ export default function Home() {
                     border: '1px solid #CBD5E1',
                   }}
                 >
-                  {selectedSoloGame === 'historieta' ? '✓ Seleccionado' : 'Elegir'}
+                  Jugar →
                 </span>
-              </button>
+              </Link>
 
               {/* Opción 2: Modo Juicio */}
-              <button
-                type="button"
-                onClick={() => handleSoloGameSelect('juicio')}
+              <Link
+                href="/juzgado"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -656,13 +656,14 @@ export default function Home() {
                   padding: '12px 14px',
                   borderRadius: 16,
                   border: '3px solid #18181B',
-                  background: selectedSoloGame === 'juicio' ? '#DCFCE7' : '#FFFFFF',
-                  boxShadow: selectedSoloGame === 'juicio' ? '0 2px 0 #18181B' : '0 4px 0 #18181B',
-                  transform: selectedSoloGame === 'juicio' ? 'translateY(2px)' : 'none',
+                  background: '#FFFFFF',
+                  boxShadow: '0 4px 0 #18181B',
                   cursor: 'pointer',
                   textAlign: 'left',
+                  textDecoration: 'none',
                   transition: 'all 0.15s ease',
                   width: '100%',
+                  boxSizing: 'border-box',
                 }}
               >
                 <div
@@ -695,7 +696,7 @@ export default function Home() {
                     Tribunal & Casos Reales
                   </span>
                   <strong style={{ fontSize: 15, fontWeight: 900, color: '#18181B' }}>
-                    Modo Juicio
+                    Juzgado de Legalín
                   </strong>
                 </div>
                 <span
@@ -709,9 +710,9 @@ export default function Home() {
                     border: '1px solid #CBD5E1',
                   }}
                 >
-                  {selectedSoloGame === 'juicio' ? '✓ Seleccionado' : 'Elegir'}
+                  Jugar →
                 </span>
-              </button>
+              </Link>
             </div>
           </section>
         </div>

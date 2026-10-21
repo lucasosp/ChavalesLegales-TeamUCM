@@ -1,10 +1,11 @@
 # LegalinStory
 
-A small visual novel library built with vanilla JavaScript and Vite. Stories are
-plain JSON, sprites and backgrounds live in `public/assets`, and the app opens
-on a library screen where you choose what to read.
+Novela visual de Chavales Legales construida con JavaScript y Vite. Se abre
+directamente **No lo reenvíes**, la experiencia principal. El contenido vive en
+JSON y las ilustraciones en `public/assets`. Las historias de ejemplo anteriores
+se conservan como fixtures de regresión, fuera del catálogo publicado.
 
-Three stories are included:
+Contenido conservado en el repositorio:
 
 - **Between the Lines** — a short chapter about a girl, a poem, and an open door.
 - **The Locker Note** — a side story about a note that was never meant to be read.
@@ -12,8 +13,41 @@ Three stories are included:
   image sharing, protection of minors, and access to justice. It includes
   messaging scenes, a perspective switch, a decision menu, an information
   minigame, four endings, and a rights/resources screen.
+- **No soy yo** — una historia complementaria sobre ciberacoso, identidad y
+  pedir ayuda. La entrada principal sigue siendo **No lo reenvíes**.
 
 ## Run it
+
+Con Node.js compatible con Vite 8:
+
+```bash
+npm install
+npm run dev
+```
+
+La plataforma Next.js integra la experiencia en `/novela`. Ejecuta también
+`npm install` en `frontend/`; sus comandos `dev` y `build` compilan la novela
+automáticamente a `frontend/public/novela` (artefactos ignorados por Git).
+La partida se guarda localmente, sin enviar decisiones al backend. La pantalla
+integrada enlaza al módulo existente `/necesito-ayuda`.
+
+En uso independiente, `VITE_PLATFORM_URL` configura el destino del botón Salir;
+en localhost apunta por defecto al frontend en el puerto 3000. Integrada en la
+plataforma, el botón comunica la salida al contenedor mediante `postMessage`
+con comprobación de origen y ventana emisora.
+
+Los apoyos de Sara se marcan juntos y se confirman una vez. No se puntúan.
+La actividad de evidencias permite corregir la selección y continuar tras
+comprobarla; modificar tarjetas invalida la comprobación anterior.
+
+Pruebas: `npm test` y `npm run build`. No hay scripts de lint ni typecheck.
+La batería recorre 270 rutas completas y comprueba los cuatro finales. Para
+pruebas de navegador opcionales instala Playwright y Chromium fuera del proyecto
+y ejecuta `scripts/browser-smoke.mjs` con `PLAYWRIGHT_MODULE_PATH` apuntando a
+`playwright/index.mjs` y `PLAYWRIGHT_BROWSERS_PATH` a sus navegadores.
+Ver el informe de auditoría en `docs/visual-novel-audit.md`.
+
+Alternativa con Nix/pnpm:
 
 ```bash
 devenv shell
@@ -21,10 +55,10 @@ pnpm install
 pnpm dev
 ```
 
-Open the printed URL. Pick a story from the library. Progress is saved to
+Open the printed URL. The main story opens directly. Progress is saved to
 `localStorage` per story, so returning to a story resumes where you left off.
-The **Library** button in the top bar goes back to the selector; **Restart**
-starts the current story over.
+El botón **Salir** vuelve a la plataforma; **Reiniciar** limpia las decisiones
+y empieza de nuevo.
 
 `pnpm dev` validates all content **before** Vite starts. The same check runs
 before `pnpm build`. If a sprite, background, scene, node link, cast entry, or
@@ -190,7 +224,7 @@ validated for future use, but are not composited or played yet.
 vite.config.js                    # content validator plugin for dev/build
 
 src/
-├── main.js                       # entry: library, story loading, composition
+├── main.js                       # entry: primary story loading, composition
 ├── app/
 │   └── App.js                    # composition root, input -> engine commands
 ├── core/
@@ -217,7 +251,7 @@ scripts/
 ├── build-no-lo-reenvies.mjs      # regenerates the story/scene/rights JSON
 ├── validation-smoke.mjs          # proves missing assets fail validation
 ├── ui-smoke.mjs                  # engine/view smoke test
-├── library-smoke.mjs             # loader + library + asset resolution test
+├── library-smoke.mjs             # published story HTTP loader + assets
 └── no-lo-reenvies-smoke.mjs      # chat, minigame, ending, rights coverage
 ```
 
@@ -240,10 +274,11 @@ pnpm test
 ```
 
 Runs the validator, a missing-asset validation test, the engine/view smoke test,
-an end-to-end library test that starts Vite and loads all three stories, and a
+an HTTP test that starts Vite and loads the published story, and a
 full playthrough of **No lo reenvíes** covering messaging scenes, the perspective
 switch, the multi-select needs menu, the minigame, the ending router, and the
-rights panel.
+rights panel. Also explores all 270 complete decision routes and checks
+animation cleanup, restart and migration of saved progress.
 
 ### Regenerating art and content
 

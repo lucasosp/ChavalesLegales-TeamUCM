@@ -15,7 +15,7 @@ export class Typewriter {
    * @param {HTMLElement} element
    * @param {{ charsPerSecond?: number }} [options]
    */
-  constructor(element, { charsPerSecond = 42 } = {}) {
+  constructor(element, { charsPerSecond = 32 } = {}) {
     this.element = element;
     this.charsPerSecond = charsPerSecond;
     this.prefersReducedMotion = globalThis.matchMedia?.(
@@ -30,9 +30,10 @@ export class Typewriter {
   play(text, onComplete = () => {}) {
     this.stop();
 
-    this.#fullText = text;
+    this.#fullText = String(text ?? "");
     this.#shown = 0;
     this.#onComplete = onComplete;
+    // The dialogue frame has a stable height; the text scrolls within its row.
     this.element.textContent = "";
     this.element.classList.add("is-typing");
 
@@ -52,6 +53,7 @@ export class Typewriter {
       if (target !== this.#shown) {
         this.#shown = target;
         this.element.textContent = this.#fullText.slice(0, target);
+        this.element.scrollTop = this.element.scrollHeight;
       }
 
       if (this.#shown < this.#fullText.length) {
@@ -74,6 +76,7 @@ export class Typewriter {
 
     this.#shown = this.#fullText.length;
     this.element.textContent = this.#fullText;
+    this.element.scrollTop = this.element.scrollHeight;
     this.#finish();
   }
 

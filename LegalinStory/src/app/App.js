@@ -42,15 +42,15 @@ export class App {
 
     const storyNodeTypes = {
       chat: {
-        present: (node) => this.bus.emit("chat", node),
+        present: (node) => this.bus.emit("chat", { ...node, stage: structuredClone(this.engine.stage) }),
         next: (node) => node.next,
       },
       interstitial: {
-        present: (node) => this.bus.emit("interstitial", node),
+        present: (node) => this.bus.emit("interstitial", { ...node, stage: structuredClone(this.engine.stage) }),
         next: (node) => node.next,
       },
       minigame: {
-        present: (node) => this.bus.emit("minigame", node),
+        present: (node) => this.bus.emit("minigame", { ...node, stage: structuredClone(this.engine.stage), flags: { ...this.engine.flags } }),
         next: (node) => node.next,
       },
       ...nodeTypes,
@@ -95,6 +95,7 @@ export class App {
   }
 
   destroy() {
+    this.engine.isRunning = false;
     this.view.destroy();
   }
 
@@ -107,7 +108,7 @@ export class App {
       this.view.showInterstitial(payload, () => this.engine.advance()),
     );
     this.bus.on("minigame", (payload) =>
-      this.view.showMinigame(payload, () => this.engine.advance()),
+      this.view.showMinigame(payload, (selected) => this.engine.completeActivity(selected)),
     );
   }
 }

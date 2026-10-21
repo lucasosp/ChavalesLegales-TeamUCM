@@ -701,7 +701,7 @@ export default function ApartadoProfesores({ initialPin = null }) {
           boxSizing: 'border-box',
         }}
       >
-        <div style={{ maxWidth: 580, width: '100%', textAlign: 'center' }}>
+        <div style={{ maxWidth: 680, width: '100%', textAlign: 'center' }}>
           <div
             style={{
               background: '#FFFFFF',
@@ -791,6 +791,86 @@ export default function ApartadoProfesores({ initialPin = null }) {
                 ⚠️ {error}
               </div>
             )}
+          </div>
+
+          {/* ====================================================================
+              LOS BOTONES GRANDES DE JUEGOS:
+              1. Superior: "Modo historieta"
+              2. Centro: "Modo juicio"
+              3. Inferior: "Juzgado de Legalín"
+              ==================================================================== */}
+          <div className="teacher-buttons-stack" style={{ marginTop: 28 }}>
+            {/* BOTÓN SUPERIOR: MODO HISTORIETA */}
+            <Link
+              href="/novela"
+              className="teacher-game-btn teacher-game-btn--historia"
+              aria-label="Abrir No lo reenvíes"
+            >
+              <div className="game-btn-left">
+                <div className="game-btn-icon-wrapper" aria-hidden="true">
+                  📖
+                </div>
+                <div className="game-btn-text-group">
+                  <span className="game-btn-badge">Narrativa & Toma de decisiones</span>
+                  <span className="game-btn-title">No lo reenvíes</span>
+                  <span className="game-btn-desc">
+                    Una novela visual sobre intimidad digital, acoso y cómo pedir ayuda. Tus decisiones cambian la historia.
+                  </span>
+                </div>
+              </div>
+              <div className="game-btn-action" aria-hidden="true">
+                <span>Jugar</span>
+                <span>→</span>
+              </div>
+            </Link>
+
+            {/* BOTÓN INTERMEDIO: MODO JUICIO */}
+            <Link
+              href="/juicio"
+              className="teacher-game-btn teacher-game-btn--juicio"
+              aria-label="Abrir Modo juicio"
+            >
+              <div className="game-btn-left">
+                <div className="game-btn-icon-wrapper" aria-hidden="true">
+                  ⚖️
+                </div>
+                <div className="game-btn-text-group">
+                  <span className="game-btn-badge">Tribunal Digital & Veredicto</span>
+                  <span className="game-btn-title">Modo juicio</span>
+                  <span className="game-btn-desc">
+                    Simulación de juicios rápidos. La clase analiza casos reales de menores y tecnología para dictar sentencia con el Código Penal.
+                  </span>
+                </div>
+              </div>
+              <div className="game-btn-action" aria-hidden="true">
+                <span>Jugar</span>
+                <span>→</span>
+              </div>
+            </Link>
+
+            {/* BOTÓN INFERIOR: JUZGADO DE LEGALÍN */}
+            <Link
+              href="/juzgado"
+              className="teacher-game-btn teacher-game-btn--juzgado"
+              aria-label="Abrir Juzgado de Legalín"
+            >
+              <div className="game-btn-left">
+                <div className="game-btn-icon-wrapper" aria-hidden="true">
+                  🐒
+                </div>
+                <div className="game-btn-text-group">
+                  <span className="game-btn-badge">Mesa del juez</span>
+                  <span className="game-btn-title">Juzgado de Legalín</span>
+                  <span className="game-btn-desc">
+                    Revisa el caso, pide lo que falta y sella LEGAL o ILEGAL. Luego elige a quién acudir. De 7 a 16 años.
+                  </span>
+                </div>
+              </div>
+              <div className="game-btn-action" aria-hidden="true">
+                <span>Jugar</span>
+                <span>→</span>
+              </div>
+            </Link>
           </div>
         </div>
       </main>

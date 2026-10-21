@@ -5,7 +5,7 @@
  */
 export function appTemplate() {
   return `
-    <main class="novel" aria-label="Visual novel">
+    <main class="novel" aria-label="Novela visual No lo reenvíes">
       <div class="scene" data-scene>
         <div class="scene-bg" data-bg-layer="0" aria-hidden="true"></div>
         <div class="scene-bg" data-bg-layer="1" aria-hidden="true"></div>
@@ -18,17 +18,18 @@ export function appTemplate() {
         <header class="topbar">
           <span class="brand" data-brand></span>
           <div class="topbar-actions">
-            <button class="library" type="button" data-library>Library</button>
-            <button class="restart" type="button" data-restart>Restart</button>
+            <button class="library" type="button" data-library>Salir</button>
+            <button class="restart" type="button" data-restart>Reiniciar</button>
           </div>
         </header>
 
         <div class="choices" data-choices hidden></div>
 
-        <section class="dialogue" data-panel aria-live="polite">
+        <p class="sr-only" data-announcement role="status"></p>
+        <section class="dialogue" data-panel>
           <div class="nameplate" data-speaker-name hidden></div>
-          <p class="dialogue-text" data-text></p>
-          <span class="advance" data-advance hidden aria-hidden="true">▼</span>
+          <p class="dialogue-text" data-text aria-hidden="true"></p>
+          <button class="advance" type="button" data-advance hidden>Continuar ▾</button>
         </section>
 
         <section class="chat" data-chat hidden aria-label="Conversación de mensajería">
@@ -36,8 +37,9 @@ export function appTemplate() {
             <span class="chat-dot" aria-hidden="true"></span>
             <span data-chat-title></span>
           </header>
-          <div class="chat-log" data-chat-log></div>
-          <p class="chat-hint" data-chat-hint hidden>Toca para continuar</p>
+          <div class="chat-log" data-chat-log role="log" aria-label="Mensajes"></div>
+          <button class="chat-hint" type="button" data-chat-skip>Mostrar toda la conversación</button>
+          <button class="chat-hint" type="button" data-chat-hint hidden>Continuar ▾</button>
         </section>
 
         <section class="interstitial" data-interstitial hidden aria-hidden="true">
@@ -53,11 +55,11 @@ export function appTemplate() {
 
         <section class="minigame" data-minigame hidden aria-hidden="true">
           <div class="minigame-card">
-            <p class="minigame-kicker">Actividad</p>
+            <p class="minigame-kicker">Tú decides · selección múltiple</p>
             <h2 class="minigame-title" data-minigame-title></h2>
             <p class="minigame-prompt" data-minigame-prompt></p>
             <div class="minigame-cards" data-minigame-cards></div>
-            <div class="minigame-feedback" data-minigame-feedback hidden></div>
+            <div class="minigame-feedback" data-minigame-feedback role="status" hidden></div>
             <div class="minigame-actions">
               <button class="minigame-button" type="button" data-minigame-check>
                 Comprobar
@@ -78,10 +80,10 @@ export function appTemplate() {
               Conoce tus derechos
             </button>
             <button class="ending-button" type="button" data-ending-restart>
-              Read again
+              Volver a empezar
             </button>
             <button class="ending-library" type="button" data-ending-library>
-              Volver a la biblioteca
+              Volver a Chavales Legales
             </button>
           </div>
         </section>

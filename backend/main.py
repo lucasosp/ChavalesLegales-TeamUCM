@@ -13,6 +13,7 @@ from models import (
     RoomState,
 )
 from rooms import room_manager
+from juzgado.router import router as juzgado_router
 
 app = FastAPI(title="Chavales Legales API")
 
@@ -27,6 +28,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(juzgado_router)  # Juzgado de Legalín: /api/cases/*
 
 JUEGOS = {
     "historia": HISTORIA,
