@@ -10,7 +10,9 @@ export default function Header() {
           <span>Chavales <b>Legales</b></span>
         </Link>
         <nav>
+          <Link href="/profesores">Profesores</Link>
           <Link href="/historia">Historia</Link>
+          <Link href="/juicio">Juicio</Link>
           <Link href="/preguntas">Preguntas</Link>
           <Link href="/cooperativo">Cooperativo</Link>
         </nav>

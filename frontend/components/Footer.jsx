@@ -2,8 +2,7 @@ export default function Footer() {
   return (
     <footer className="foot">
       <div className="wrap">
-        ¿Necesitas ayuda? Llama al <b>017</b> (INCIBE, gratis y confidencial) · AEPD Canal Prioritario · Policía / Guardia Civil
-        <small>Proyecto educativo Team UCM</small>
+        <span>UCM</span> · <span>Infancia y juventud</span> · <a href="https://www.administraciondejusticia.gob.es/" target="_blank" rel="noopener noreferrer">Administración de Justicia</a>
       </div>
     </footer>
   )

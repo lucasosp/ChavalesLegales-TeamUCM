@@ -84,3 +84,50 @@ COOPERATIVO = [
         "correcta": 1,
     },
 ]
+
+# Modo juicio: simulación de casos jurídicos reales adaptados para aula.
+JUICIO = [
+    {
+        "id": "difusion_fotos",
+        "titulo": "Caso 1: El sticker privado en el grupo de clase",
+        "hechos": "Un alumno recibe en confianza una fotografía de un compañero en el baño del colegio y decide convertirla en sticker y compartirla en el grupo de WhatsApp de 30 alumnos de la clase.",
+        "pregunta": "¿Qué determina la ley sobre este comportamiento?",
+        "opciones": [
+            "Es delito de difusión no consentida de imágenes íntimas (art. 197.7 CP)",
+            "No es nada porque el grupo es privado y solo era una broma entre amigos",
+            "Solo hay falta si el afectado pide dinero",
+        ],
+        "correcta": 0,
+        "sentencia": "¡Culpable según la ley! Difundir imágenes íntimas o que menoscaben la intimidad de otra persona sin su consentimiento es delito tipificado en el art. 197.7 del Código Penal, con especial gravedad al tratarse de menores.",
+        "articulo": "Art. 197.7 Código Penal",
+    },
+    {
+        "id": "cuenta_falsa",
+        "titulo": "Caso 2: El perfil falso del profesor en TikTok",
+        "hechos": "Dos estudiantes crean una cuenta falsa usando la fotografía real y el nombre de un profesor del centro para publicar vídeos satíricos e insultos hacia otros profesores.",
+        "pregunta": "¿Existe infracción o delito en este caso?",
+        "opciones": [
+            "Es libertad de expresión y humor en redes sociales",
+            "Puede constituir delito de usurpación de estado civil (art. 401 CP) e injurias",
+            "Solo se sanciona si la cuenta consigue más de 10.000 seguidores",
+        ],
+        "correcta": 1,
+        "sentencia": "¡Delito! Hacerse pasar por otra persona de forma continuada vulnera el art. 401 del Código Penal (usurpación de identidad), y si además se insulta o calumnia, se incurre en delitos contra el honor.",
+        "articulo": "Art. 401 y 205-208 Código Penal",
+    },
+    {
+        "id": "amenazas_online",
+        "titulo": "Caso 3: Mensajes amenazantes tras una partida de videojuegos",
+        "hechos": "Tras perder una partida online, un usuario envía mensajes reiterados amenazando con revelar la dirección real de un menor y acudir a pegarle si no le entrega su cuenta.",
+        "pregunta": "¿Cómo califica la justicia esta conducta de hostigamiento?",
+        "opciones": [
+            "Es delito de amenazas graves y coacciones (arts. 169 y 172 CP)",
+            "En los videojuegos no rige el Código Penal, solo las normas del juego",
+            "Solo es delito si el agresor vive en la misma ciudad",
+        ],
+        "correcta": 0,
+        "sentencia": "¡Delito grave! Las amenazas y coacciones cometidas a través de internet o videojuegos tienen plena validez penal. Protegerse guardando pruebas y denunciando ante la policía o llamando al 017 es fundamental.",
+        "articulo": "Arts. 169 y 172 Código Penal",
+    },
+]
+

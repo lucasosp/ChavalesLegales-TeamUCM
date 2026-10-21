@@ -1,26 +1,34 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 
 export default function Home() {
   const [pin, setPin] = useState('')
 
+  const handlePinSubmit = (e) => {
+    e.preventDefault()
+    if (pin.trim()) {
+      window.location.href = `/historia?pin=${encodeURIComponent(pin.trim())}`
+    }
+  }
+
   return (
     <div className="kahoot-page">
       {/* ====================================================================
-          FONDO ORGÁNICO CURVADO ESTILO KAHOOT CON LA PALETA OFICIAL
+          FONDO ORGÁNICO CURVADO ESTILO KAHOOT CON LA PALETA ACTIVA
           ==================================================================== */}
       <div className="kahoot-bg-canvas" aria-hidden="true">
-        {/* Curva granate/naranja izquierda */}
+        {/* Curva izquierda */}
         <div className="bg-wave-left" />
 
-        {/* Arco dominante verde oscuro / verde derecho */}
+        {/* Arco dominante derecho */}
         <div className="bg-arc-right" />
 
-        {/* Resplandor inferior suave amarillo y verde */}
+        {/* Resplandor inferior suave */}
         <div className="bg-sphere-glow" />
 
-        {/* Curvas SVG geométricas tipo Kahoot superpuestas */}
+        {/* Curvas SVG geométricas dinámicas superpuestas */}
         <svg
           className="bg-curved-svg"
           viewBox="0 0 1440 900"
@@ -28,61 +36,62 @@ export default function Home() {
           xmlns="http://www.w3.org/2000/svg"
           preserveAspectRatio="none"
         >
-          {/* Gran onda granate oscura de fondo */}
+          {/* Gran onda oscura de fondo */}
           <path
             d="M-100 200 C300 120 500 500 1000 350 C1250 270 1400 480 1550 420 L1550 1000 L-100 1000 Z"
-            fill="#461020"
+            fill="var(--granate)"
             fillOpacity="0.45"
           />
 
-          {/* Gran arco curvado característico de Kahoot (corte diagonal suave) */}
+          {/* Gran arco curvado característico de Kahoot */}
           <path
             d="M-50 780 C320 620 680 720 1100 520 C1300 420 1480 460 1600 410 L1600 950 L-50 950 Z"
-            fill="#3e6b32"
+            fill="var(--verde-oscuro)"
             fillOpacity="0.35"
           />
 
-          {/* Onda sutil naranja en la esquina superior izquierda */}
+          {/* Onda sutil en la esquina superior izquierda */}
           <path
             d="M-80 -80 C200 -20 320 220 180 440 C80 580 -40 620 -120 600 Z"
-            fill="#b03921"
+            fill="var(--naranja)"
             fillOpacity="0.22"
           />
 
-          {/* Arco circular verde luminoso superior derecho */}
+          {/* Arco circular luminoso superior derecho */}
           <circle
             cx="1350"
             cy="150"
             r="480"
-            fill="#608841"
+            fill="var(--verde)"
             fillOpacity="0.25"
           />
           <circle
             cx="1350"
             cy="150"
             r="340"
-            fill="#fdc623"
-            fillOpacity="0.08"
+            fill="var(--amarillo)"
+            fillOpacity="0.12"
           />
         </svg>
       </div>
 
       {/* ====================================================================
-          PARTE SUPERIOR: BOTÓN ACCESO A PROFESIONALES ARRIBA A LA IZQUIERDA
+          PARTE SUPERIOR: BOTÓN ACCESO A PROFESIONALES (MINIMAL GLASS)
           ==================================================================== */}
       <header className="kahoot-topbar">
-        <button
-          type="button"
-          className="btn-profesores"
-          aria-label="Acceso a profesionales"
+        <Link
+          href="/profesores"
+          className="btn-pro-opt1"
+          aria-label="Acceso a profesores"
         >
-          <span className="prof-icon-wrap" aria-hidden="true">
+          <span className="pro-icon-chip" aria-hidden="true">
             <svg viewBox="0 0 24 24">
               <path d="M12 3L1 9L12 15L21 10.09V17H23V9M5 13.18V17.18C5 19.94 8.13 22 12 22C15.87 22 19 19.94 19 17.18V13.18L12 17L5 13.18Z" />
             </svg>
           </span>
-          <span>Acceso a profesionales</span>
-        </button>
+          <span className="pro-label">Acceso a profesionales</span>
+          <span className="pro-arrow" aria-hidden="true">→</span>
+        </Link>
       </header>
 
       {/* ====================================================================
@@ -92,13 +101,15 @@ export default function Home() {
       <main className="kahoot-main-content">
         {/* Título en texto web tipográfico con Talina DEMO */}
         <div className="kahoot-title-wrapper">
-          <h1 className="brand-title" aria-label="Chavales Legales">
-            <span className="title-left-col">
-              <span className="title-word">CHAVAL</span>
-              <span className="title-word">LEGAL</span>
-            </span>
-            <span className="title-suffix-es">ES</span>
-          </h1>
+          <Link href="/" className="brand-title-link" style={{ textDecoration: 'none' }}>
+            <h1 className="brand-title" aria-label="Chavales Legales">
+              <span className="title-left-col">
+                <span className="title-word">CHAVAL</span>
+                <span className="title-word">LEGAL</span>
+              </span>
+              <span className="title-suffix-es">ES</span>
+            </h1>
+          </Link>
         </div>
 
         {/* Las dos secciones centradas */}
@@ -111,10 +122,7 @@ export default function Home() {
 
             <form
               className="pin-form"
-              onSubmit={(e) => {
-                e.preventDefault()
-                /* Enlaces no funcionales de momento según requerimiento */
-              }}
+              onSubmit={handlePinSubmit}
             >
               <div className="pin-input-container">
                 <input
@@ -132,7 +140,7 @@ export default function Home() {
               </div>
 
               <button
-                type="button"
+                type="submit"
                 className="btn-pin-submit"
               >
                 <span>Entrar</span>
@@ -144,8 +152,8 @@ export default function Home() {
           <section className="solo-section-card" aria-label="Jugar sin PIN">
             <h2 className="solo-title">¿No tienes PIN de clase?</h2>
 
-            <button
-              type="button"
+            <Link
+              href="/historia"
               className="btn-solo-action"
             >
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -156,7 +164,7 @@ export default function Home() {
                 <line x1="18" y1="11" x2="18.01" y2="11" />
               </svg>
               <span>Jugar sin PIN</span>
-            </button>
+            </Link>
           </section>
         </div>
       </main>
@@ -169,18 +177,37 @@ export default function Home() {
           <p className="footer-highlight">
             Chavales Legales · Tu escudo digital
           </p>
-          <p className="footer-sub">
-            ¿Necesitas ayuda con trampas o acoso online? Llama gratis al <b>017</b> (INCIBE · Confidencial)
-          </p>
           <div className="footer-links-row">
-            <span>Proyecto Team UCM</span>
+            <a
+              href="https://www.ucm.es/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-link"
+            >
+              UCM
+            </a>
             <span>•</span>
-            <span>Seguridad Digital Infantil</span>
+            <a
+              href="https://www.juventudinfancia.gob.es/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-link"
+            >
+              Infancia y juventud
+            </a>
             <span>•</span>
-            <span>AEPD Canal Prioritario</span>
+            <a
+              href="https://www.administraciondejusticia.gob.es/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-link"
+            >
+              Administración de Justicia
+            </a>
           </div>
         </div>
       </footer>
     </div>
   )
 }
+

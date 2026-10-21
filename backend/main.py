@@ -2,7 +2,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from contenido import COOPERATIVO, HISTORIA, PREGUNTAS
+from contenido import COOPERATIVO, HISTORIA, JUICIO, PREGUNTAS
 
 app = FastAPI(title="Chavales Legales API")
 
@@ -13,7 +13,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-JUEGOS = {"historia": HISTORIA, "preguntas": PREGUNTAS, "cooperativo": COOPERATIVO}
+JUEGOS = {
+    "historia": HISTORIA,
+    "preguntas": PREGUNTAS,
+    "cooperativo": COOPERATIVO,
+    "juicio": JUICIO,
+}
 
 
 @app.get("/")
