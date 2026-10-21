@@ -1,9 +1,15 @@
 'use client'
 
 import { useState } from 'react'
+import SalaEsperaAlumnos from '../components/SalaEsperaAlumnos'
 
 export default function Home() {
   const [pin, setPin] = useState('')
+  const [enSalaEspera, setEnSalaEspera] = useState(false)
+
+  if (enSalaEspera) {
+    return <SalaEsperaAlumnos pin={pin || '734 912'} onVolver={() => setEnSalaEspera(false)} />
+  }
 
   return (
     <div className="kahoot-page">
@@ -113,6 +119,9 @@ export default function Home() {
               className="pin-form"
               onSubmit={(e) => {
                 e.preventDefault()
+                if (!pin.trim()) {
+                  setEnSalaEspera(true)
+                }
                 /* Enlaces no funcionales de momento según requerimiento */
               }}
             >
@@ -134,6 +143,11 @@ export default function Home() {
               <button
                 type="button"
                 className="btn-pin-submit"
+                onClick={() => {
+                  if (!pin.trim()) {
+                    setEnSalaEspera(true)
+                  }
+                }}
               >
                 <span>Entrar</span>
               </button>
