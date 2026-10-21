@@ -15,13 +15,18 @@ try {
     page.on("response", (response) => { if (response.status() >= 400) errors.push(`${response.status()} ${response.url()}`); });
     page.on("console", (message) => { if (message.type() === "error") errors.push(`${message.text()} ${message.location().url}`); });
     await page.goto(process.env.PLATFORM_URL);
+    await page.evaluate(() => localStorage.setItem("no-lo-reenvies.save", JSON.stringify({ nodeId: "final1", flags: { stale: true }, seen: [] })));
     await page.locator('a[href="/novela"]').first().click();
     const frame = page.frameLocator("#novela-frame");
     await frame.getByRole("heading", { name: "Antes de empezar...", exact: true }).waitFor();
+    assert.equal(await frame.locator(".topbar-actions > *").count(), 1, "only the exit control should remain in the top bar");
+    assert.equal(await page.evaluate(() => localStorage.getItem("no-lo-reenvies.save")), null, "entering from the platform should clear previous progress");
+    await frame.getByRole("button", { name: "Salir", exact: true }).waitFor();
+    await frame.getByRole("button", { name: "Comenzar historia" }).waitFor();
+    assert.equal(await page.locator("#novela-frame").count(), 1);
     await frame.getByRole("button", { name: "Comenzar historia" }).click();
     await frame.getByRole("button", { name: "Continuar", exact: true }).click();
     await frame.locator("[data-text]").filter({ hasText: "Sara" }).waitFor();
-    assert.equal(await frame.getByRole("link", { name: "Necesito ayuda", exact: true }).getAttribute("href"), "/necesito-ayuda");
     await frame.getByRole("button", { name: "Salir", exact: true }).click();
     await page.waitForURL(process.env.PLATFORM_URL.replace(/\/$/, "") + "/");
     assert.deepEqual(errors, []);
@@ -100,6 +105,16 @@ try {
     console.log(`Browser checks passed at ${viewport.width}×${viewport.height}`);
     await page.close();
   }
+  const embeddedPage = await browser.newPage({ reducedMotion: "reduce" });
+  await embeddedPage.goto(url);
+  await embeddedPage.evaluate(() => localStorage.setItem("no-lo-reenvies.save", JSON.stringify({ nodeId: "final1", flags: { stale: true }, seen: [] })));
+  await embeddedPage.evaluate((src) => { document.body.innerHTML = `<iframe id="fresh-entry-frame" src="${src}"></iframe>`; }, url);
+  const embeddedNovel = embeddedPage.frameLocator("#fresh-entry-frame");
+  await embeddedNovel.getByRole("heading", { name: "Antes de empezar...", exact: true }).waitFor();
+  assert.equal(await embeddedPage.evaluate(() => localStorage.getItem("no-lo-reenvies.save")), null, "embedded entry should clear an earlier save");
+  assert.equal(await embeddedNovel.locator(".topbar-actions > *").count(), 1, "only the exit control should remain in the embedded top bar");
+  await embeddedPage.close();
+
   const page = await browser.newPage({ reducedMotion: "no-preference" });
   await page.goto(url);
   await page.evaluate(() => localStorage.setItem("no-lo-reenvies.save", JSON.stringify({ nodeId: "ch1-chat-1", flags: {}, seen: [], stage: {} })));

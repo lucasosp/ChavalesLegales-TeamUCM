@@ -67,12 +67,17 @@ async function startStory(entry) {
     document.title = `${content.title} — LegalinStory`;
     preloadCharacterArt(content.assets);
 
+    const saveStore = new LocalStorageSaveStore(`${entry.id}.save`);
+    // The platform launches the novel in a fresh iframe each time. Start a
+    // clean run on entry while preserving save/resume for standalone use.
+    if (window.parent !== window) saveStore.clear();
+
     app = new App({
       root,
       story: content.story,
       startId: content.startId,
       title: content.title,
-      saveStore: new LocalStorageSaveStore(`${entry.id}.save`),
+      saveStore,
       resolveCharacter: content.resolveCharacter,
       resolveBackground: content.resolveBackground,
       rights: content.rights,

@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 export default function Novela() {
@@ -17,7 +16,6 @@ export default function Novela() {
 
   return (
     <main style={{ position: 'fixed', inset: 0, zIndex: 100, background: '#461020' }}>
-      <Link href="/" style={{ position: 'absolute', top: 8, left: 12, zIndex: 1, color: '#fff', background: '#461020', padding: '8px 12px', borderRadius: 8 }}>← Inicio</Link>
       <iframe id="novela-frame" title="No lo reenvíes · Novela visual interactiva" src="/novela/index.html" style={{ display: 'block', width: '100%', height: '100%', border: 0 }} />
     </main>
   )
