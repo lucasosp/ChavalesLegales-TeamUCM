@@ -20,6 +20,8 @@
 /* Paneles (preparación, carga y sentencia final): tarjeta blanca como el resto de la web */
 .juzgado-app .jz-panel { position: relative; max-width: 900px; margin: 0 auto; display: grid; gap: 1rem; padding: 2.2rem 2.4rem; color: var(--d-tinta);
             background: #fff; border: var(--d-borde-g) solid var(--d-tinta); border-radius: 28px; box-shadow: 0 10px 0 var(--d-tinta), 0 24px 48px rgba(0, 0, 0, .35); }
+.juzgado-app .veredicto-prep { gap: .8rem; padding: 1.8rem 2.2rem; }
+.juzgado-app .veredicto-prep h3 { margin-top: .4rem; }
 .juzgado-app .jz-panel h1 { font-size: 2.6rem; font-weight: 700; line-height: 1.1; }
 .juzgado-app .jz-panel h1 em { font-style: normal; color: var(--verde-dark); }
 .juzgado-app .jz-panel h3 { margin-top: .6rem; font-size: 1.15rem; font-weight: 600; color: var(--granate); }
@@ -36,7 +38,7 @@
 .juzgado-app .btn:disabled { opacity: .45; cursor: not-allowed; }
 .juzgado-app .chips { display: flex; flex-wrap: wrap; gap: .5rem; }
 .juzgado-app .chip { padding: .5rem 1rem; border-radius: 999px; cursor: pointer; font-size: 1rem; font-weight: 600; color: var(--d-tinta);
-        background: #fff; border: 3px solid var(--d-tinta); box-shadow: 0 3px 0 var(--d-tinta); transition: transform var(--d-rapida); }
+        background: #fff; border: 3px solid var(--d-tinta); box-shadow: 0 3px 0 var(--d-tinta); transition: transform var(--d-rapida), opacity var(--d-rapida), background-color var(--d-rapida); }
 .juzgado-app .chip:hover:not(:disabled) { transform: translateY(-2px); }
 .juzgado-app .chip.on { background: var(--amarillo); }
 .juzgado-app .chip:disabled { opacity: .35; cursor: not-allowed; }
