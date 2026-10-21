@@ -17,6 +17,10 @@ class Player(BaseModel):
     nickname: str
     seat_index: int
     avatar_tipo: int
+    base_type: Optional[int] = 1
+    color_pelo: Optional[str] = "#4A2810"
+    color_ropa: Optional[str] = "#4A1A1C"
+    tiene_gorro: Optional[bool] = False
     score: int = 0
     streak: int = 0
     current_answer: Optional[int] = None
@@ -46,4 +50,8 @@ class JoinRoomResponse(BaseModel):
     nickname: str
     seat_index: int
     avatar_tipo: int
+    base_type: Optional[int] = 1
+    color_pelo: Optional[str] = "#4A2810"
+    color_ropa: Optional[str] = "#4A1A1C"
+    tiene_gorro: Optional[bool] = False
     modo: str

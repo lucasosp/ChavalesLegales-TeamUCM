@@ -80,6 +80,20 @@ export default function Home() {
 
     const socket = createGameSocket({
       url: wsUrl,
+      onOpen: () => {
+        try {
+          const guardado = localStorage.getItem('chavales_mi_avatar')
+          if (guardado) {
+            const avatar = JSON.parse(guardado)
+            socket.send('UPDATE_AVATAR', {
+              baseType: avatar.baseType,
+              colorPelo: avatar.colorPelo,
+              colorRopa: avatar.colorRopa,
+              tieneGorro: avatar.tieneGorro,
+            })
+          }
+        } catch {}
+      },
       onMessage: (data) => {
         if (data.event === 'ROOM_STATE') {
           setGameState(data)
@@ -138,6 +152,10 @@ export default function Home() {
             nombre: player.nickname,
             seatIndex: player.seat_index,
             avatarTipo: player.avatar_tipo,
+            baseType: player.base_type,
+            colorPelo: player.color_pelo,
+            colorRopa: player.color_ropa,
+            tieneGorro: player.tiene_gorro,
           }] : [])
 
       return (
@@ -149,6 +167,14 @@ export default function Home() {
           currentSeat={player?.seat_index ?? 0}
           roomUrl={`http://localhost:3001/profesores/sala/${pin}`}
           onVolver={handleSalirPartida}
+          onUpdateAvatar={(nuevoAvatar) => {
+            socketRef.current?.send('UPDATE_AVATAR', {
+              baseType: nuevoAvatar.baseType,
+              colorPelo: nuevoAvatar.colorPelo,
+              colorRopa: nuevoAvatar.colorRopa,
+              tieneGorro: nuevoAvatar.tieneGorro,
+            })
+          }}
         />
       )
     }

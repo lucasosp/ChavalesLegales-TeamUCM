@@ -83,6 +83,25 @@ const SEAT_COORDS = [
   { id: 11, x: 805, y: 465, row: 3 },
 ]
 
+// Generación dinámica de coordenadas de asientos para cualquier capacidad
+function getSeatCoords(totalSeats) {
+  const X_COLS = [155, 370, 590, 805]
+  const Y_START = 195
+  const Y_STEP = 135
+  const seats = []
+  for (let i = 0; i < totalSeats; i++) {
+    const col = i % 4
+    const row = Math.floor(i / 4) + 1
+    seats.push({
+      id: i,
+      x: X_COLS[col],
+      y: Y_START + (row - 1) * Y_STEP,
+      row,
+    })
+  }
+  return seats
+}
+
 export default function SalaEsperaAlumnos({
   pin = '734 912',
   cleanPin: rawCleanPin,
@@ -93,64 +112,103 @@ export default function SalaEsperaAlumnos({
   isHost = false,
   currentSeat = null,
   roomUrl = '',
+  onUpdateAvatar,
 }) {
   const isLive = Array.isArray(externalStudents)
   const cleanPin = rawCleanPin || (pin ? String(pin).replace(/\s+/g, '') : '')
   const displayUrl = roomUrl || (cleanPin ? `http://localhost:3001/profesores/sala/${cleanPin}` : '')
 
   // Modal de personalización: cerrado al entrar (se genera uno random automáticamente estilo Kahoot)
+    // Estado para la capacidad del aula y modo infinito
+  const [capacidadAula, setCapacidadAula] = useState(TOTAL_SEATS)
+  const [modoInfinito, setModoInfinito] = useState(false)
+
+  const aumentarCapacidad = () => {
+    setCapacidadAula((prev) => prev + 4)
+  }
+
+  const disminuirCapacidad = () => {
+    setCapacidadAula((prev) => {
+      const minOcupado = Math.ceil(students.length / 4) * 4 || 4
+      return Math.max(minOcupado, prev - 4)
+    })
+  }
+
   const [mostrarPersonalizador, setMostrarPersonalizador] = useState(false)
 
-  // Configuración del avatar del alumno actual (generado aleatoriamente al inicio)
-  const [miAvatar, setMiAvatar] = useState(() => generarAvatarAleatorio('Tú'))
+  // Configuración del avatar del alumno actual (recupera de localStorage o genera aleatorio)
+  const [miAvatar, setMiAvatar] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const guardado = localStorage.getItem('chavales_mi_avatar')
+        if (guardado) return JSON.parse(guardado)
+      } catch {}
+    }
+    return generarAvatarAleatorio('Tú')
+  })
+
+  // Estado del avatar confirmado que se visualiza en el pupitre
+  const [avatarConfirmado, setAvatarConfirmado] = useState(miAvatar)
+
+  const miAsiento = currentSeat !== null && currentSeat !== undefined ? currentSeat : 0
 
   // Estado local para los alumnos en la sala de espera simulada
   const [mockStudents, setMockStudents] = useState(() => {
-    const avatarInicial = generarAvatarAleatorio('Tú')
     return [
       {
         id: 'player-1',
-        nombre: avatarInicial.nombre,
-        seatIndex: 0,
-        baseType: avatarInicial.baseType,
-        colorPelo: avatarInicial.colorPelo,
-        tieneGorro: avatarInicial.tieneGorro,
-        colorRopa: avatarInicial.colorRopa,
+        nombre: miAvatar.nombre || 'Tú',
+        seatIndex: miAsiento,
+        baseType: miAvatar.baseType,
+        colorPelo: miAvatar.colorPelo,
+        tieneGorro: miAvatar.tieneGorro,
+        colorRopa: miAvatar.colorRopa,
         isPlayer: true,
       },
     ]
   })
 
-  // Sincronizar miAvatar con el avatar inicial colocado en el asiento 0
-  useEffect(() => {
-    if (mockStudents.length > 0 && mockStudents[0].isPlayer) {
-      setMiAvatar({
-        nombre: mockStudents[0].nombre,
-        baseType: mockStudents[0].baseType,
-        colorPelo: mockStudents[0].colorPelo,
-        tieneGorro: mockStudents[0].tieneGorro,
-        colorRopa: mockStudents[0].colorRopa,
-      })
-    }
-  }, [])
-
-  // Al confirmar el avatar modificado, actualiza el primer pupitre (asiento 0)
+  // Al confirmar el avatar modificado, actualiza el pupitre y notifica cambios
   const confirmarMiAvatar = () => {
     setMostrarPersonalizador(false)
+    setAvatarConfirmado(miAvatar)
+
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('chavales_mi_avatar', JSON.stringify(miAvatar))
+      } catch {}
+    }
+
+    if (onUpdateAvatar) {
+      onUpdateAvatar(miAvatar)
+    }
+
     setMockStudents((prev) => {
       const alumnoJugador = {
         id: 'player-1',
         nombre: miAvatar.nombre || 'Tú',
-        seatIndex: 0,
+        seatIndex: miAsiento,
         baseType: miAvatar.baseType,
         colorPelo: miAvatar.colorPelo,
         tieneGorro: miAvatar.tieneGorro,
         colorRopa: miAvatar.colorRopa,
         isPlayer: true,
       }
-      const sinAsientoCero = prev.filter((s) => s.seatIndex !== 0)
-      return [alumnoJugador, ...sinAsientoCero]
+      const sinMiAsiento = prev.filter((s) => s.seatIndex !== miAsiento)
+      return [alumnoJugador, ...sinMiAsiento]
     })
+  }
+
+  // Cancelar personalización y revertir a la versión confirmada
+  const cancelarPersonalizacion = () => {
+    setMostrarPersonalizador(false)
+    setMiAvatar(avatarConfirmado)
+  }
+
+  // Abrir modal asegurando sincronización con el confirmado
+  const abrirPersonalizador = () => {
+    setMiAvatar(avatarConfirmado)
+    setMostrarPersonalizador(true)
   }
 
   // Genera otro avatar aleatorio dentro del modal
@@ -162,16 +220,16 @@ export default function SalaEsperaAlumnos({
   // Simulación de entrada paulatina de compañeros bots cada 2-3 segundos solo si NO estamos en vivo
   useEffect(() => {
     if (isLive) return
-    if (mockStudents.length >= TOTAL_SEATS) return
+    if (mockStudents.length >= capacidadAula) return
 
     const timer = setTimeout(() => {
       setMockStudents((prev) => {
-        if (prev.length >= TOTAL_SEATS) return prev
+        if (prev.length >= capacidadAula) return prev
 
         // Buscar siguiente asiento libre
         const asientosOcupados = prev.map((s) => s.seatIndex)
         let siguienteAsiento = 0
-        for (let i = 0; i < TOTAL_SEATS; i++) {
+        for (let i = 0; i < capacidadAula; i++) {
           if (!asientosOcupados.includes(i)) {
             siguienteAsiento = i
             break
@@ -181,7 +239,7 @@ export default function SalaEsperaAlumnos({
         // Generar alumno ficticio con avatar paramétrico aleatorio
         const nuevo = {
           id: `bot-${siguienteAsiento + 1}`,
-          nombre: NOMBRES_MOCK[siguienteAsiento] || `Alumno ${siguienteAsiento + 1}`,
+          nombre: NOMBRES_MOCK[siguienteAsiento % NOMBRES_MOCK.length] || `Alumno ${siguienteAsiento + 1}`,
           seatIndex: siguienteAsiento,
           baseType: BASES_DISPONIBLES[siguienteAsiento % BASES_DISPONIBLES.length],
           colorPelo: OPCIONES_PELO[siguienteAsiento % OPCIONES_PELO.length].hex,
@@ -194,7 +252,7 @@ export default function SalaEsperaAlumnos({
     }, 2400)
 
     return () => clearTimeout(timer)
-  }, [isLive, mockStudents.length])
+  }, [isLive, mockStudents.length, capacidadAula])
 
   // Helpers para testing rápido
   const reiniciarAula = () => {
@@ -204,22 +262,24 @@ export default function SalaEsperaAlumnos({
   }
 
   const llenarAula = () => {
-    const todos = SEAT_COORDS.map((seat, idx) => {
-      if (idx === 0) {
+    const currentCoords = getSeatCoords(capacidadAula)
+    const todos = currentCoords.map((seat, idx) => {
+      if (idx === miAsiento) {
+        const activo = avatarConfirmado || miAvatar
         return {
           id: 'player-1',
-          nombre: miAvatar.nombre || 'Tú',
-          seatIndex: 0,
-          baseType: miAvatar.baseType,
-          colorPelo: miAvatar.colorPelo,
-          tieneGorro: miAvatar.tieneGorro,
-          colorRopa: miAvatar.colorRopa,
+          nombre: activo.nombre || 'Tú',
+          seatIndex: miAsiento,
+          baseType: activo.baseType,
+          colorPelo: activo.colorPelo,
+          tieneGorro: activo.tieneGorro,
+          colorRopa: activo.colorRopa,
           isPlayer: true,
         }
       }
       return {
         id: `bot-${idx + 1}`,
-        nombre: NOMBRES_MOCK[idx] || `Alumno ${idx + 1}`,
+        nombre: NOMBRES_MOCK[idx % NOMBRES_MOCK.length] || `Alumno ${idx + 1}`,
         seatIndex: idx,
         baseType: BASES_DISPONIBLES[idx % BASES_DISPONIBLES.length],
         colorPelo: OPCIONES_PELO[idx % OPCIONES_PELO.length].hex,
@@ -232,7 +292,17 @@ export default function SalaEsperaAlumnos({
   }
 
   const students = isLive ? externalStudents : mockStudents
-  const porcentajeLleno = Math.min(100, Math.round((students.length / TOTAL_SEATS) * 100))
+  const porcentajeLleno = Math.min(100, Math.round((students.length / capacidadAula) * 100))
+  const seatCoords = getSeatCoords(capacidadAula)
+  const numRows = Math.max(3, Math.ceil(capacidadAula / 4))
+  const svgHeight = 195 + (numRows - 1) * 135 + 95
+
+  // Modo Infinito: añade automáticamente una fila de pupitres vacíos cuando se llena el aforo
+  useEffect(() => {
+    if (modoInfinito && students.length >= capacidadAula) {
+      setCapacidadAula((prev) => prev + 4)
+    }
+  }, [modoInfinito, students.length, capacidadAula])
 
   return (
     <div className="sala-page-wrapper">
@@ -472,11 +542,28 @@ export default function SalaEsperaAlumnos({
           position: relative;
           width: 100%;
           flex: 1;
-          padding: 14px 20px 20px;
+          padding: 14px 20px 24px;
           box-sizing: border-box;
           display: flex;
           justify-content: center;
-          align-items: center;
+          align-items: flex-start;
+          overflow-y: auto;
+          max-height: min(72vh, 660px);
+        }
+
+        .sala-canvas-stage::-webkit-scrollbar {
+          width: 8px;
+        }
+        .sala-canvas-stage::-webkit-scrollbar-track {
+          background: #EFE8DD;
+          border-radius: 4px;
+        }
+        .sala-canvas-stage::-webkit-scrollbar-thumb {
+          background: #C5B7A1;
+          border-radius: 4px;
+        }
+        .sala-canvas-stage::-webkit-scrollbar-thumb:hover {
+          background: #4A1A1C;
         }
 
         .classroom-svg {
@@ -484,7 +571,85 @@ export default function SalaEsperaAlumnos({
           max-width: 1100px;
           height: auto;
           display: block;
-          max-height: calc(100vh - 180px);
+        }
+
+        .sala-aforo-controls {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: #FFFFFF;
+          border: 2px solid #18181B;
+          border-radius: 12px;
+          padding: 3px 8px;
+          box-shadow: 0 2px 0 #18181B;
+        }
+
+        .sala-aforo-label {
+          font-size: 11px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: #4A1A1C;
+        }
+
+        .btn-aforo-stepper {
+          width: 24px;
+          height: 24px;
+          border-radius: 6px;
+          border: 1.5px solid #18181B;
+          background: #F4F1EA;
+          color: #18181B;
+          font-weight: 900;
+          font-size: 14px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          line-height: 1;
+          transition: background 0.15s ease, transform 0.1s ease;
+        }
+
+        .btn-aforo-stepper:hover:not(:disabled) {
+          background: #FACC15;
+          transform: translateY(-1px);
+        }
+
+        .btn-aforo-stepper:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+
+        .sala-aforo-val {
+          font-size: 13px;
+          font-weight: 900;
+          color: #18181B;
+          min-width: 20px;
+          text-align: center;
+        }
+
+        .btn-aforo-infinito {
+          background: #F4F1EA;
+          border: 1.5px solid #18181B;
+          border-radius: 8px;
+          padding: 3px 8px;
+          font-size: 11px;
+          font-weight: 800;
+          color: #18181B;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          margin-left: 2px;
+          transition: all 0.15s ease;
+        }
+
+        .btn-aforo-infinito:hover {
+          background: #FACC15;
+        }
+
+        .btn-aforo-infinito.active {
+          background: #86EFAC;
+          box-shadow: 0 1px 0 #18181B;
         }
 
         .sala-footer-legal {
@@ -778,7 +943,7 @@ export default function SalaEsperaAlumnos({
           MODAL DE PERSONALIZACIÓN DE AVATAR (ABIERTO SOLO SI EL USUARIO QUIERE)
           ============================================================== */}
       {mostrarPersonalizador && (
-        <div className="avatar-modal-overlay" onClick={() => setMostrarPersonalizador(false)}>
+        <div className="avatar-modal-overlay" onClick={cancelarPersonalizacion}>
           <div className="avatar-modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <div>
@@ -788,7 +953,7 @@ export default function SalaEsperaAlumnos({
               <button
                 type="button"
                 className="btn-modal-close"
-                onClick={() => setMostrarPersonalizador(false)}
+                onClick={cancelarPersonalizacion}
                 title="Cerrar sin guardar"
               >
                 ✕
@@ -946,7 +1111,7 @@ export default function SalaEsperaAlumnos({
         <div className="sala-subbar">
           <div className="sala-counter-wrap">
             <span className="sala-counter-text">
-              Alumnos en el aula: <b>{students.length}</b> / {TOTAL_SEATS}
+              Alumnos en el aula: <b>{students.length}</b> / {capacidadAula}
             </span>
             <div className="sala-progress-track">
               <div
@@ -954,6 +1119,41 @@ export default function SalaEsperaAlumnos({
                 style={{ width: `${porcentajeLleno}%` }}
               />
             </div>
+
+            {/* Controles de gestión de aforo para el profesor */}
+            {(isHost || !isLive) && (
+              <div className="sala-aforo-controls">
+                <span className="sala-aforo-label">Aforo:</span>
+                <button
+                  type="button"
+                  className="btn-aforo-stepper"
+                  onClick={disminuirCapacidad}
+                  disabled={capacidadAula <= Math.max(4, students.length)}
+                  title="Reducir pupitres (-4)"
+                >
+                  -
+                </button>
+                <span className="sala-aforo-val">{capacidadAula}</span>
+                <button
+                  type="button"
+                  className="btn-aforo-stepper"
+                  onClick={aumentarCapacidad}
+                  title="Añadir pupitres (+4)"
+                >
+                  +
+                </button>
+                <button
+                  type="button"
+                  className={`btn-aforo-infinito ${modoInfinito ? 'active' : ''}`}
+                  onClick={() => setModoInfinito((prev) => !prev)}
+                  title={modoInfinito ? 'Modo Infinito activo (añade filas automáticamente)' : 'Activar Modo Infinito (∞)'}
+                >
+                  ∞ Modo Infinito
+                </button>
+              </div>
+            )}
+
+            {/* Indicador de pupitre y botón de personalización para el alumno */}
             {!isHost && currentSeat !== null && (
               <span
                 style={{
@@ -972,19 +1172,22 @@ export default function SalaEsperaAlumnos({
                 Tu pupitre: #{currentSeat + 1}
               </span>
             )}
+
+            {!isHost && (
+              <button
+                type="button"
+                className="btn-avatar-edit"
+                onClick={abrirPersonalizador}
+                title="Personalizar mi personaje"
+              >
+                Personalizar avatar
+              </button>
+            )}
           </div>
 
           <div className="sala-actions">
             {!isLive ? (
               <>
-                <button
-                  type="button"
-                  className="btn-avatar-edit"
-                  onClick={() => setMostrarPersonalizador(true)}
-                  title="Personalizar mi personaje"
-                >
-                  Personalizar avatar
-                </button>
                 <button
                   type="button"
                   className="btn-sala-pill"
@@ -1057,7 +1260,7 @@ export default function SalaEsperaAlumnos({
         <div className="sala-canvas-stage">
           <svg
             className="classroom-svg"
-            viewBox="0 0 960 560"
+            viewBox={`0 0 960 ${svgHeight}`}
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -1074,12 +1277,25 @@ export default function SalaEsperaAlumnos({
             <rect x="0" y="0" width="960" height="130" fill="#EFE8DD" />
             <line x1="0" y1="130" x2="960" y2="130" stroke="#4A1A1C" strokeWidth="6" />
 
-            <rect x="0" y="133" width="960" height="427" fill="#F8F4EC" />
-            <line x1="0" y1="260" x2="960" y2="260" stroke="#ECE2D0" strokeWidth="2" strokeDasharray="6 6" />
-            <line x1="0" y1="395" x2="960" y2="395" stroke="#ECE2D0" strokeWidth="2" strokeDasharray="6 6" />
-            <line x1="240" y1="133" x2="160" y2="560" stroke="#EFE5D5" strokeWidth="1.5" />
-            <line x1="480" y1="133" x2="480" y2="560" stroke="#EFE5D5" strokeWidth="1.5" />
-            <line x1="720" y1="133" x2="800" y2="560" stroke="#EFE5D5" strokeWidth="1.5" />
+            <rect x="0" y="133" width="960" height={svgHeight - 133} fill="#F8F4EC" />
+            {Array.from({ length: numRows - 1 }, (_, i) => {
+              const lineY = 260 + i * 135
+              return (
+                <line
+                  key={`floor-line-${i}`}
+                  x1="0"
+                  y1={lineY}
+                  x2="960"
+                  y2={lineY}
+                  stroke="#ECE2D0"
+                  strokeWidth="2"
+                  strokeDasharray="6 6"
+                />
+              )
+            })}
+            <line x1="240" y1="133" x2="160" y2={svgHeight} stroke="#EFE5D5" strokeWidth="1.5" />
+            <line x1="480" y1="133" x2="480" y2={svgHeight} stroke="#EFE5D5" strokeWidth="1.5" />
+            <line x1="720" y1="133" x2="800" y2={svgHeight} stroke="#EFE5D5" strokeWidth="1.5" />
 
             {/* PIZARRA DIGITAL FRONTAL */}
             <g transform="translate(240, 18)">
@@ -1129,16 +1345,22 @@ export default function SalaEsperaAlumnos({
                 RENDERIZADO DE LOS 12 PUPITRES / SILLAS
                 (Renderizados de atrás hacia adelante para correcta oclusión)
                ========================================================== */}
-            {SEAT_COORDS.map((seat) => {
+            {seatCoords.map((seat) => {
               const student = students.find((s) => s.seatIndex === seat.id)
               const { x, y } = seat
+              const isMe = student && ((!isHost && (currentSeat !== null && currentSeat !== undefined ? seat.id === currentSeat : seat.id === 0)) || Boolean(student.isPlayer))
+              const activeAvatar = isMe ? (avatarConfirmado || miAvatar) : student
+              const activeBase = (activeAvatar && activeAvatar.baseType) || (student && student.avatarTipo !== undefined ? BASES_DISPONIBLES[student.avatarTipo % BASES_DISPONIBLES.length] : 1)
+              const activePelo = (activeAvatar && activeAvatar.colorPelo) || OPCIONES_PELO[seat.id % OPCIONES_PELO.length].hex
+              const activeRopa = (activeAvatar && activeAvatar.colorRopa) || OPCIONES_ROPA[(seat.id + 1) % OPCIONES_ROPA.length].hex
+              const activeGorro = activeAvatar ? Boolean(activeAvatar.tieneGorro) : false
 
               return (
                 <g
                   key={`seat-${seat.id}`}
                   id={`desk-group-${seat.id}`}
-                  onClick={student && student.isPlayer ? () => setMostrarPersonalizador(true) : undefined}
-                  style={{ cursor: student && student.isPlayer ? 'pointer' : 'default' }}
+                  onClick={isMe ? abrirPersonalizador : undefined}
+                  style={{ cursor: isMe ? 'pointer' : 'default' }}
                 >
                   {/* --- SILLA VACÍA (SIEMPRE DETRÁS DEL PUPITRE) --- */}
                   <g>
@@ -1170,10 +1392,10 @@ export default function SalaEsperaAlumnos({
                         standalone={false}
                         x={x}
                         y={y}
-                        baseType={student.baseType || 1}
-                        colorPelo={student.colorPelo}
-                        tieneGorro={student.tieneGorro}
-                        colorRopa={student.colorRopa}
+                        baseType={activeBase}
+                        colorPelo={activePelo}
+                        tieneGorro={activeGorro}
+                        colorRopa={activeRopa}
                       />
                     </g>
                   )}
@@ -1235,42 +1457,39 @@ export default function SalaEsperaAlumnos({
                   )}
 
                   {/* --- CARTEL FLOTANTE CON NOMBRE DEL ALUMNO --- */}
-                  {student && (() => {
-                    const isMe = (!isHost && seat.id === currentSeat) || Boolean(student.isPlayer)
-                    return (
-                      <g
-                        className="anim-name-float"
-                        style={{ transformOrigin: `${x}px ${y - 60}px` }}
+                  {student && (
+                    <g
+                      className="anim-name-float"
+                      style={{ transformOrigin: `${x}px ${y - 60}px` }}
+                    >
+                      {/* Fondo blanco puro o dorado si es el alumno actual */}
+                      <rect
+                        x={x - (isMe ? 54 : 48)}
+                        y={y - 74}
+                        width={isMe ? 108 : 96}
+                        height={24}
+                        rx={12}
+                        fill={isMe ? '#FEF08A' : '#FFFFFF'}
+                        stroke={isMe ? '#CA8A04' : '#18181B'}
+                        strokeWidth={isMe ? '2.8' : '2.2'}
+                        filter="url(#cardShadow)"
+                      />
+                      {/* Punto verde de conexión */}
+                      <circle cx={x - (isMe ? 40 : 36)} cy={y - 62} r={3.5} fill={isMe ? '#CA8A04' : '#22C55E'} />
+                      {/* Nombre del alumno */}
+                      <text
+                        x={x + 4}
+                        y={y - 58}
+                        textAnchor="middle"
+                        fontSize="11"
+                        fontWeight={isMe ? '900' : '800'}
+                        fill="#18181B"
+                        letterSpacing="0.02em"
                       >
-                        {/* Fondo blanco puro o dorado si es el alumno actual */}
-                        <rect
-                          x={x - (isMe ? 54 : 48)}
-                          y={y - 74}
-                          width={isMe ? 108 : 96}
-                          height={24}
-                          rx={12}
-                          fill={isMe ? '#FEF08A' : '#FFFFFF'}
-                          stroke={isMe ? '#CA8A04' : '#18181B'}
-                          strokeWidth={isMe ? '2.8' : '2.2'}
-                          filter="url(#cardShadow)"
-                        />
-                        {/* Punto verde de conexión */}
-                        <circle cx={x - (isMe ? 40 : 36)} cy={y - 62} r={3.5} fill={isMe ? '#CA8A04' : '#22C55E'} />
-                        {/* Nombre del alumno */}
-                        <text
-                          x={x + 4}
-                          y={y - 58}
-                          textAnchor="middle"
-                          fontSize="11"
-                          fontWeight={isMe ? '900' : '800'}
-                          fill="#18181B"
-                          letterSpacing="0.02em"
-                        >
-                          {isMe ? `${student.nombre} (Tú)` : student.nombre}
-                        </text>
-                      </g>
-                    )
-                  })()}
+                        {isMe ? `${student.nombre || 'Tú'} (Tú)` : student.nombre}
+                      </text>
+                    </g>
+                  )}
                 </g>
               )
             })}

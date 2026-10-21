@@ -40,6 +40,10 @@ class Room:
                 "nombre": p.nickname,
                 "seatIndex": p.seat_index,
                 "avatarTipo": p.avatar_tipo,
+                "baseType": p.base_type,
+                "colorPelo": p.color_pelo,
+                "colorRopa": p.color_ropa,
+                "tieneGorro": p.tiene_gorro,
                 "score": p.score,
                 "hasAnswered": p.current_answer is not None,
                 "isConnected": p.is_connected,
@@ -56,6 +60,10 @@ class Room:
                 "score": p.score,
                 "streak": p.streak,
                 "avatarTipo": p.avatar_tipo,
+                "baseType": p.base_type,
+                "colorPelo": p.color_pelo,
+                "colorRopa": p.color_ropa,
+                "tieneGorro": p.tiene_gorro,
                 "seatIndex": p.seat_index,
                 "rank": idx + 1,
             }
@@ -251,6 +259,33 @@ class RoomManager:
 
         return True
 
+    async def update_player_avatar(
+        self,
+        room: Room,
+        player_id: str,
+        base_type: Optional[int] = None,
+        color_pelo: Optional[str] = None,
+        color_ropa: Optional[str] = None,
+        tiene_gorro: Optional[bool] = None,
+    ):
+        async with self.lock:
+            if player_id not in room.players:
+                return
+            player = room.players[player_id]
+            if base_type is not None:
+                try:
+                    player.base_type = int(base_type)
+                except (ValueError, TypeError):
+                    pass
+            if color_pelo is not None:
+                player.color_pelo = str(color_pelo)
+            if color_ropa is not None:
+                player.color_ropa = str(color_ropa)
+            if tiene_gorro is not None:
+                player.tiene_gorro = bool(tiene_gorro)
+
+        await self.broadcast_room_state(room)
+
     async def reveal_question(self, room: Room):
         if room.state != RoomState.QUESTION:
             return
@@ -344,6 +379,10 @@ class RoomManager:
                 "nickname": player.nickname if player else "",
                 "seat_index": player.seat_index if player else 0,
                 "avatar_tipo": player.avatar_tipo if player else 0,
+                "base_type": player.base_type if player else 1,
+                "color_pelo": player.color_pelo if player else None,
+                "color_ropa": player.color_ropa if player else None,
+                "tiene_gorro": player.tiene_gorro if player else False,
                 "score": player.score if player else 0,
                 "rank": player_rank,
                 "current_answer": player.current_answer if player else None,

@@ -104,6 +104,10 @@ async def unirse_a_sala(pin: str, req: JoinRoomRequest):
         nickname=player.nickname,
         seat_index=player.seat_index,
         avatar_tipo=player.avatar_tipo,
+        base_type=player.base_type,
+        color_pelo=player.color_pelo,
+        color_ropa=player.color_ropa,
+        tiene_gorro=player.tiene_gorro,
         modo=room.modo,
     )
 
@@ -169,6 +173,19 @@ async def ws_player(websocket: WebSocket, pin: str, player_id: str = Query(...))
                 answer_index = data.get("answer_index")
                 if answer_index is not None and isinstance(answer_index, int):
                     await room_manager.submit_answer(room, player_id, answer_index)
+            elif action == "UPDATE_AVATAR":
+                base_type = data.get("baseType") or data.get("base_type")
+                color_pelo = data.get("colorPelo") or data.get("color_pelo")
+                color_ropa = data.get("colorRopa") or data.get("color_ropa")
+                tiene_gorro = data.get("tieneGorro") or data.get("tiene_gorro")
+                await room_manager.update_player_avatar(
+                    room,
+                    player_id,
+                    base_type=base_type,
+                    color_pelo=color_pelo,
+                    color_ropa=color_ropa,
+                    tiene_gorro=tiene_gorro,
+                )
     except WebSocketDisconnect:
         await room_manager.disconnect_player(room, player_id)
     except Exception:
