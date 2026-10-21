@@ -38,9 +38,19 @@ const OPCIONES_ROPA = [
   { label: 'Azul', hex: '#1E3A8A' },
 ]
 
+const BASES_DISPONIBLES = [1, 3, 4, 5, 6]
+
+const BASES_CATALOGO = [
+  { id: 1, label: 'Curioso' },
+  { id: 3, label: 'Sabio' },
+  { id: 4, label: 'Coleta' },
+  { id: 5, label: 'Diadema' },
+  { id: 6, label: 'Legalín' },
+]
+
 // Genera un avatar aleatorio con la paleta de colores corporativa
 function generarAvatarAleatorio(nombre = 'Tú') {
-  const baseType = Math.floor(Math.random() * 3) + 1
+  const baseType = BASES_DISPONIBLES[Math.floor(Math.random() * BASES_DISPONIBLES.length)]
   const colorPelo = OPCIONES_PELO[Math.floor(Math.random() * OPCIONES_PELO.length)].hex
   const tieneGorro = Math.random() > 0.5
   const colorRopa = OPCIONES_ROPA[Math.floor(Math.random() * OPCIONES_ROPA.length)].hex
@@ -158,7 +168,7 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
           id: `bot-${siguienteAsiento + 1}`,
           nombre: NOMBRES_MOCK[siguienteAsiento] || `Alumno ${siguienteAsiento + 1}`,
           seatIndex: siguienteAsiento,
-          baseType: (siguienteAsiento % 3) + 1,
+          baseType: BASES_DISPONIBLES[siguienteAsiento % BASES_DISPONIBLES.length],
           colorPelo: OPCIONES_PELO[siguienteAsiento % OPCIONES_PELO.length].hex,
           tieneGorro: siguienteAsiento % 2 === 0,
           colorRopa: OPCIONES_ROPA[(siguienteAsiento + 1) % OPCIONES_ROPA.length].hex,
@@ -196,7 +206,7 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
         id: `bot-${idx + 1}`,
         nombre: NOMBRES_MOCK[idx] || `Alumno ${idx + 1}`,
         seatIndex: idx,
-        baseType: (idx % 3) + 1,
+        baseType: BASES_DISPONIBLES[idx % BASES_DISPONIBLES.length],
         colorPelo: OPCIONES_PELO[idx % OPCIONES_PELO.length].hex,
         tieneGorro: idx % 2 === 0,
         colorRopa: OPCIONES_ROPA[idx % OPCIONES_ROPA.length].hex,
@@ -471,7 +481,7 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
         .avatar-modal-card {
           background: #FFFFFF;
           width: 100%;
-          max-width: 480px;
+          max-width: 490px;
           border-radius: 28px;
           border: 4px solid #18181B;
           box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 6px 0 #18181B;
@@ -554,7 +564,7 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
           color: #18181B;
           font-size: 11px;
           font-weight: 800;
-          padding: 5px 12px;
+          padding: 5px 14px;
           border-radius: 999px;
           margin-top: 6px;
           cursor: pointer;
@@ -582,33 +592,38 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
           letter-spacing: 0.06em;
         }
 
-        .base-tabs-grid {
+        /* Galería visual con las caras de los 5 avatares */
+        .base-faces-gallery {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(5, 1fr);
           gap: 8px;
           width: 100%;
         }
 
-        .btn-base-tab {
+        .btn-face-card {
           background: #F4F1EA;
           border: 2.5px solid #18181B;
-          border-radius: 14px;
-          padding: 8px 4px;
+          border-radius: 16px;
+          padding: 6px 4px;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 4px;
+          justify-content: center;
           cursor: pointer;
-          font-weight: 800;
-          font-size: 11px;
-          color: #18181B;
-          transition: transform 0.1s ease, background 0.15s ease;
+          box-shadow: 0 2px 0 #18181B;
+          transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.15s ease, box-shadow 0.15s ease;
         }
 
-        .btn-base-tab.active {
-          background: #FACC15;
-          box-shadow: 0 3px 0 #18181B;
+        .btn-face-card:hover {
+          background: #FFFBEB;
           transform: translateY(-2px);
+        }
+
+        .btn-face-card.active {
+          background: #FACC15;
+          box-shadow: 0 4px 0 #18181B;
+          transform: translateY(-3px);
+          border-color: #18181B;
         }
 
         .swatches-row {
@@ -637,26 +652,13 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
           box-shadow: 0 4px 0 #18181B;
         }
 
-        .btn-toggle-hat {
-          background: #F4F1EA;
-          border: 2.5px solid #18181B;
-          border-radius: 14px;
-          padding: 10px 14px;
-          font-weight: 800;
-          font-size: 13px;
-          color: #18181B;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          width: 100%;
-          transition: transform 0.1s ease, background 0.15s ease;
-        }
-
-        .btn-toggle-hat.active {
-          background: #86EFAC;
-          box-shadow: 0 3px 0 #18181B;
+        .swatch-indicator {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: #FFFFFF;
+          border: 1.5px solid #18181B;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
         .btn-confirm-avatar {
@@ -735,7 +737,7 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
           <div className="avatar-modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <div>
-                <h2 className="modal-title">🎨 Personaliza tu Personaje</h2>
+                <h2 className="modal-title">Personaliza tu Personaje</h2>
                 <p className="modal-subtitle">Modifica tu estilo o genera otro aleatorio</p>
               </div>
               <button
@@ -765,110 +767,80 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
                   onClick={aleatorizarMiAvatar}
                   title="Generar otro avatar al azar estilo Kahoot"
                 >
-                  🎲 Generar aleatorio
+                  Generar aleatorio
                 </button>
               </div>
 
-              {/* Selector de tipo de base (1, 2 o 3) */}
+              {/* Selector de tipo de base con galería visual de las 5 caras */}
               <div className="selector-section">
                 <span className="selector-label">1. Elige tu base de personaje</span>
-                <div className="base-tabs-grid">
-                  <button
-                    type="button"
-                    className={`btn-base-tab ${miAvatar.baseType === 1 ? 'active' : ''}`}
-                    onClick={() => setMiAvatar((prev) => ({ ...prev, baseType: 1 }))}
-                  >
-                    <span>Curioso</span>
-                    <span style={{ fontSize: '10px', color: '#6B7280' }}>Base 1</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className={`btn-base-tab ${miAvatar.baseType === 2 ? 'active' : ''}`}
-                    onClick={() => setMiAvatar((prev) => ({ ...prev, baseType: 2 }))}
-                  >
-                    <span>Skater</span>
-                    <span style={{ fontSize: '10px', color: '#6B7280' }}>Base 2</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className={`btn-base-tab ${miAvatar.baseType === 3 ? 'active' : ''}`}
-                    onClick={() => setMiAvatar((prev) => ({ ...prev, baseType: 3 }))}
-                  >
-                    <span>Sabio</span>
-                    <span style={{ fontSize: '10px', color: '#6B7280' }}>Base 3</span>
-                  </button>
+                <div className="base-faces-gallery">
+                  {BASES_CATALOGO.map((b) => (
+                    <button
+                      key={b.id}
+                      type="button"
+                      className={`btn-face-card ${miAvatar.baseType === b.id ? 'active' : ''}`}
+                      onClick={() => setMiAvatar((prev) => ({ ...prev, baseType: b.id }))}
+                      title={b.label}
+                      aria-label={b.label}
+                    >
+                      <AvatarGeometrico
+                        standalone
+                        size={46}
+                        baseType={b.id}
+                        colorPelo={miAvatar.colorPelo}
+                        colorRopa={miAvatar.colorRopa}
+                      />
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              {/* Controles dinámicos según el baseType seleccionado */}
+              {/* Opciones fijas de personalización para todos los avatares */}
               <div className="selector-section">
-                {miAvatar.baseType === 1 && (
-                  <div>
-                    <span className="selector-label" style={{ display: 'block', marginBottom: '8px' }}>
-                      2. Color de pelo
-                    </span>
-                    <div className="swatches-row">
-                      {OPCIONES_PELO.map((pelo) => (
-                        <button
-                          key={pelo.hex}
-                          type="button"
-                          className={`btn-swatch ${miAvatar.colorPelo === pelo.hex ? 'active' : ''}`}
-                          style={{ background: pelo.hex }}
-                          title={pelo.label}
-                          onClick={() => setMiAvatar((prev) => ({ ...prev, colorPelo: pelo.hex }))}
-                        >
-                          {miAvatar.colorPelo === pelo.hex && (
-                            <span style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: 'bold' }}>✓</span>
-                          )}
-                        </button>
-                      ))}
-                    </div>
+                <div>
+                  <span className="selector-label" style={{ display: 'block', marginBottom: '8px' }}>
+                    2. Color de sudadera/ropa
+                  </span>
+                  <div className="swatches-row">
+                    {OPCIONES_ROPA.map((ropa) => (
+                      <button
+                        key={ropa.hex}
+                        type="button"
+                        className={`btn-swatch ${miAvatar.colorRopa === ropa.hex ? 'active' : ''}`}
+                        style={{ background: ropa.hex }}
+                        title={ropa.label}
+                        onClick={() => setMiAvatar((prev) => ({ ...prev, colorRopa: ropa.hex }))}
+                      >
+                        {miAvatar.colorRopa === ropa.hex && (
+                          <span className="swatch-indicator" />
+                        )}
+                      </button>
+                    ))}
                   </div>
-                )}
+                </div>
 
-                {miAvatar.baseType === 2 && (
-                  <div>
-                    <span className="selector-label" style={{ display: 'block', marginBottom: '8px' }}>
-                      2. Accesorio de cabeza
-                    </span>
-                    <button
-                      type="button"
-                      className={`btn-toggle-hat ${miAvatar.tieneGorro ? 'active' : ''}`}
-                      onClick={() => setMiAvatar((prev) => ({ ...prev, tieneGorro: !prev.tieneGorro }))}
-                    >
-                      <span>{miAvatar.tieneGorro ? '🧢 Con gorra hacia atrás' : '✂️ Sin gorra (Pelo moderno)'}</span>
-                      <span style={{ fontSize: '11px', fontWeight: 'bold' }}>
-                        {miAvatar.tieneGorro ? '(Puesto)' : '(Quitado)'}
-                      </span>
-                    </button>
+                <div>
+                  <span className="selector-label" style={{ display: 'block', marginBottom: '8px' }}>
+                    3. Color de pelo
+                  </span>
+                  <div className="swatches-row">
+                    {OPCIONES_PELO.map((pelo) => (
+                      <button
+                        key={pelo.hex}
+                        type="button"
+                        className={`btn-swatch ${miAvatar.colorPelo === pelo.hex ? 'active' : ''}`}
+                        style={{ background: pelo.hex }}
+                        title={pelo.label}
+                        onClick={() => setMiAvatar((prev) => ({ ...prev, colorPelo: pelo.hex }))}
+                      >
+                        {miAvatar.colorPelo === pelo.hex && (
+                          <span className="swatch-indicator" />
+                        )}
+                      </button>
+                    ))}
                   </div>
-                )}
-
-                {miAvatar.baseType === 3 && (
-                  <div>
-                    <span className="selector-label" style={{ display: 'block', marginBottom: '8px' }}>
-                      2. Color de sudadera
-                    </span>
-                    <div className="swatches-row">
-                      {OPCIONES_ROPA.map((ropa) => (
-                        <button
-                          key={ropa.hex}
-                          type="button"
-                          className={`btn-swatch ${miAvatar.colorRopa === ropa.hex ? 'active' : ''}`}
-                          style={{ background: ropa.hex }}
-                          title={ropa.label}
-                          onClick={() => setMiAvatar((prev) => ({ ...prev, colorRopa: ropa.hex }))}
-                        >
-                          {miAvatar.colorRopa === ropa.hex && (
-                            <span style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: 'bold' }}>✓</span>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
 
               {/* Botón de confirmación */}
@@ -877,8 +849,7 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
                 className="btn-confirm-avatar"
                 onClick={confirmarMiAvatar}
               >
-                <span>Guardar cambios</span>
-                <span>✨</span>
+                Guardar cambios
               </button>
             </div>
           </div>
@@ -925,7 +896,7 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
               onClick={() => setMostrarPersonalizador(true)}
               title="Personalizar mi personaje"
             >
-              🎨 Personalizar mi avatar
+              Personalizar avatar
             </button>
             <button
               type="button"
@@ -933,7 +904,7 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
               onClick={reiniciarAula}
               title="Vaciar las sillas para volver a ver la animación"
             >
-              🔄 Reiniciar
+              Reiniciar
             </button>
             <button
               type="button"
@@ -941,7 +912,7 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
               onClick={llenarAula}
               title="Llenar todos los pupitres de inmediato"
             >
-              ⚡ Llenar aula
+              Llenar aula
             </button>
             {onVolver && (
               <button
@@ -1168,7 +1139,7 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
                         fill="#18181B"
                         letterSpacing="0.02em"
                       >
-                        {student.isPlayer ? `⭐ ${student.nombre}` : student.nombre}
+                        {student.isPlayer ? `${student.nombre} (Tú)` : student.nombre}
                       </text>
                     </g>
                   )}
@@ -1181,7 +1152,6 @@ export default function SalaEsperaAlumnos({ pin = '734 912', onVolver }) {
         {/* Pie informativo de la sala */}
         <div className="sala-footer-legal">
           <div className="sala-tip-badge">
-            <span>💡</span>
             <span><b>Consejo Legalín:</b> Nadie puede obligarte a compartir fotos privadas ni contraseñas. ¡Juega limpio y seguro!</span>
           </div>
 
