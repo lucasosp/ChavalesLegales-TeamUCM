@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { SELLOS } from './Sello'
+import { Salpicadura } from './Particulas'
 
 // Papel del recurso (centro de la mesa). Es la zona donde caen los sellos.
 export default function CasePaper({ caso, revealedDocsCount, onPedirDoc, docRecibido, marca, golpe, onSoltarSello }) {
@@ -14,7 +15,7 @@ export default function CasePaper({ caso, revealedDocsCount, onPedirDoc, docReci
       onDragLeave={() => setEncima(false)}
       onDrop={e => { e.preventDefault(); setEncima(false); onSoltarSello(e.dataTransfer.getData('sello')) }}
     >
-      <p className="papel__cab">Juzgado de Legalín · Recurso nº {caso.id}</p>
+      <p className="papel__cab">Juzgado de Legalín · Caso nº {caso.indice + 1}</p>
       <p className="papel__resumen">{caso.caseSummary}</p>
       <h2 className="papel__pregunta">{caso.verdictQuestion}</h2>
 
@@ -30,6 +31,7 @@ export default function CasePaper({ caso, revealedDocsCount, onPedirDoc, docReci
         </button>
       )}
 
+      {marca && <Salpicadura key={`g-${marca}`} tipo={marca} />}
       {marca && <span key={marca} className={`tinta tinta--${marca}`}>{SELLOS[marca].texto}</span>}
     </article>
   )

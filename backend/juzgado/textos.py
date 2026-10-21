@@ -35,6 +35,11 @@ MENSAJES = {
         "10-12": "Ese recurso no es el mejor. ¿Quién se encarga de esto?",
         "13-16": "Ese recurso no es el adecuado. Piensa qué organismo se ocupa de este tipo de casos.",
     },
+    "racha": {
+        "7-9": "🔥 ¡{n} seguidos! ¡Estrella extra!",
+        "10-12": "🔥 ¡Racha de {n} aciertos! Ganas una estrella extra.",
+        "13-16": "🔥 Racha de {n} aciertos a la primera: +1 estrella extra.",
+    },
 }
 
 
