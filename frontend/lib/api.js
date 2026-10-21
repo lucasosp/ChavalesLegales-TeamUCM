@@ -185,13 +185,20 @@ export async function getInfoSala(pin) {
   return await r.json()
 }
 
-export async function unirseASala(pin, nickname) {
+export async function unirseASala(pin, nickname, avatar = {}) {
   const cleanPin = pin.replace(/\s+/g, '').trim()
   const base = getApiBaseUrl()
+  const payload = {
+    nickname,
+    base_type: avatar?.baseType ?? avatar?.base_type,
+    color_pelo: avatar?.colorPelo ?? avatar?.color_pelo,
+    color_ropa: avatar?.colorRopa ?? avatar?.color_ropa,
+    tiene_gorro: avatar?.tieneGorro !== undefined ? avatar.tieneGorro : avatar?.tiene_gorro,
+  }
   const r = await fetch(`${base}/api/salas/${cleanPin}/join`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nickname }),
+    body: JSON.stringify(payload),
   })
 
   if (!r.ok) {
@@ -201,5 +208,3 @@ export async function unirseASala(pin, nickname) {
 
   return await r.json()
 }
-
-

@@ -156,8 +156,10 @@ export default function ApartadoProfesores({ initialPin = null }) {
         capacidad={roomState.capacidad_aula}
         modoInfinito={roomState.modo_infinito}
         onCapacidadChange={(nuevaCapacidad, nuevoModoInfinito) => {
+          setRoomState((prev) => prev ? { ...prev, capacidad_aula: nuevaCapacidad, modo_infinito: nuevoModoInfinito } : prev)
           socketRef.current?.send('UPDATE_CAPACITY', {
             capacidad: nuevaCapacidad,
+            capacidad_aula: nuevaCapacidad,
             modo_infinito: nuevoModoInfinito,
           })
         }}

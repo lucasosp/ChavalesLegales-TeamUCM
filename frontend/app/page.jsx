@@ -61,7 +61,14 @@ export default function Home() {
     setCargando(true)
     setErrorMsg(null)
     try {
-      const res = await unirseASala(pin, cleanNick)
+      let miAvatar = {}
+      if (typeof window !== 'undefined') {
+        try {
+          const guardado = localStorage.getItem('chavales_mi_avatar')
+          if (guardado) miAvatar = JSON.parse(guardado)
+        } catch {}
+      }
+      const res = await unirseASala(pin, cleanNick, miAvatar)
       setPlayerData(res)
       setStep('GAME')
     } catch (err) {
@@ -158,19 +165,23 @@ export default function Home() {
         cleanPin={pin}
         students={studentList}
         isHost={false}
-        currentSeat={player?.seat_index ?? 0}
+        currentSeat={player?.seat_index ?? (player?.seatIndex ?? 0)}
         roomUrl={`http://localhost:3001/profesores/sala/${pin}`}
         onVolver={handleSalirPartida}
         onUpdateAvatar={(nuevoAvatar) => {
           socketRef.current?.send('UPDATE_AVATAR', {
             baseType: nuevoAvatar.baseType,
+            base_type: nuevoAvatar.baseType,
             colorPelo: nuevoAvatar.colorPelo,
+            color_pelo: nuevoAvatar.colorPelo,
             colorRopa: nuevoAvatar.colorRopa,
+            color_ropa: nuevoAvatar.colorRopa,
             tieneGorro: nuevoAvatar.tieneGorro,
+            tiene_gorro: nuevoAvatar.tieneGorro,
           })
         }}
-        capacidad={gameState?.capacidad_aula}
-        modoInfinito={gameState?.modo_infinito}
+        capacidad={gameState?.capacidad_aula ?? playerData?.capacidad_aula}
+        modoInfinito={gameState?.modo_infinito ?? playerData?.modo_infinito}
       />
     )
   }

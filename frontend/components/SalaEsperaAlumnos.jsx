@@ -376,7 +376,7 @@ export default function SalaEsperaAlumnos({
         }
 
         .sala-top-banner {
-          background: #4A1A1C;
+          background: #461020;
           color: #FFFFFF;
           padding: 16px 28px;
           display: flex;
@@ -391,8 +391,8 @@ export default function SalaEsperaAlumnos({
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          background: #3D4A27;
-          border: 2px solid #86EFAC;
+          background: #3e6b32;
+          border: 2px solid #608841;
           padding: 6px 14px;
           border-radius: 999px;
           font-size: 13px;
@@ -419,7 +419,7 @@ export default function SalaEsperaAlumnos({
 
         .sala-subtitle {
           font-size: 14px;
-          color: #FACC15;
+          color: #fdc623;
           font-weight: 500;
           margin: 0;
         }
@@ -438,7 +438,7 @@ export default function SalaEsperaAlumnos({
           display: block;
           font-size: 11px;
           font-weight: 800;
-          color: #3D4A27;
+          color: #3e6b32;
           letter-spacing: 0.08em;
           text-transform: uppercase;
         }
@@ -448,7 +448,7 @@ export default function SalaEsperaAlumnos({
           font-size: 22px;
           font-weight: 900;
           letter-spacing: 0.08em;
-          color: #4A1A1C;
+          color: #461020;
         }
 
         .sala-subbar {
@@ -485,7 +485,7 @@ export default function SalaEsperaAlumnos({
 
         .sala-progress-fill {
           height: 100%;
-          background: #86EFAC;
+          background: #608841;
           transition: width 0.4s ease;
         }
 
@@ -508,7 +508,7 @@ export default function SalaEsperaAlumnos({
         }
 
         .btn-sala-pill:hover {
-          background: #FACC15;
+          background: #fdc623;
           transform: translateY(-1px);
         }
 
@@ -517,7 +517,7 @@ export default function SalaEsperaAlumnos({
         }
 
         .btn-avatar-edit {
-          background: #FACC15;
+          background: #fdc623;
           border: 2.5px solid #18181B;
           padding: 6px 14px;
           border-radius: 12px;
@@ -538,7 +538,7 @@ export default function SalaEsperaAlumnos({
         }
 
         .btn-sala-volver {
-          background: #4A1A1C;
+          background: #461020;
           color: #FFFFFF;
           border: 2px solid #18181B;
           padding: 6px 14px;
@@ -549,12 +549,12 @@ export default function SalaEsperaAlumnos({
         }
 
         .btn-sala-volver:hover {
-          background: #3D4A27;
+          background: #3e6b32;
         }
 
         .btn-sala-iniciar {
-          background: #22C55E;
-          color: #0F172A;
+          background: #608841;
+          color: #FFFFFF;
           border: 2px solid #18181B;
           padding: 8px 18px;
           border-radius: 14px;
@@ -566,7 +566,7 @@ export default function SalaEsperaAlumnos({
         }
 
         .btn-sala-iniciar:hover:not(:disabled) {
-          background: #4ADE80;
+          background: #74A152;
           transform: translateY(-2px);
           box-shadow: 0 6px 0 #18181B;
         }
@@ -583,13 +583,13 @@ export default function SalaEsperaAlumnos({
           position: relative;
           width: 100%;
           flex: 1;
-          padding: 14px 20px 24px;
+          padding: 16px 20px 32px;
           box-sizing: border-box;
           display: flex;
           justify-content: center;
           align-items: flex-start;
           overflow-y: auto;
-          max-height: min(72vh, 660px);
+          min-height: calc(100vh - 150px);
         }
 
         .sala-canvas-stage::-webkit-scrollbar {
@@ -604,12 +604,12 @@ export default function SalaEsperaAlumnos({
           border-radius: 4px;
         }
         .sala-canvas-stage::-webkit-scrollbar-thumb:hover {
-          background: #4A1A1C;
+          background: #461020;
         }
 
         .classroom-svg {
           width: 100%;
-          max-width: 1100px;
+          max-width: 1180px;
           height: auto;
           display: block;
           flex-shrink: 0;
@@ -631,7 +631,7 @@ export default function SalaEsperaAlumnos({
           font-weight: 800;
           text-transform: uppercase;
           letter-spacing: 0.05em;
-          color: #4A1A1C;
+          color: #461020;
         }
 
         .btn-aforo-stepper {
@@ -652,7 +652,7 @@ export default function SalaEsperaAlumnos({
         }
 
         .btn-aforo-stepper:hover:not(:disabled) {
-          background: #FACC15;
+          background: #fdc623;
           transform: translateY(-1px);
         }
 
@@ -686,11 +686,13 @@ export default function SalaEsperaAlumnos({
         }
 
         .btn-aforo-infinito:hover {
-          background: #FACC15;
+          background: #fdc623;
         }
 
         .btn-aforo-infinito.active {
-          background: #86EFAC;
+          background: #608841;
+          color: #FFFFFF;
+          border-color: #3e6b32;
           box-shadow: 0 1px 0 #18181B;
         }
 
@@ -744,7 +746,7 @@ export default function SalaEsperaAlumnos({
         }
 
         .modal-header {
-          background: #4A1A1C;
+          background: #461020;
           color: #FFFFFF;
           padding: 16px 22px;
           border-bottom: 3px solid #18181B;
@@ -762,7 +764,7 @@ export default function SalaEsperaAlumnos({
 
         .modal-subtitle {
           font-size: 13px;
-          color: #FACC15;
+          color: #fdc623;
           margin-top: 2px;
           font-weight: 600;
         }
@@ -784,7 +786,7 @@ export default function SalaEsperaAlumnos({
         }
 
         .btn-modal-close:hover {
-          background: #B03921;
+          background: #b03921;
           transform: scale(1.08);
         }
 
@@ -811,7 +813,7 @@ export default function SalaEsperaAlumnos({
         }
 
         .btn-randomize-pill {
-          background: #FACC15;
+          background: #fdc623;
           border: 2px solid #18181B;
           color: #18181B;
           font-size: 11px;
@@ -839,7 +841,7 @@ export default function SalaEsperaAlumnos({
         .selector-label {
           font-size: 12px;
           font-weight: 800;
-          color: #4A1A1C;
+          color: #461020;
           text-transform: uppercase;
           letter-spacing: 0.06em;
         }
@@ -1283,7 +1285,7 @@ export default function SalaEsperaAlumnos({
           <svg
             className="classroom-svg"
             viewBox={`0 0 960 ${svgHeight}`}
-            style={{ minHeight: svgHeight, width: '100%', maxWidth: 1100 }}
+            style={{ minHeight: svgHeight, width: '100%', maxWidth: 1180 }}
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -1297,71 +1299,118 @@ export default function SalaEsperaAlumnos({
             </defs>
 
             {/* SUELO Y PARED POLIGONAL DEL AULA */}
-            <rect x="0" y="0" width="960" height="130" fill="#EFE8DD" />
-            <line x1="0" y1="130" x2="960" y2="130" stroke="#4A1A1C" strokeWidth="6" />
+            {/* Pared superior cálida y limpia */}
+            <rect x="0" y="0" width="960" height="116" fill="#FAF6EE" />
+            <rect x="0" y="112" width="960" height="4" fill="#461020" />
+            <rect x="0" y="116" width="960" height="8" fill="#E8DBC9" />
 
-            <rect x="0" y="133" width="960" height={svgHeight - 133} fill="#F8F4EC" />
-            {Array.from({ length: numRows - 1 }, (_, i) => {
-              const lineY = 260 + i * 135
+            {/* Suelo continuo y amplio */}
+            <rect x="0" y="124" width="960" height={svgHeight - 124} fill="#F8F4EC" />
+            {Array.from({ length: numRows }, (_, i) => {
+              const lineY = 265 + i * 135
               return (
                 <line
                   key={`floor-line-${i}`}
-                  x1="0"
+                  x1="40"
                   y1={lineY}
-                  x2="960"
+                  x2="920"
                   y2={lineY}
-                  stroke="#ECE2D0"
-                  strokeWidth="2"
-                  strokeDasharray="6 6"
+                  stroke="#EDE4D6"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
                 />
               )
             })}
-            <line x1="240" y1="133" x2="160" y2={svgHeight} stroke="#EFE5D5" strokeWidth="1.5" />
-            <line x1="480" y1="133" x2="480" y2={svgHeight} stroke="#EFE5D5" strokeWidth="1.5" />
-            <line x1="720" y1="133" x2="800" y2={svgHeight} stroke="#EFE5D5" strokeWidth="1.5" />
 
             {/* PIZARRA DIGITAL FRONTAL */}
-            <g transform="translate(240, 18)">
-              <rect x="0" y="0" width="480" height="96" rx="14" fill="#3D4A27" stroke="#18181B" strokeWidth="3" />
-              <rect x="10" y="10" width="460" height="76" rx="10" fill="#1F2E22" />
-              <text x="240" y="34" textAnchor="middle" fill="#FACC15" fontSize="13" fontWeight="800" letterSpacing="2">
-                CHAVALES LEGALES · AULA 4B
-              </text>
-              <text x="240" y="58" textAnchor="middle" fill="#FFFFFF" fontSize="18" fontWeight="900" letterSpacing="1">
-                SALA DE ESPERA
-              </text>
-              <g transform="translate(140, 66)">
-                <circle cx="8" cy="8" r="4" fill="#86EFAC" />
-                <text x="22" y="12" fill="#86EFAC" fontSize="11" fontWeight="700">
+            <g transform="translate(220, 18)">
+              {/* Marco exterior en granate corporativo */}
+              <rect x="0" y="0" width="520" height="82" rx="16" fill="#461020" stroke="#18181B" strokeWidth="2.5" />
+              {/* Borde interior decorativo */}
+              <rect x="6" y="6" width="508" height="70" rx="12" fill="#3e6b32" opacity="0.35" />
+              {/* Fondo de pizarra verde oscura */}
+              <rect x="8" y="8" width="504" height="66" rx="10" fill="#1F2E22" />
+
+              {/* Repisa para tizas con tizas decorativas */}
+              <rect x="170" y="74" width="180" height="5" rx="2.5" fill="#fdc623" />
+              <rect x="190" y="70" width="18" height="4" rx="2" fill="#FFFFFF" />
+              <rect x="215" y="70" width="16" height="4" rx="2" fill="#fdc623" />
+              <rect x="295" y="68" width="24" height="6" rx="2" fill="#8C7A6B" />
+
+              {/* Texto único requerido en la pizarra */}
+              <g transform="translate(260, 42)">
+                <circle cx="-168" cy="-1" r="5" fill="#608841" />
+                <circle cx="-168" cy="-1" r="8" fill="#86EFAC" opacity="0.4" className="sala-dot-pulse" />
+                <text
+                  x="-152"
+                  y="4"
+                  textAnchor="start"
+                  fill="#FFFFFF"
+                  fontSize="15"
+                  fontWeight="800"
+                  letterSpacing="0.3"
+                  fontFamily="'Plus Jakarta Sans', system-ui, sans-serif"
+                >
                   Esperando a que el profesor inicie la partida...
                 </text>
               </g>
             </g>
 
             {/* DECORACIÓN IZQUIERDA: MESA DE PROFESOR CON MARTILLO DE JUEZ */}
-            <g transform="translate(40, 36)">
-              <polygon points="0,50 140,50 130,85 10,85" fill="#DDD2C0" stroke="#18181B" strokeWidth="2.5" />
-              <polygon points="10,85 130,85 125,92 15,92" fill="#C5B7A1" stroke="#18181B" strokeWidth="2.5" />
-              <rect x="25" y="40" width="34" height="10" rx="2" fill="#4A1A1C" stroke="#18181B" strokeWidth="1.5" />
-              <rect x="27" y="32" width="30" height="9" rx="2" fill="#3D4A27" stroke="#18181B" strokeWidth="1.5" />
-              <rect x="29" y="25" width="26" height="8" rx="2" fill="#FACC15" stroke="#18181B" strokeWidth="1.5" />
-              <g transform="translate(85, 34)">
-                <ellipse cx="20" cy="16" rx="14" ry="4" fill="#4A1A1C" stroke="#18181B" strokeWidth="1.5" />
-                <line x1="8" y1="14" x2="28" y2="4" stroke="#FACC15" strokeWidth="3" strokeLinecap="round" />
-                <rect x="22" y="-2" width="12" height="7" rx="2" fill="#4A1A1C" stroke="#18181B" strokeWidth="1.5" transform="rotate(-30 26 2)" />
+            <g transform="translate(42, 26)">
+              <ellipse cx="65" cy="84" rx="55" ry="6" fill="#18181B" opacity="0.08" />
+              <rect x="14" y="52" width="6" height="30" rx="3" fill="#2C2830" />
+              <rect x="110" y="52" width="6" height="30" rx="3" fill="#2C2830" />
+              <rect x="10" y="44" width="110" height="32" rx="8" fill="#EADBC6" />
+              <rect x="16" y="50" width="98" height="20" rx="6" fill="#FDFBF7" />
+              <circle cx="65" cy="60" r="6" fill="#461020" />
+              <circle cx="65" cy="60" r="4" fill="#fdc623" />
+              <rect x="0" y="38" width="130" height="12" rx="6" fill="#FFFDF9" stroke="#DFD2BD" strokeWidth="1.5" />
+              {/* Libros en mesa de juez */}
+              <rect x="18" y="30" width="30" height="8" rx="2" fill="#461020" />
+              <rect x="20" y="23" width="26" height="7" rx="2" fill="#3e6b32" />
+              <rect x="22" y="17" width="22" height="6" rx="2" fill="#fdc623" />
+              {/* Martillo de juez apoyado plano sobre la mesa */}
+              <g id="teacher-gavel">
+                {/* Taco de golpeo apoyado sobre la mesa */}
+                <rect x="70" y="33" width="22" height="5" rx="2.5" fill="#461020" />
+                {/* Cabeza del martillo apoyada horizontal sobre la mesa */}
+                <rect x="96" y="29" width="14" height="9" rx="3" fill="#461020" />
+                <rect x="94.5" y="30.5" width="2" height="6" rx="1" fill="#fdc623" />
+                {/* Mango horizontal apoyado */}
+                <rect x="74" y="32" width="24" height="3" rx="1.5" fill="#fdc623" />
+                <circle cx="73.5" cy="33.5" r="2.2" fill="#461020" />
               </g>
             </g>
 
             {/* DECORACIÓN DERECHA: PLANTA POLIGONAL Y RELOJ */}
-            <g transform="translate(840, 28)">
-              <polygon points="20,0 40,0 52,12 52,32 40,44 20,44 8,32 8,12" fill="#3D4A27" stroke="#18181B" strokeWidth="2.5" />
-              <circle cx="30" cy="22" r="14" fill="#FFFFFF" />
-              <line x1="30" y1="22" x2="30" y2="13" stroke="#18181B" strokeWidth="2" strokeLinecap="round" />
-              <line x1="30" y1="22" x2="37" y2="22" stroke="#FACC15" strokeWidth="2" strokeLinecap="round" />
-              <polygon points="12,85 48,85 42,108 18,108" fill="#4A1A1C" stroke="#18181B" strokeWidth="2" />
-              <polygon points="30,85 15,65 30,75" fill="#3D4A27" />
-              <polygon points="30,85 45,65 30,75" fill="#86EFAC" />
-              <polygon points="30,75 30,55 35,70" fill="#3D4A27" />
+            <g transform="translate(846, 20)">
+              {/* Reloj flat */}
+              <g transform="translate(18, 0)">
+                <circle cx="22" cy="22" r="22" fill="#461020" />
+                <circle cx="22" cy="22" r="18" fill="#FFFFFF" />
+                <circle cx="22" cy="7" r="1.5" fill="#3e6b32" />
+                <circle cx="22" cy="37" r="1.5" fill="#3e6b32" />
+                <circle cx="7" cy="22" r="1.5" fill="#3e6b32" />
+                <circle cx="37" cy="22" r="1.5" fill="#3e6b32" />
+                <line x1="22" y1="22" x2="16" y2="14" stroke="#18181B" strokeWidth="2.2" strokeLinecap="round" />
+                <line x1="22" y1="22" x2="31" y2="17" stroke="#fdc623" strokeWidth="2.2" strokeLinecap="round" />
+                <circle cx="22" cy="22" r="2.5" fill="#b03921" />
+              </g>
+
+              {/* Planta flat */}
+              <g transform="translate(18, 52)">
+                <ellipse cx="22" cy="46" rx="18" ry="4" fill="#18181B" opacity="0.08" />
+                <ellipse cx="10" cy="18" rx="10" ry="15" fill="#3e6b32" transform="rotate(-35 10 18)" />
+                <ellipse cx="11" cy="17" rx="7" ry="12" fill="#608841" transform="rotate(-35 10 18)" />
+                <ellipse cx="34" cy="18" rx="10" ry="15" fill="#3e6b32" transform="rotate(35 34 18)" />
+                <ellipse cx="33" cy="17" rx="7" ry="12" fill="#608841" transform="rotate(35 34 18)" />
+                <ellipse cx="22" cy="10" rx="9" ry="16" fill="#608841" />
+                <ellipse cx="22" cy="10" rx="5" ry="12" fill="#86EFAC" opacity="0.5" />
+                <line x1="22" y1="12" x2="22" y2="30" stroke="#3e6b32" strokeWidth="2.5" strokeLinecap="round" />
+                <path d="M 9 24 L 35 24 L 31 44 L 13 44 Z" fill="#b03921" />
+                <rect x="7" y="22" width="30" height="5" rx="2.5" fill="#C44830" />
+              </g>
             </g>
 
             {/* ==========================================================
@@ -1369,14 +1418,14 @@ export default function SalaEsperaAlumnos({
                 (Renderizados de atrás hacia adelante para correcta oclusión)
                ========================================================== */}
             {seatCoords.map((seat) => {
-              const student = students.find((s) => s.seatIndex === seat.id)
+              const student = students.find((s) => (s.seatIndex !== undefined ? s.seatIndex : s.seat_index) === seat.id)
               const { x, y } = seat
-              const isMe = student && ((!isHost && (currentSeat !== null && currentSeat !== undefined ? seat.id === currentSeat : seat.id === 0)) || Boolean(student.isPlayer))
+              const isMe = student && ((!isHost && (currentSeat !== null && currentSeat !== undefined ? (student.seatIndex !== undefined ? student.seatIndex : student.seat_index) === currentSeat : seat.id === 0)) || Boolean(student.isPlayer))
               const activeAvatar = isMe ? (avatarConfirmado || miAvatar) : student
-              const activeBase = (activeAvatar && activeAvatar.baseType) || (student && student.avatarTipo !== undefined ? BASES_DISPONIBLES[student.avatarTipo % BASES_DISPONIBLES.length] : 1)
-              const activePelo = (activeAvatar && activeAvatar.colorPelo) || OPCIONES_PELO[seat.id % OPCIONES_PELO.length].hex
-              const activeRopa = (activeAvatar && activeAvatar.colorRopa) || OPCIONES_ROPA[(seat.id + 1) % OPCIONES_ROPA.length].hex
-              const activeGorro = activeAvatar ? Boolean(activeAvatar.tieneGorro) : false
+              const activeBase = (activeAvatar && (activeAvatar.baseType ?? activeAvatar.base_type)) || (student && (student.baseType ?? student.base_type)) || (student && student.avatarTipo !== undefined ? BASES_DISPONIBLES[student.avatarTipo % BASES_DISPONIBLES.length] : 1)
+              const activePelo = (activeAvatar && (activeAvatar.colorPelo ?? activeAvatar.color_pelo)) || (student && (student.colorPelo ?? student.color_pelo)) || OPCIONES_PELO[seat.id % OPCIONES_PELO.length].hex
+              const activeRopa = (activeAvatar && (activeAvatar.colorRopa ?? activeAvatar.color_ropa)) || (student && (student.colorRopa ?? student.color_ropa)) || OPCIONES_ROPA[(seat.id + 1) % OPCIONES_ROPA.length].hex
+              const activeGorro = activeAvatar ? Boolean(activeAvatar.tieneGorro !== undefined ? activeAvatar.tieneGorro : activeAvatar.tiene_gorro) : (student ? Boolean(student.tieneGorro !== undefined ? student.tieneGorro : student.tiene_gorro) : false)
 
               return (
                 <g
@@ -1387,21 +1436,38 @@ export default function SalaEsperaAlumnos({
                 >
                   {/* --- SILLA VACÍA (SIEMPRE DETRÁS DEL PUPITRE) --- */}
                   <g>
-                    <polygon
-                      points={`${x - 22},${y - 28} ${x + 22},${y - 28} ${x + 18},${y - 4} ${x - 18},${y - 4}`}
-                      fill={student ? '#3D4A27' : '#D8D1C4'}
-                      stroke="#18181B"
-                      strokeWidth="2.2"
+                    {/* Patas del respaldo */}
+                    <rect x={x - 18} y={y - 6} width="5" height="14" rx="2.5" fill="#4B4552" />
+                    <rect x={x + 13} y={y - 6} width="5" height="14" rx="2.5" fill="#4B4552" />
+                    {/* Respaldo suave redondeado */}
+                    <rect
+                      x={x - 26}
+                      y={y - 28}
+                      width="52"
+                      height="26"
+                      rx="10"
+                      fill={student ? '#608841' : '#E8DFD0'}
+                      stroke={student ? '#3e6b32' : '#D2C5B4'}
+                      strokeWidth="2"
                     />
-                    <polygon
-                      points={`${x - 22},${y - 28} ${x + 22},${y - 28} ${x + 18},${y - 22} ${x - 18},${y - 22}`}
-                      fill={student ? '#4D5E33' : '#E8E2D6'}
+                    {/* Brillo / relieve superior del respaldo */}
+                    <rect
+                      x={x - 20}
+                      y={y - 26}
+                      width="40"
+                      height="5"
+                      rx="2.5"
+                      fill="#FFFFFF"
+                      opacity={student ? 0.22 : 0.4}
                     />
-                    <polygon
-                      points={`${x - 18},${y - 4} ${x + 18},${y - 4} ${x + 14},${y + 8} ${x - 14},${y + 8}`}
-                      fill={student ? '#2A3519' : '#C2BAAC'}
-                      stroke="#18181B"
-                      strokeWidth="1.8"
+                    {/* Cojín del asiento */}
+                    <rect
+                      x={x - 23}
+                      y={y - 4}
+                      width="46"
+                      height="12"
+                      rx="5"
+                      fill={student ? '#3e6b32' : '#D6CBBA'}
                     />
                   </g>
 
@@ -1424,22 +1490,37 @@ export default function SalaEsperaAlumnos({
                   )}
 
                   {/* --- PUPITRE DE MADERA (EN FRENTE DEL ALUMNO) --- */}
-                  <g filter="url(#deskShadow)">
-                    <line x1={x - 46} y1={y + 40} x2={x - 46} y2={y + 60} stroke="#18181B" strokeWidth="3.5" strokeLinecap="round" />
-                    <line x1={x + 46} y1={y + 40} x2={x + 46} y2={y + 60} stroke="#18181B" strokeWidth="3.5" strokeLinecap="round" />
+                  <g>
+                    {/* Sombra suave en el suelo */}
+                    <ellipse cx={x} cy={y + 64} rx="56" ry="6" fill="#18181B" opacity="0.08" />
 
-                    <polygon
-                      points={`${x - 64},${y + 4} ${x + 64},${y + 4} ${x + 54},${y + 36} ${x - 54},${y + 36}`}
-                      fill="#FAF7F0"
-                      stroke="#18181B"
-                      strokeWidth="2.5"
+                    {/* Patas cilíndricas del pupitre */}
+                    <rect x={x - 48} y={y + 36} width="7" height="26" rx="3.5" fill="#2C2830" />
+                    <rect x={x + 41} y={y + 36} width="7" height="26" rx="3.5" fill="#2C2830" />
+                    <ellipse cx={x - 44.5} cy={y + 62} rx="5.5" ry="2.5" fill="#18181B" />
+                    <ellipse cx={x + 44.5} cy={y + 62} rx="5.5" ry="2.5" fill="#18181B" />
+                    {/* Barra transversal */}
+                    <rect x={x - 44} y={y + 49} width="88" height="4" rx="2" fill="#4B4552" />
+
+                    {/* Tablero del pupitre con borde 2.5D redondeado */}
+                    <rect
+                      x={x - 64}
+                      y={y + 6}
+                      width="128"
+                      height="30"
+                      rx="10"
+                      fill="#FFFDF9"
+                      stroke="#E5DAC9"
+                      strokeWidth="2"
                     />
-
-                    <polygon
-                      points={`${x - 54},${y + 36} ${x + 54},${y + 36} ${x + 50},${y + 44} ${x - 50},${y + 44}`}
-                      fill="#DFD7C7"
-                      stroke="#18181B"
-                      strokeWidth="2.5"
+                    {/* Canto frontal biselado de madera cálida */}
+                    <rect
+                      x={x - 62}
+                      y={y + 26}
+                      width="124"
+                      height="9"
+                      rx="4.5"
+                      fill="#E8DEC9"
                     />
                   </g>
 
@@ -1447,32 +1528,34 @@ export default function SalaEsperaAlumnos({
                   {!student ? (
                     <g>
                       <rect
-                        x={x - 30}
+                        x={x - 38}
                         y={y + 12}
-                        width="60"
+                        width="76"
                         height="18"
-                        rx="6"
-                        fill="#F3EFE7"
-                        stroke="#B8B0A2"
+                        rx="9"
+                        fill="#F4EFE6"
+                        stroke="#D5CBB9"
                         strokeWidth="1.5"
-                        strokeDasharray="3 3"
                       />
+                      <circle cx={x - 26} cy={y + 21} r="3" fill="#B0A694" />
                       <text
-                        x={x}
-                        y={y + 24}
+                        x={x + 4}
+                        y={y + 25}
                         textAnchor="middle"
                         fontSize="10"
-                        fontWeight="700"
-                        fill="#8A8274"
+                        fontWeight="800"
+                        fill="#7D715F"
+                        letterSpacing="0.03em"
+                        fontFamily="'Plus Jakarta Sans', system-ui, sans-serif"
                       >
-                        Silla {seat.id + 1}
+                        Pupitre {seat.id + 1}
                       </text>
                     </g>
                   ) : (
                     <g>
                       {/* Manos apoyadas en la mesa estilo flat */}
-                      <ellipse cx={x - 20} cy={y + 14} rx="4.5" ry="3.5" fill="#FDE0C5" />
-                      <ellipse cx={x + 20} cy={y + 14} rx="4.5" ry="3.5" fill="#FDE0C5" />
+                      <ellipse cx={x - 22} cy={y + 14} rx="4.5" ry="3.5" fill="#FDE0C5" />
+                      <ellipse cx={x + 22} cy={y + 14} rx="4.5" ry="3.5" fill="#FDE0C5" />
 
                       {/* Utensilio sobre el pupitre */}
                       {renderDeskItem(x, y, seat.id)}
@@ -1498,7 +1581,7 @@ export default function SalaEsperaAlumnos({
                         filter="url(#cardShadow)"
                       />
                       {/* Punto verde de conexión */}
-                      <circle cx={x - (isMe ? 40 : 36)} cy={y - 62} r={3.5} fill={isMe ? '#CA8A04' : '#22C55E'} />
+                      <circle cx={x - (isMe ? 40 : 36)} cy={y - 62} r={3.5} fill={isMe ? '#CA8A04' : '#608841'} />
                       {/* Nombre del alumno */}
                       <text
                         x={x + 4}
@@ -1540,8 +1623,9 @@ function renderDeskItem(x, y, id) {
   if (itemVariant === 0) {
     return (
       <g>
-        <polygon points={`${x - 14},${y + 7} ${x + 14},${y + 7} ${x + 11},${y + 24} ${x - 11},${y + 24}`} fill="#18181B" />
-        <polygon points={`${x - 11},${y + 9} ${x + 11},${y + 9} ${x + 9},${y + 21} ${x - 9},${y + 21}`} fill="#86EFAC" />
+        <rect x={x - 16} y={y + 10} width="32" height="14" rx="7" fill="#b03921" />
+        <line x1={x - 12} y1={y + 17} x2={x + 12} y2={y + 17} stroke="#fdc623" strokeWidth="2" strokeLinecap="round" />
+        <circle cx={x + 10} cy={y + 17} r="2" fill="#FFFFFF" />
       </g>
     )
   }
@@ -1550,28 +1634,37 @@ function renderDeskItem(x, y, id) {
     return (
       <g>
         <rect
-          x={x - 14}
-          y={y + 11}
-          width="24"
-          height="17"
-          rx="2"
-          fill="#FFFFFF"
-          stroke="#3D4A27"
-          strokeWidth="1.5"
-          transform={`rotate(-5 ${x - 2} ${y + 19})`}
+          x={x - 15}
+          y={y + 9}
+          width="26"
+          height="18"
+          rx="3"
+          fill="#608841"
+          transform={`rotate(-4 ${x - 2} ${y + 18})`}
         />
-        <line x1={x + 13} y1={y + 11} x2={x + 19} y2={y + 25} stroke="#FACC15" strokeWidth="2.8" strokeLinecap="round" />
+        <rect
+          x={x - 11}
+          y={y + 12}
+          width="18"
+          height="12"
+          rx="2"
+          fill="#FAF8F5"
+          transform={`rotate(-4 ${x - 2} ${y + 18})`}
+        />
+        <line x1={x + 13} y1={y + 10} x2={x + 20} y2={y + 24} stroke="#fdc623" strokeWidth="2.8" strokeLinecap="round" />
+        <circle cx={x + 20} cy={y + 24} r="1.4" fill="#b03921" />
       </g>
     )
   }
 
   return (
     <g>
-      <rect x={x - 16} y={y + 10} width="32" height="19" rx="3" fill="#4A1A1C" stroke="#18181B" strokeWidth="1.5" />
-      <rect x={x - 13} y={y + 12} width="26" height="15" rx="2" fill="#FACC15" />
-      <text x={x} y={y + 23} textAnchor="middle" fontSize="8" fontWeight="900" fill="#4A1A1C">
+      <rect x={x - 16} y={y + 9} width="32" height="18" rx="3" fill="#461020" />
+      <rect x={x - 13} y={y + 11} width="26" height="14" rx="2" fill="#5A182B" />
+      <text x={x} y={y + 22} textAnchor="middle" fontSize="9" fontWeight="900" fill="#fdc623" fontFamily="'Plus Jakarta Sans', system-ui, sans-serif">
         § LEX
       </text>
+      <path d={`M ${x + 6} ${y + 25} L ${x + 6} ${y + 29} L ${x + 8} ${y + 27} L ${x + 10} ${y + 29} L ${x + 10} ${y + 25} Z`} fill="#fdc623" />
     </g>
   )
 }

@@ -42,6 +42,14 @@ class CreateRoomResponse(BaseModel):
 
 class JoinRoomRequest(BaseModel):
     nickname: str
+    base_type: Optional[int] = None
+    baseType: Optional[int] = None
+    color_pelo: Optional[str] = None
+    colorPelo: Optional[str] = None
+    color_ropa: Optional[str] = None
+    colorRopa: Optional[str] = None
+    tiene_gorro: Optional[bool] = None
+    tieneGorro: Optional[bool] = None
 
 
 class JoinRoomResponse(BaseModel):
@@ -55,3 +63,5 @@ class JoinRoomResponse(BaseModel):
     color_ropa: Optional[str] = "#4A1A1C"
     tiene_gorro: Optional[bool] = False
     modo: str
+    capacidad_aula: Optional[int] = 12
+    modo_infinito: Optional[bool] = False

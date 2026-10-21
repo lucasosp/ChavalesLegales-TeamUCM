@@ -42,11 +42,17 @@ class Room:
                 "id": p.id,
                 "nombre": p.nickname,
                 "seatIndex": p.seat_index,
+                "seat_index": p.seat_index,
                 "avatarTipo": p.avatar_tipo,
+                "avatar_tipo": p.avatar_tipo,
                 "baseType": p.base_type,
+                "base_type": p.base_type,
                 "colorPelo": p.color_pelo,
+                "color_pelo": p.color_pelo,
                 "colorRopa": p.color_ropa,
+                "color_ropa": p.color_ropa,
                 "tieneGorro": p.tiene_gorro,
+                "tiene_gorro": p.tiene_gorro,
                 "score": p.score,
                 "hasAnswered": p.current_answer is not None,
                 "isConnected": p.is_connected,
@@ -121,7 +127,15 @@ class RoomManager:
         clean_pin = pin.replace(" ", "").strip()
         return self.rooms.get(clean_pin)
 
-    async def join_player(self, pin: str, nickname: str) -> Optional[Player]:
+    async def join_player(
+        self,
+        pin: str,
+        nickname: str,
+        base_type: Optional[int] = None,
+        color_pelo: Optional[str] = None,
+        color_ropa: Optional[str] = None,
+        tiene_gorro: Optional[bool] = None,
+    ) -> Optional[Player]:
         room = self.get_room(pin)
         if not room:
             return None
@@ -144,6 +158,10 @@ class RoomManager:
                 nickname=clean_name,
                 seat_index=seat_index,
                 avatar_tipo=avatar_tipo,
+                base_type=int(base_type) if base_type is not None else 1,
+                color_pelo=str(color_pelo) if color_pelo is not None else "#4A2810",
+                color_ropa=str(color_ropa) if color_ropa is not None else "#4A1A1C",
+                tiene_gorro=bool(tiene_gorro) if tiene_gorro is not None else False,
             )
             room.players[player_id] = player
 
