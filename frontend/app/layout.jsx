@@ -1,22 +1,28 @@
 import './globals.css'
-import Header from '../components/Header'
-import Footer from '../components/Footer'
 
 export const metadata = {
-  title: 'Chavales Legales',
-  description: 'Juegos para que niños y niñas aprendan a protegerse en internet: phishing, acoso y deepfakes.',
+  title: 'Chavales Legales · Tu escudo digital',
+  description: 'Aprende ciberseguridad, prevención de ciberacoso y detección de trampas digitales jugando.',
 }
 
-export const viewport = { themeColor: "#2A0A14" }
+export const viewport = {
+  themeColor: '#461020',
+  width: 'device-width',
+  initialScale: 1,
+}
 
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
-      <body>
-        <Header />
-        <main className="wrap">{children}</main>
-        <Footer />
-      </body>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body>{children}</body>
     </html>
   )
 }
