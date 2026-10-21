@@ -166,7 +166,7 @@ narrate(
 
 /* ----------------------------------------------------------------- chapter 1 */
 
-card("chapter1-card", "Capítulo 1", "27 mensajes nuevos", "Martes, 18:42.", "ch1-1");
+card("chapter1-card", "Capítulo 1", "El grupo está hablando de ti", "Martes, 18:42.", "ch1-1");
 
 narrate(
   "ch1-1",
@@ -183,7 +183,7 @@ chat(
     msg("Hugo", "alguien ha visto lo de Sara??", "18:39"),
     msg("Dani", "qué dices", "18:39"),
     msg("Hugo", "jajajaj", "18:40"),
-    system("Contenido no mostrado.", "18:40"),
+    msg("Hugo", "Imagen oculta", "18:40", { hidden: true }),
     msg("Dani", "borra eso tío", "18:41"),
     msg("Hugo", "Mensaje eliminado.", "18:42", { deleted: true }),
   ],
@@ -301,7 +301,7 @@ narrate(
 card(
   "chapter2-card",
   "Capítulo 2",
-  "Ahora te toca a ti",
+  "En tus manos",
   "Hasta ahora has decidido qué hacer cuando algo te ocurre a ti.\nAhora eres la persona que recibe el contenido.",
   "ch2-1",
 );
@@ -319,7 +319,7 @@ chat(
   "Julia",
   [
     msg("Hugo", "mira lo que están pasando por ahí", "19:03"),
-    system("Archivo de contenido sensible oculto.", "19:03"),
+    msg("Hugo", "Imagen oculta", "19:03", { hidden: true }),
     msg("Hugo", "pásaselo a alguien de 4ºA\na ver qué dicen JAJA", "19:04"),
     msg("Julia", "pero esto de dónde ha salido?", "19:04"),
     msg("Hugo", "ni idea\nestá por todos lados", "19:05"),
@@ -417,7 +417,7 @@ narrate("ch2-end", "La historia continúa.", "chapter3-card");
 
 /* ----------------------------------------------------------------- chapter 3 */
 
-card("chapter3-card", "Capítulo 3", "El sitio vacío", "Miércoles, 08:05.", "ch3-1");
+card("chapter3-card", "Capítulo 3", "Alguien que te entiende", "Miércoles, 08:05.", "ch3-1");
 
 narrate(
   "ch3-1",
@@ -580,7 +580,7 @@ branch(
 card(
   "chapter4-card",
   "Capítulo 4",
-  "No sé por dónde empezar",
+  "Romper el silencio",
   "Departamento de Orientación.",
   "ch4-0",
 );
@@ -666,47 +666,19 @@ say(
   "needs-menu",
 );
 
-choice(
-  "needs-menu",
-  "¿Qué necesita Sara? Puedes elegir varias.",
-  [
-    option(
-      "needCompanion",
-      "Que una persona de confianza la acompañe.",
-      "needs-menu",
-      { flags: { needCompanion: true }, when: { not: { flag: "needCompanion" } } },
-    ),
-    option(
-      "needClearLanguage",
-      "Que le expliquen las cosas con palabras sencillas.",
-      "needs-menu",
-      {
-        flags: { needClearLanguage: true },
-        when: { not: { flag: "needClearLanguage" } },
-      },
-    ),
-    option(
-      "needPause",
-      "Poder pedir una pausa cuando esté nerviosa.",
-      "needs-menu",
-      { flags: { needPause: true }, when: { not: { flag: "needPause" } } },
-    ),
-    option(
-      "needProtection",
-      "Saber qué medidas podrían adoptarse para protegerla en el instituto.",
-      "needs-menu",
-      {
-        flags: { needProtection: true },
-        when: { not: { flag: "needProtection" } },
-      },
-    ),
-    option("continue", "Continuar.", "needs-response"),
+nodes["needs-menu"] = {
+  type: "minigame",
+  mode: "support",
+  title: "¿Qué necesita Sara para hablar?",
+  prompt: "Ayuda a Sara a preparar la conversación con Marina. Marca todos los apoyos que quieras y confírmalos juntos. Puedes cambiar tu selección; no es un examen.",
+  cards: [
+    { id: "needCompanion", text: "Que una persona de confianza la acompañe.", flag: "needCompanion", feedback: "Tener apoyo puede hacer más fácil dar el primer paso." },
+    { id: "needClearLanguage", text: "Que le expliquen las cosas con palabras sencillas.", flag: "needClearLanguage", feedback: "Puede preguntar cuando algo no se entienda." },
+    { id: "needPause", text: "Poder pedir una pausa cuando esté nerviosa.", flag: "needPause", feedback: "No necesita contarlo todo de una vez." },
+    { id: "needProtection", text: "Saber cómo pueden protegerla en el instituto.", flag: "needProtection", feedback: "Marina puede explicar qué medidas se pueden valorar en el centro." },
   ],
-  {
-    speaker: "Marina",
-    tone: "narration",
-  },
-);
+  next: "needs-response",
+};
 
 say(
   "needs-response",
@@ -726,8 +698,8 @@ say(
 card(
   "chapter5-card",
   "Capítulo 5",
-  "¿Qué pasa si denuncio?",
-  "Orientación / interfaz interactiva.",
+  "Guardar pruebas sin hacer daño",
+  "Con Marina. Un paso cada vez.",
   "ch5-1",
 );
 
@@ -808,7 +780,7 @@ narrate(
 card(
   "chapter6-card",
   "Capítulo 6",
-  "No es un examen",
+  "Contarlo a tu ritmo",
   "Días después. Una sala tranquila.",
   "ch6-1",
 );
@@ -1192,11 +1164,13 @@ const rights = {
   resources: [
     {
       name: "INCIBE 017",
-      text: "Ayuda en ciberseguridad para menores, familias y centros educativos.",
+      text: "Orientación en ciberseguridad para menores, familias y centros educativos. Este servicio no presenta una denuncia por ti.",
+      url: "https://www.incibe.es/linea-de-ayuda-en-ciberseguridad",
     },
     {
       name: "Canal Prioritario de la AEPD",
-      text: "Solicitud urgente de retirada de contenidos sexuales o violentos cuando proceda.",
+      text: "Recurso para solicitar la retirada urgente de contenido sexual o violento difundido sin permiso cuando existe un riesgo grave. No equivale a presentar una denuncia penal.",
+      url: "https://www.aepd.es/canalprioritario",
     },
     {
       name: "Policía y Fiscalía de Menores",

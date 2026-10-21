@@ -145,3 +145,61 @@ export async function getJuego(modo) {
   throw new Error('No se pudo cargar el juego')
 }
 
+// ============================================================================
+// FUNCIONES DE SALAS MULTIJUGADOR (ESTILO KAHOOT)
+// ============================================================================
+
+export function getApiBaseUrl() {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')
+  }
+  return ''
+}
+
+export async function crearSala(modo = 'juicio', tiempoPregunta = 30) {
+  const base = getApiBaseUrl()
+  const r = await fetch(`${base}/api/salas`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ modo, tiempo_pregunta: tiempoPregunta }),
+  })
+
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({}))
+    throw new Error(err.detail || 'Error al crear la sala')
+  }
+
+  return await r.json()
+}
+
+export async function getInfoSala(pin) {
+  const cleanPin = pin.replace(/\s+/g, '').trim()
+  const base = getApiBaseUrl()
+  const r = await fetch(`${base}/api/salas/${cleanPin}`)
+
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({}))
+    throw new Error(err.detail || 'Sala no encontrada')
+  }
+
+  return await r.json()
+}
+
+export async function unirseASala(pin, nickname) {
+  const cleanPin = pin.replace(/\s+/g, '').trim()
+  const base = getApiBaseUrl()
+  const r = await fetch(`${base}/api/salas/${cleanPin}/join`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nickname }),
+  })
+
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({}))
+    throw new Error(err.detail || 'No se pudo unir a la sala')
+  }
+
+  return await r.json()
+}
+
+

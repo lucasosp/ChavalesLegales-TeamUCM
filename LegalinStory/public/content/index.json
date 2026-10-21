@@ -2,20 +2,6 @@
   "version": 1,
   "stories": [
     {
-      "id": "between-the-lines",
-      "title": "Between the Lines",
-      "subtitle": "A short story about a girl, a poem, and an open door.",
-      "manifest": "stories/between-the-lines/novel.json",
-      "cover": "assets/backgrounds/classroom-dusk.svg"
-    },
-    {
-      "id": "the-locker-note",
-      "title": "The Locker Note",
-      "subtitle": "A side story about a note that was never meant to be read.",
-      "manifest": "stories/the-locker-note/novel.json",
-      "cover": "assets/backgrounds/hallway-dusk.svg"
-    },
-    {
       "id": "no-lo-reenvies",
       "title": "No lo reenvíes",
       "subtitle": "Una novela visual sobre acoso, intimidad y derecho a pedir ayuda.",

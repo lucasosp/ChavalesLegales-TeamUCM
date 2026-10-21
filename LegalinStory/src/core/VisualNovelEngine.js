@@ -201,6 +201,20 @@ export class VisualNovelEngine {
     return true;
   }
 
+  completeActivity(selectedIds) {
+    if (!this.isRunning || this.isFinished || this.currentNode.type !== "minigame") return false;
+    if (!Array.isArray(selectedIds)) return false;
+    const node = this.currentNode;
+    const selected = new Set(selectedIds);
+    if (!selected.size || [...selected].some((id) => !node.cards.some((card) => card.id === id))) return false;
+    if (node.mode !== "support" && !node.cards.every((card) => Boolean(card.correct) === selected.has(card.id))) return false;
+    for (const card of node.cards) {
+      if (card.flag) this.flags[card.flag] = selected.has(card.id);
+    }
+    this.#goTo(node.next);
+    return true;
+  }
+
   /** @param {string} nextId */
   #goTo(nextId) {
     if (!this.story[nextId]) {

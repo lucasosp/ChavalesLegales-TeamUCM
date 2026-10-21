@@ -1,0 +1,49 @@
+"""Modelos de datos y estados para la lógica multijugador estilo Kahoot."""
+from enum import Enum
+from typing import Dict, List, Optional, Any
+from pydantic import BaseModel, Field
+
+
+class RoomState(str, Enum):
+    LOBBY = "LOBBY"
+    QUESTION = "QUESTION"
+    REVEAL = "REVEAL"
+    LEADERBOARD = "LEADERBOARD"
+    FINISHED = "FINISHED"
+
+
+class Player(BaseModel):
+    id: str
+    nickname: str
+    seat_index: int
+    avatar_tipo: int
+    score: int = 0
+    streak: int = 0
+    current_answer: Optional[int] = None
+    answer_time_ms: Optional[int] = None
+    is_connected: bool = True
+
+
+class CreateRoomRequest(BaseModel):
+    modo: str = "general"  # 'general', 'juicio' o 'preguntas'
+    tiempo_pregunta: int = 30  # segundos por defecto
+
+
+class CreateRoomResponse(BaseModel):
+    pin: str
+    host_token: str
+    modo: str
+    total_preguntas: int = 0
+
+
+class JoinRoomRequest(BaseModel):
+    nickname: str
+
+
+class JoinRoomResponse(BaseModel):
+    pin: str
+    player_id: str
+    nickname: str
+    seat_index: int
+    avatar_tipo: int
+    modo: str

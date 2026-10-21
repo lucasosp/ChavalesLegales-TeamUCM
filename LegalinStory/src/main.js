@@ -5,7 +5,6 @@ import {
   resolveCharacterAsset,
 } from "./content/contentLoader.js";
 import { LocalStorageSaveStore } from "./services/saveStores.js";
-import { StorySelector } from "./ui/StorySelector.js";
 import "./styles/main.css";
 
 const root = document.querySelector("#app");
@@ -15,7 +14,7 @@ let app = null;
 let session = 0;
 
 async function init() {
-  showLoading("the library");
+  showLoading("No lo reenvíes");
 
   try {
     index = await loadStoryIndex();
@@ -29,7 +28,7 @@ async function init() {
       history.replaceState({}, "", location.pathname);
       await startStory(requested);
     } else {
-      showLibrary();
+      await startStory(index.stories[0]);
     }
   } catch (error) {
     showError(error, { retry: true });
@@ -41,18 +40,12 @@ function showLibrary() {
   app?.destroy();
   app = null;
 
-  document.title = "LegalinStory — Story Library";
-  history.replaceState({}, "", location.pathname);
-
-  if (!index) {
-    init();
-    return;
+  // When embedded, the host owns navigation. Standalone use returns to the platform.
+  if (window.parent !== window) window.parent.postMessage({ type: "legalinstory:exit" }, location.origin);
+  else {
+    const local = ["localhost", "127.0.0.1"].includes(location.hostname);
+    location.assign(import.meta.env.VITE_PLATFORM_URL || (local ? `${location.protocol}//${location.hostname}:3000/` : "/"));
   }
-
-  new StorySelector(root, {
-    stories: index.stories,
-    onSelect: startStory,
-  });
 }
 
 async function startStory(entry) {
@@ -95,23 +88,23 @@ async function startStory(entry) {
 function showLoading(title) {
   root.innerHTML = `
     <main class="load-screen" aria-busy="true">
-      <p class="library-kicker">Opening</p>
+      <p class="library-kicker">Chavales Legales</p>
       <h1 class="load-title" data-load-title></h1>
       <span class="load-pulse" aria-hidden="true"></span>
     </main>
   `;
-  document.title = `Opening ${title} — LegalinStory`;
+  document.title = `Abriendo ${title} — Chavales Legales`;
   root.querySelector("[data-load-title]").textContent = title;
 }
 
 function showError(error, { retry }) {
   console.error(error);
-  document.title = "Content error — LegalinStory";
+  document.title = "Error al cargar — Chavales Legales";
 
   root.innerHTML = `
     <main class="load-screen">
-      <p class="library-kicker">Content error</p>
-      <h1 class="load-title">The story could not be opened.</h1>
+      <p class="library-kicker">No se ha podido cargar</p>
+      <h1 class="load-title">No hemos podido abrir la historia.</h1>
       <p class="load-message" data-error></p>
       <button class="load-button" type="button" data-retry></button>
     </main>
@@ -121,8 +114,8 @@ function showError(error, { retry }) {
     error instanceof Error ? error.message : String(error);
 
   const button = root.querySelector("[data-retry]");
-  button.textContent = retry ? "Retry" : "Back to library";
-  button.addEventListener("click", () => (retry ? init() : showLibrary()));
+  button.textContent = "Volver a intentar";
+  button.addEventListener("click", () => init());
 }
 
 function preloadCharacterArt(assets) {

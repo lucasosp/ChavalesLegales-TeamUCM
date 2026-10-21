@@ -26,6 +26,8 @@ export class VisualNovelView {
   #minigameComplete = null;
   #minigameCards = [];
   #minigameSelected = new Set();
+  #minigameMode = "information";
+  #minigameChecked = false;
   #rightsVisible = false;
   #rights = null;
 
@@ -80,12 +82,14 @@ export class VisualNovelView {
       panel: root.querySelector("[data-panel]"),
       speaker: root.querySelector("[data-speaker-name]"),
       text: root.querySelector("[data-text]"),
+      announcement: root.querySelector("[data-announcement]"),
       advance: root.querySelector("[data-advance]"),
       choices: root.querySelector("[data-choices]"),
       chat: root.querySelector("[data-chat]"),
       chatTitle: root.querySelector("[data-chat-title]"),
       chatLog: root.querySelector("[data-chat-log]"),
       chatHint: root.querySelector("[data-chat-hint]"),
+      chatSkip: root.querySelector("[data-chat-skip]"),
       interstitial: root.querySelector("[data-interstitial]"),
       interstitialKicker: root.querySelector("[data-interstitial-kicker]"),
       interstitialTitle: root.querySelector("[data-interstitial-title]"),
@@ -141,6 +145,7 @@ export class VisualNovelView {
     this.#clearChoices();
     this.#applyStage(stage);
     this.#setSpeaker(speaker);
+    this.refs.announcement.textContent = `${speaker ? `${speaker}: ` : ""}${text}`;
 
     this.refs.panel.classList.toggle("is-narration", tone === "narration");
     this.refs.panel.classList.toggle("is-thought", tone === "thought");
@@ -159,6 +164,7 @@ export class VisualNovelView {
     this.#awaitingChoice = false;
     this.#applyStage(stage);
     this.#setSpeaker(speaker);
+    this.refs.announcement.textContent = `${speaker ? `${speaker}: ` : ""}${prompt}`;
     this.#clearChoices();
 
     this.refs.panel.classList.toggle("is-narration", tone === "narration");
@@ -208,13 +214,15 @@ export class VisualNovelView {
 
   /* ------------------------------------------------------------ chat scenes */
 
-  showChat({ chatTitle, self, messages }) {
+  showChat({ chatTitle, self, messages, stage }) {
     this.#resetTransientOverlays();
+    this.#applyStage(stage);
     this.refs.panel.hidden = true;
     this.refs.chat.hidden = false;
     this.refs.chatTitle.textContent = chatTitle ?? "Mensajes";
     this.refs.chatLog.replaceChildren();
     this.refs.chatHint.hidden = true;
+    this.refs.chatSkip.hidden = false;
 
     this.#chatSelf = self ?? null;
     this.#chatMessages = Array.isArray(messages) ? messages : [];
@@ -226,10 +234,8 @@ export class VisualNovelView {
       return;
     }
 
-    this.#revealChatMessage();
-    if (this.#chatRevealing) {
-      this.#chatTimer = setInterval(() => this.#revealChatMessage(), 480);
-    }
+    if (this.typewriter.prefersReducedMotion) this.#skipChat();
+    else this.#revealChatMessage();
   }
 
   #revealChatMessage() {
@@ -245,6 +251,10 @@ export class VisualNovelView {
     this.refs.chatLog.scrollTop = this.refs.chatLog.scrollHeight;
 
     if (this.#chatIndex >= this.#chatMessages.length) this.#finishChat();
+    else {
+      const delay = Math.min(4200, Math.max(1400, (message.text?.length ?? 0) * 45));
+      this.#chatTimer = setTimeout(() => this.#revealChatMessage(), delay);
+    }
   }
 
   #skipChat() {
@@ -266,6 +276,7 @@ export class VisualNovelView {
     this.#chatTimer = null;
     this.#chatRevealing = false;
     this.refs.chatHint.hidden = false;
+    this.refs.chatSkip.hidden = true;
   }
 
   #clearChat() {
@@ -310,9 +321,14 @@ export class VisualNovelView {
     const text = document.createElement("p");
     text.className = "chat-text";
     text.textContent = message.hidden
-      ? "Contenido no mostrado."
+      ? "▧ Imagen oculta · contenido privado"
       : message.text ?? "";
     bubble.append(text);
+    if (message.hidden) {
+      const caption = document.createElement("small");
+      caption.textContent = "La imagen no se muestra ni se descarga en esta experiencia.";
+      bubble.append(caption);
+    }
 
     if (message.time) {
       const time = document.createElement("span");
@@ -329,6 +345,7 @@ export class VisualNovelView {
 
   showInterstitial(payload, onComplete) {
     this.#resetTransientOverlays();
+    this.#applyStage(payload.stage);
     this.refs.panel.hidden = true;
     this.#interactionLocked = true;
     this.#interstitialComplete = onComplete;
@@ -356,11 +373,17 @@ export class VisualNovelView {
 
   showMinigame(payload, onComplete) {
     this.#resetTransientOverlays();
+    this.#applyStage(payload.stage);
     this.refs.panel.hidden = true;
     this.#interactionLocked = true;
     this.#minigameComplete = onComplete;
     this.#minigameCards = Array.isArray(payload.cards) ? payload.cards : [];
     this.#minigameSelected = new Set();
+    this.#minigameMode = payload.mode ?? "information";
+    this.#minigameChecked = false;
+    for (const card of this.#minigameCards) {
+      if (card.flag && payload.flags?.[card.flag]) this.#minigameSelected.add(card.id);
+    }
 
     this.refs.minigame.hidden = false;
     this.refs.minigame.setAttribute("aria-hidden", "false");
@@ -370,7 +393,10 @@ export class VisualNovelView {
     this.refs.minigameFeedback.replaceChildren();
     this.refs.minigameContinue.hidden = true;
     this.refs.minigameCheck.hidden = false;
+    this.refs.minigameCheck.textContent = this.#minigameMode === "support" ? "Confirmar apoyos" : "Comprobar selección";
+    this.refs.minigameCheck.disabled = this.#minigameSelected.size === 0;
     this.#renderMinigameCards();
+    this.refs.minigameCards.querySelector("button")?.focus({ preventScroll: true });
   }
 
   #renderMinigameCards() {
@@ -381,12 +407,13 @@ export class VisualNovelView {
       button.type = "button";
       button.className = "minigame-option";
       button.dataset.cardId = card.id;
-      button.setAttribute("aria-pressed", "false");
+      button.setAttribute("aria-pressed", String(this.#minigameSelected.has(card.id)));
+      button.classList.toggle("is-selected", this.#minigameSelected.has(card.id));
 
       const marker = document.createElement("span");
       marker.className = "minigame-marker";
       marker.setAttribute("aria-hidden", "true");
-      marker.textContent = "○";
+      marker.textContent = this.#minigameSelected.has(card.id) ? "✓" : "○";
 
       const label = document.createElement("span");
       label.className = "minigame-label";
@@ -403,8 +430,12 @@ export class VisualNovelView {
           this.#minigameSelected.add(card.id);
           button.classList.add("is-selected");
           button.setAttribute("aria-pressed", "true");
-          marker.textContent = "●";
+          marker.textContent = "✓";
         }
+        this.#minigameChecked = false;
+        this.refs.minigameFeedback.hidden = true;
+        this.refs.minigameContinue.hidden = true;
+        this.refs.minigameCheck.disabled = this.#minigameSelected.size === 0;
       });
 
       this.refs.minigameCards.append(button);
@@ -412,6 +443,8 @@ export class VisualNovelView {
   }
 
   #checkMinigame() {
+    if (!this.#minigameSelected.size) return;
+    const support = this.#minigameMode === "support";
     const allCorrect = this.#minigameCards.every(
       (card) => Boolean(card.correct) === this.#minigameSelected.has(card.id),
     );
@@ -420,31 +453,39 @@ export class VisualNovelView {
     feedback.replaceChildren();
 
     const summary = document.createElement("p");
-    summary.className = allCorrect ? "is-good" : "is-bad";
-    summary.textContent = allCorrect
+    summary.className = support || allCorrect ? "is-good" : "is-bad";
+    summary.textContent = support
+      ? "Estos apoyos pueden ayudarte a hablar con más tranquilidad. No hay una respuesta única y puedes pedir otros más adelante."
+      : allCorrect
       ? "Bien. Esa información puede ayudar sin crear nuevas copias del contenido."
       : "Revisa las tarjetas. No necesitas descargar ni reenviar el contenido para pedir ayuda.";
     feedback.append(summary);
 
     for (const card of this.#minigameCards) {
+      const selected = this.#minigameSelected.has(card.id);
+      if (support && !selected) continue;
       const line = document.createElement("p");
-      line.className = card.correct ? "is-good" : "is-bad";
-      line.textContent = `${card.correct ? "✔" : "✘"} ${card.feedback ?? ""}`;
+      const matched = support || Boolean(card.correct) === selected;
+      line.className = matched ? "is-good" : "is-bad";
+      line.textContent = `${support ? "✓" : selected ? "Seleccionada:" : "Sin seleccionar:"} ${card.text} — ${card.feedback ?? ""}`;
       feedback.append(line);
     }
 
     feedback.hidden = false;
-    this.refs.minigameContinue.hidden = false;
+    this.#minigameChecked = support || allCorrect;
+    this.refs.minigameContinue.hidden = !this.#minigameChecked;
+    feedback.scrollIntoView?.({ block: "nearest", behavior: "instant" });
   }
 
   #completeMinigame() {
+    if (!this.#minigameChecked) return;
     const complete = this.#minigameComplete;
     this.#minigameComplete = null;
     this.refs.minigame.hidden = true;
     this.refs.minigame.setAttribute("aria-hidden", "true");
     this.refs.panel.hidden = false;
     this.#interactionLocked = false;
-    complete?.();
+    complete?.([...this.#minigameSelected]);
   }
 
   /* --------------------------------------------------------------- rights */
@@ -480,6 +521,14 @@ export class VisualNovelView {
         const name = document.createElement("strong");
         name.textContent = resource.name ?? "";
         item.append(name, document.createTextNode(` — ${resource.text ?? ""}`));
+        if (resource.url?.startsWith("https://")) {
+          const link = document.createElement("a");
+          link.href = resource.url;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = ` Abrir ${resource.name} (nueva pestaña)`;
+          item.append(link);
+        }
         list.append(item);
       }
 
@@ -528,6 +577,12 @@ export class VisualNovelView {
   }
 
   #resetTransientOverlays() {
+    this.refs.announcement.textContent = "";
+    this.typewriter.stop();
+    this.#clearChoices();
+    this.#awaitingChoice = false;
+    this.#leaveEnding();
+    this.refs.advance.hidden = true;
     this.#clearChat();
     this.refs.interstitial.hidden = true;
     this.refs.interstitial.setAttribute("aria-hidden", "true");
@@ -546,6 +601,9 @@ export class VisualNovelView {
   /* ------------------------------------------------------------------ helpers */
 
   #bindEvents() {
+    this.refs.advance.addEventListener("click", () => this.onAdvance());
+    this.refs.chatHint.addEventListener("click", () => this.onAdvance());
+    this.refs.chatSkip.addEventListener("click", () => this.#skipChat());
     this.refs.scene.addEventListener("click", (event) => {
       if (event.target.closest("button")) return;
       if (this.#interactionLocked || this.#rightsVisible) return;
@@ -587,6 +645,20 @@ export class VisualNovelView {
   }
 
   #handleKeyDown(event) {
+    if (event.repeat) return;
+    if (this.#rightsVisible && event.key === "Tab") {
+      const controls = [...this.refs.rights.querySelectorAll("a, button")];
+      const first = controls[0];
+      const last = controls.at(-1);
+      if (event.shiftKey && (document.activeElement === first || !this.refs.rights.contains(document.activeElement))) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !this.refs.rights.contains(document.activeElement))) {
+        event.preventDefault();
+        first?.focus();
+      }
+      return;
+    }
     if (event.key === "Escape" && this.#rightsVisible) {
       event.preventDefault();
       this.#closeRights();

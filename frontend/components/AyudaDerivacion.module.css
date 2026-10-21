@@ -1,0 +1,55 @@
+.page { min-height: 100vh; padding: 1.5rem 1rem 4rem; background: radial-gradient(circle at top right, #065f46, #022c22 58%); color: #fff; }
+.container { width: min(100%, 850px); margin: 0 auto; }
+.homeLink { display: inline-flex; min-height: 44px; align-items: center; color: #d1fae5; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.intro { margin: 1.5rem 0 2rem; }
+.eyebrow { color: #047857; font-size: .82rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.intro .eyebrow { color: #fde68a; }
+.intro h1 { font-size: clamp(2.2rem, 7vw, 3.5rem); line-height: 1.1; margin: .5rem 0 1rem; }
+.intro p:last-child { color: #ecfdf5; max-width: 65ch; font-size: 1.05rem; line-height: 1.6; }
+.flow { display: grid; gap: 1.2rem; }
+.emergencyStrip { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.1rem 1.25rem; border-radius: 18px; background: #fff7ed; color: #7c2d12; border: 2px solid #fdba74; line-height: 1.5; }
+.emergencyStrip strong { display: block; font-size: 1.1rem; }
+.emergencyActions { display: flex; gap: .65rem; flex-wrap: wrap; flex-shrink: 0; }
+.emergencyActions a, .emergencyActions button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: .55rem .85rem; border-radius: 10px; border: 2px solid #9a3412; background: #9a3412; color: #fff; font-size: .94rem; font-weight: 800; text-decoration: none; cursor: pointer; }
+.emergencyActions button { background: #fff; color: #7c2d12; }
+.panel { padding: clamp(1.25rem, 4vw, 2.2rem); border-radius: 22px; background: #fff; color: #17332b; box-shadow: 0 16px 45px #00150f66; }
+.panel h2 { font-size: clamp(1.5rem, 4.5vw, 2rem); line-height: 1.2; margin: .5rem 0 .8rem; }
+.panel p { line-height: 1.55; }
+.options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; margin: 1.4rem 0; }
+.option, .selectedOption { min-height: 65px; padding: .85rem 1rem; text-align: left; border: 2px solid #bbd5ca; border-radius: 13px; background: #f7fbf9; color: #17332b; font-weight: 750; font-size: 1rem; cursor: pointer; }
+.selectedOption { border-color: #047857; background: #d1fae5; box-shadow: inset 5px 0 #047857; }
+.checkRow { display: flex; align-items: flex-start; gap: .7rem; margin: 1rem 0; padding: .8rem; border-radius: 12px; background: #eff8f3; line-height: 1.4; cursor: pointer; }
+.checkRow input { width: 20px; height: 20px; flex-shrink: 0; accent-color: #047857; }
+.question { margin: 1.25rem 0; padding: 1rem; border: 1px solid #b8d4c8; border-radius: 12px; }
+.question legend { padding: 0 .35rem; font-weight: 750; line-height: 1.4; }
+.radioRow { display: flex; gap: .65rem; flex-wrap: wrap; }
+.radioRow label { display: inline-flex; align-items: center; min-height: 44px; gap: .35rem; padding: .45rem .75rem; border-radius: 9px; background: #eef8f2; cursor: pointer; }
+.radioRow input { width: 17px; height: 17px; accent-color: #047857; }
+.actions { display: flex; flex-wrap: wrap; gap: .7rem; margin-top: 1.5rem; }
+.actions button, .primaryLink, .secondaryLink, .phoneLink { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: .65rem 1rem; border-radius: 11px; font-size: 1rem; font-weight: 800; text-decoration: none; cursor: pointer; }
+.mainButton, .primaryLink { border: 2px solid #047857; background: #047857; color: #fff; }
+.dangerButton { border: 2px solid #9a3412; background: #9a3412; color: #fff; }
+.backButton, .resetButton, .secondaryLink { border: 2px solid #047857; background: #fff; color: #065f46; }
+.phoneLink { border: 2px solid #b45309; background: #fffbeb; color: #78350f; }
+.error { margin-top: .75rem; color: #991b1b; font-weight: 700; }
+.urgentText { padding: 1rem; margin: 1rem 0; border-radius: 12px; background: #fff7ed; color: #7c2d12; font-weight: 800; }
+.urgentText a { color: inherit; }
+.primaryCard, .resourceCard { display: grid; gap: .65rem; margin-top: 1.2rem; padding: 1.25rem; border: 2px solid #a7d5bd; border-radius: 16px; background: #f6fbf8; }
+.primaryCard { border-color: #047857; }
+.primaryCard h2, .resourceCard h2 { margin: 0; }
+.primaryCard p, .resourceCard p { margin: 0; }
+.kind { font-size: .9rem; color: #365d4b; font-weight: 700; }
+.primaryCard a, .resourceCard a { justify-self: start; }
+.additional { display: grid; gap: .15rem; margin-top: 1.6rem; }
+.additional h3 { font-size: 1.35rem; }
+.privacy { color: #e2f5ea; font-size: .94rem; line-height: 1.55; }
+.page :is(button, a, input):focus-visible { outline: 3px solid #fbbf24; outline-offset: 3px; }
+.panel :is(button, a, input):focus-visible { outline-color: #9a3412; }
+@media (max-width: 650px) {
+  .page { padding: 1rem .8rem 3rem; }
+  .emergencyStrip { align-items: stretch; flex-direction: column; }
+  .emergencyActions { flex-direction: column; }
+  .options { grid-template-columns: 1fr; }
+  .actions button { flex: 1 1 100%; }
+  .primaryCard a, .resourceCard a { justify-self: stretch; text-align: center; }
+}
