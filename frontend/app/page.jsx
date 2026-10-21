@@ -2,15 +2,19 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import SalaEsperaAlumnos from '../components/SalaEsperaAlumnos'
 
 export default function Home() {
   const [pin, setPin] = useState('')
+  const [enSalaEspera, setEnSalaEspera] = useState(false)
+
+  if (enSalaEspera) {
+    return <SalaEsperaAlumnos pin={pin || '734 912'} onVolver={() => setEnSalaEspera(false)} />
+  }
 
   const handlePinSubmit = (e) => {
     e.preventDefault()
-    if (pin.trim()) {
-      window.location.href = `/historia?pin=${encodeURIComponent(pin.trim())}`
-    }
+    setEnSalaEspera(true)
   }
 
   return (
